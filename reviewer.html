@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reviewer & Inspection Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col" x-data="reviewerApp()">
+
+    <!-- Header -->
+    <header class="bg-indigo-700 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold tracking-tight">👑 Reviewer & Inspection Portal</h1>
+            <div class="flex items-center gap-2 text-sm">
+                <button @click="showOnboarding = !showOnboarding" class="bg-indigo-600 hover:bg-indigo-500 px-3 py-1.5 rounded font-medium transition" x-text="showOnboarding ? 'Close Directory' : 'Manage Teachers'"></button>
+                <button @click="exportData()" class="bg-indigo-600 hover:bg-indigo-500 px-3 py-1.5 rounded font-medium transition">Backup All</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full space-y-6">
+
+        <!-- Onboarding Panel -->
+        <section x-show="showOnboarding" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+            <h2 class="text-lg font-semibold text-indigo-900 mb-4">Teacher Onboarding Directory</h2>
+            <form @submit.prevent="registerTeacher" class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Full Name</label>
+                    <input type="text" x-model="teacherForm.name" required class="w-full rounded border-slate-300 border px-3 py-1.5 text-sm" placeholder="e.g. Felix Fleku">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Unique Staff ID</label>
+                    <input type="text" x-model="teacherForm.id" required class="w-full rounded border-slate-300 border px-3 py-1.5 text-sm" placeholder="e.g. GES-0543">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Phone Contact</label>
+                    <input type="text" x-model="teacherForm.contact" required class="w-full rounded border-slate-300 border px-3 py-1.5 text-sm" placeholder="0543521863">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Assigned Subjects</label>
+                    <input type="text" x-model="teacherForm.subjects" required class="w-full rounded border-slate-300 border px-3 py-1.5 text-sm" placeholder="Computing, Social Studies">
+                </div>
+                <div class="flex items-end">
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-1.5 px-4 rounded transition">Save Teacher</button>
+                </div>
+            </form>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm border-collapse">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-700 text-xs uppercase">
+                            <th class="p-3">Staff ID</th>
+                            <th class="p-3">Name</th>
+                            <th class="p-3">Contact</th>
+                            <th class="p-3">Subjects</th>
+                            <th class="p-3 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200">
+                        <template x-for="t in teachers" :key="t.id">
+                            <tr>
+                                <td class="p-3 font-mono font-semibold text-indigo-700" x-text="t.id"></td>
+                                <td class="p-3 font-medium" x-text="t.name"></td>
+                                <td class="p-3 text-slate-600" x-text="t.contact"></td>
+                                <td class="p-3 text-slate-600" x-text="t.subjects"></td>
+                                <td class="p-3 text-right">
+                                    <button @click="deleteTeacher(t.id)" class="text-rose-600 hover:text-rose-800 text-xs font-medium">Remove</button>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Metrics Bar -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <div class="text-xs font-semibold text-slate-500 uppercase">Active Queue Records</div>
+                <div class="text-2xl font-bold text-indigo-900 mt-1" x-text="activeLessons.length"></div>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <div class="text-xs font-semibold text-slate-500 uppercase">Archived Records (>7 Days)</div>
+                <div class="text-2xl font-bold text-slate-600 mt-1" x-text="archivedLessons.length"></div>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <div class="text-xs font-semibold text-slate-500 uppercase">Approved Plans</div>
+                <div class="text-2xl font-bold text-emerald-600 mt-1" x-text="lessons.filter(l => l.status === 'Approved').length"></div>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between">
+                <div class="text-xs font-semibold text-rose-600 uppercase">Lagging Teachers Alert</div>
+                <div class="flex items-center justify-between mt-1">
+                    <span class="text-2xl font-bold text-rose-700" x-text="laggingTeachers.length"></span>
+                    <button @click="triggerLaggingAlerts()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-2 py-1 rounded font-medium transition">Trigger Alert</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Vetting Management Panel -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 border-b border-slate-100 pb-4">
+                <div class="flex gap-2">
+                    <button @click="adminSubTab = 'queue'" :class="adminSubTab === 'queue' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700'" class="px-4 py-2 rounded-lg text-xs font-semibold transition">Vetting Queue</button>
+                    <button @click="adminSubTab = 'history'" :class="adminSubTab === 'history' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700'" class="px-4 py-2 rounded-lg text-xs font-semibold transition">General Teachers History</button>
+                    <button @click="adminSubTab = 'archive'" :class="adminSubTab === 'archive' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700'" class="px-4 py-2 rounded-lg text-xs font-semibold transition">Inspection Archive</button>
+                </div>
+                <input type="text" x-model="adminSearchQuery" placeholder="Search teacher or subject..." class="rounded-lg border-slate-300 border px-3 py-1.5 text-sm w-full md:w-64">
+            </div>
+
+            <!-- TAB 1: Vetting Queue -->
+            <div x-show="adminSubTab === 'queue'" class="space-y-4 max-h-[550px] overflow-y-auto">
+                <template x-for="lesson in adminFilteredActiveLessons" :key="lesson.id">
+                    <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div class="space-y-1 flex-grow">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="bg-indigo-100 text-indigo-800 text-xs font-semibold px-2 py-0.5 rounded" x-text="lesson.subject"></span>
+                                <span class="bg-slate-200 text-slate-700 text-xs px-2 py-0.5 rounded" x-text="lesson.classLevel"></span>
+                                <span class="bg-indigo-50 text-indigo-700 text-xs font-medium px-2 py-0.5 rounded" x-text="lesson.week + ' (' + lesson.year + ')'"></span>
+                                <span class="text-xs font-semibold text-indigo-900 bg-white px-2 py-0.5 rounded border border-slate-200" x-text="'Teacher: ' + lesson.teacherName + ' (' + lesson.teacherId + ')'"></span>
+                                <span class="text-xs font-bold px-2 py-0.5 rounded-full" 
+                                      :class="{
+                                          'bg-amber-100 text-amber-800': lesson.status === 'Submitted',
+                                          'bg-emerald-100 text-emerald-800': lesson.status === 'Approved',
+                                          'bg-rose-100 text-rose-800': lesson.status === 'Rejected' || lesson.status === 'Changes Requested'
+                                      }" 
+                                      x-text="lesson.status">
+                                </span>
+                            </div>
+                            <div class="text-xs pt-2">
+                                <a :href="lesson.fileData" :download="lesson.fileName" class="text-indigo-600 hover:underline font-semibold inline-flex items-center gap-1 bg-white p-2 rounded border border-indigo-100">
+                                    📥 Download Document: <span x-text="lesson.fileName"></span>
+                                </a>
+                            </div>
+                            <div x-show="lesson.feedback" class="text-xs text-rose-700 bg-rose-50 p-2 rounded border border-rose-100 mt-1">
+                                <strong>Feedback:</strong> <span x-text="lesson.feedback"></span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-2 shrink-0">
+                            <button @click="reviewAction(lesson, 'Approved')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded font-medium">Approve</button>
+                            <button @click="reviewAction(lesson, 'Changes Requested')" class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-3 py-1.5 rounded font-medium">Request Changes</button>
+                            <button @click="reviewAction(lesson, 'Rejected')" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded font-medium">Reject</button>
+                        </div>
+                    </div>
+                </template>
+                <div x-show="adminFilteredActiveLessons.length === 0" class="text-center py-8 text-slate-400 text-sm">No submissions in queue.</div>
+            </div>
+
+            <!-- TAB 2: General History -->
+            <div x-show="adminSubTab === 'history'" class="space-y-4 max-h-[550px] overflow-y-auto">
+                <table class="w-full text-left text-sm border-collapse">
+                   <thead>
+                       <tr class="bg-slate-100 text-slate-700 text-xs uppercase">
+                           <th class="p-3">Staff ID & Name</th>
+                           <th class="p-3">Contact</th>
+                           <th class="p-3">Subject & Class</th>
+                           <th class="p-3">Week / Year</th>
+                           <th class="p-3">Status</th>
+                           <th class="p-3">File</th>
+                           <th class="p-3 text-right">Action</th>
+                       </tr>
+                   </thead>
+                   <tbody class="divide-y divide-slate-200">
+                       <template x-for="lesson in adminFilteredAllLessons" :key="lesson.id">
+                           <tr>
+                               <td class="p-3"><div class="font-medium text-slate-900" x-text="lesson.teacherName"></div><div class="text-xs font-mono text-indigo-700" x-text="lesson.teacherId"></div></td>
+                               <td class="p-3 text-slate-600 text-xs" x-text="lesson.teacherContact"></td>
+                               <td class="p-3 text-xs"><span class="font-semibold" x-text="lesson.subject"></span> (<span x-text="lesson.classLevel"></span>)</td>
+                               <td class="p-3 text-xs text-slate-600" x-text="lesson.week + ' ' + lesson.year"></td>
+                               <td class="p-3"><span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="{'bg-amber-100 text-amber-800': lesson.status === 'Submitted', 'bg-emerald-100 text-emerald-800': lesson.status === 'Approved', 'bg-rose-100 text-rose-800': lesson.status === 'Rejected' || lesson.status === 'Changes Requested'}" x-text="lesson.status"></span></td>
+                               <td class="p-3"><a :href="lesson.fileData" :download="lesson.fileName" class="text-indigo-600 text-xs hover:underline font-medium">📥 <span x-text="lesson.fileName"></span></a></td>
+                               <td class="p-3 text-right"><button @click="deleteLesson(lesson.id)" class="text-rose-600 hover:text-rose-800 text-xs font-medium">Delete</button></td>
+                           </tr>
+                       </template>
+                   </tbody>
+                </table>
+            </div>
+
+            <!-- TAB 3: Archive -->
+            <div x-show="adminSubTab === 'archive'" class="space-y-4 max-h-[550px] overflow-y-auto">
+                <template x-for="lesson in archivedLessons" :key="lesson.id">
+                    <div class="border border-slate-200 rounded-xl p-3 bg-slate-50 flex justify-between items-center text-xs">
+                        <div>
+                            <span class="font-bold text-indigo-900" x-text="lesson.teacherName + ' (' + lesson.teacherId + ')'"></span> — <span x-text="lesson.subject + ' | ' + lesson.week + ' ' + lesson.year"></span>
+                            <a :href="lesson.fileData" :download="lesson.fileName" class="text-indigo-600 font-semibold ml-2 underline">📎 <span x-text="lesson.fileName"></span></a>
+                        </div>
+                        <button @click="restoreFromArchive(lesson.id)" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded font-medium">Restore</button>
+                    </div>
+                </template>
+                <div x-show="archivedLessons.length === 0" class="text-center py-8 text-slate-400 text-sm">No archived records.</div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function reviewerApp() {
+            return {
+                showOnboarding: false,
+                adminSubTab: 'queue',
+                teachers: JSON.parse(localStorage.getItem('school_teachers_v5') || '[]'),
+                lessons: JSON.parse(localStorage.getItem('school_lessons_v7') || '[]'),
+                adminSearchQuery: '',
+                teacherForm: { name: '', id: '', contact: '', subjects: '' },
+
+                registerTeacher() {
+                    const id = this.teacherForm.id.trim();
+                    if (this.teachers.some(t => t.id === id)) { alert('Staff ID exists.'); return; }
+                    this.teachers.push({ ...this.teacherForm, id });
+                    localStorage.setItem('school_teachers_v5', JSON.stringify(this.teachers));
+                    this.teacherForm = { name: '', id: '', contact: '', subjects: '' };
+                    alert('Teacher registered!');
+                },
+
+                deleteTeacher(id) {
+                    if (confirm('Remove teacher?')) {
+                        this.teachers = this.teachers.filter(t => t.id !== id);
+                        localStorage.setItem('school_teachers_v5', JSON.stringify(this.teachers));
+                    }
+                },
+
+                reviewAction(lesson, newStatus) {
+                    const comment = prompt('Enter review feedback:', lesson.feedback || '');
+                    if (comment !== null) {
+                        lesson.status = newStatus;
+                        lesson.feedback = comment;
+                        localStorage.setItem('school_lessons_v7', JSON.stringify(this.lessons));
+                    }
+                },
+
+                deleteLesson(id) {
+                    if (confirm('Delete record?')) {
+                        this.lessons = this.lessons.filter(l => l.id !== id);
+                        localStorage.setItem('school_lessons_v7', JSON.stringify(this.lessons));
+                    }
+                },
+
+                restoreFromArchive(id) {
+                    const l = this.lessons.find(item => item.id === id);
+                    if (l) {
+                        l.isArchived = false;
+                        localStorage.setItem('school_lessons_v7', JSON.stringify(this.lessons));
+                        alert('Restored to active queue!');
+                    }
+                },
+
+                get activeLessons() { return this.lessons.filter(l => !l.isArchived); },
+                get archivedLessons() { return this.lessons.filter(l => l.isArchived); },
+                get laggingTeachers() {
+                    const submittedIds = new Set(this.activeLessons.map(l => l.teacherId));
+                    return this.teachers.filter(t => !submittedIds.has(t.id));
+                },
+                get adminFilteredActiveLessons() {
+                    const q = this.adminSearchQuery.toLowerCase();
+                    return this.activeLessons.filter(l => !q || l.teacherName.toLowerCase().includes(q) || l.subject.toLowerCase().includes(q));
+                },
+                get adminFilteredAllLessons() {
+                    const q = this.adminSearchQuery.toLowerCase();
+                    return this.lessons.filter(l => !q || l.teacherName.toLowerCase().includes(q) || l.subject.toLowerCase().includes(q));
+                },
+                triggerLaggingAlerts() {
+                    if (this.laggingTeachers.length === 0) { alert('All teachers submitted!'); return; }
+                    alert('Lags detected:\n' + this.laggingTeachers.map(t => `${t.name} (${t.contact})`).join('\n'));
+                },
+                exportData() {
+                    const backup = { teachers: this.teachers, lessons: this.lessons };
+                    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = 'school_backup.json';
+                    a.click();
+                }
+            }
+        }
+    </script>
+</body>
+</html>

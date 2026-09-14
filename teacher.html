@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Lesson Plan Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col" x-data="teacherApp()">
+
+    <!-- Header -->
+    <header class="bg-indigo-700 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <h1 class="text-xl font-bold tracking-tight">📚 Teacher Portal</h1>
+                <span class="bg-indigo-800 text-indigo-100 text-xs px-3 py-1 rounded-full font-medium border border-indigo-600" 
+                      x-text="'Active: ' + (activeTeacher ? activeTeacher.name + ' (' + activeTeacher.id + ')' : 'Select Profile')">
+                </span>
+            </div>
+
+            <!-- Profile Selector -->
+            <div class="flex items-center gap-3 text-sm">
+                <label class="text-xs text-indigo-200">Switch Profile:</label>
+                <select x-model="selectedTeacherId" @change="saveActiveSession()" class="bg-indigo-800 text-white border border-indigo-600 rounded-lg px-3 py-1.5 text-xs focus:outline-none">
+                    <template x-for="t in teachers" :key="t.id">
+                        <option :value="t.id" x-text="t.name + ' (' + t.id + ')'"></option>
+                    </template>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Left Column: Metrics & Upload Form -->
+        <div class="space-y-6 lg:col-span-1">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-base font-bold text-indigo-900 mb-3">My Performance Metrics</h2>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between bg-slate-50 p-2 rounded">
+                        <span class="text-slate-600">Total Submissions:</span>
+                        <span class="font-bold text-indigo-900" x-text="teacherFilteredLessons.length"></span>
+                    </div>
+                    <div class="flex justify-between bg-slate-50 p-2 rounded">
+                        <span class="text-slate-600">Approved Plans:</span>
+                        <span class="font-bold text-emerald-600" x-text="teacherFilteredLessons.filter(l => l.status === 'Approved').length"></span>
+                    </div>
+                    <div class="flex justify-between bg-slate-50 p-2 rounded">
+                        <span class="text-slate-600">Pending / Revisions:</span>
+                        <span class="font-bold text-amber-600" x-text="teacherFilteredLessons.filter(l => l.status !== 'Approved').length"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-lg font-semibold mb-1 text-indigo-900" x-text="editingId ? 'Update Lesson Plan' : 'Submit Prepared Plan'"></h2>
+                <p class="text-xs text-slate-500 mb-4" x-text="'Staff ID: ' + (activeTeacher ? activeTeacher.id : '')"></p>
+                
+                <form @submit.prevent="submitLessonFile" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700 mb-1">Subject</label>
+                        <select x-model="form.subject" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm">
+                            <option value="">Select subject...</option>
+                            <template x-for="subj in activeTeacherSubjects" :key="subj">
+                                <option :value="subj" x-text="subj"></option>
+                            </template>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700 mb-1">Class Level</label>
+                        <input type="text" x-model="form.classLevel" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="e.g. JHS 2">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-700 mb-1">Week</label>
+                            <select x-model="form.week" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm">
+                                <option value="">Select week...</option>
+                                <template x-for="w in 15" :key="w">
+                                    <option :value="'Week ' + w" x-text="'Week ' + w"></option>
+                                </template>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-700 mb-1">Year</label>
+                            <select x-model="form.year" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm">
+                                <option value="2026">2026</option>
+                                <option value="2027">2027</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700 mb-1">Upload Document (Word / PDF)</label>
+                        <input type="file" @change="handleFileUpload($event)" accept=".pdf,.doc,.docx" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700">
+                        <span class="text-xs text-emerald-600 mt-1 block font-medium" x-show="form.fileName" x-text="'Attached: ' + form.fileName"></span>
+                    </div>
+
+                    <div class="flex space-x-2 pt-2">
+                        <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg text-sm transition" x-text="editingId ? 'Update' : 'Submit'"></button>
+                        <button type="button" @click="resetForm()" x-show="editingId" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium py-2 px-4 rounded-lg text-sm">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Right Column: Submission History -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-2 flex flex-col">
+            <h2 class="text-lg font-semibold text-indigo-900 mb-4">My Submitted Lesson Plans</h2>
+
+            <div class="space-y-4 flex-grow overflow-y-auto max-h-[600px]">
+                <template x-for="lesson in teacherFilteredLessons" :key="lesson.id">
+                    <div class="border border-slate-200 rounded-xl p-4 bg-white flex flex-col justify-between hover:shadow-sm transition">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="bg-indigo-100 text-indigo-800 text-xs font-semibold px-2 py-0.5 rounded" x-text="lesson.subject"></span>
+                                    <span class="bg-slate-100 text-slate-700 text-xs px-2 py-0.5 rounded" x-text="lesson.classLevel"></span>
+                                    <span class="bg-indigo-50 text-indigo-700 text-xs font-medium px-2 py-0.5 rounded" x-text="lesson.week + ' (' + lesson.year + ')'"></span>
+                                </div>
+                                <span class="text-xs font-bold px-2.5 py-0.5 rounded-full" 
+                                      :class="{
+                                          'bg-amber-100 text-amber-800': lesson.status === 'Submitted',
+                                          'bg-emerald-100 text-emerald-800': lesson.status === 'Approved',
+                                          'bg-rose-100 text-rose-800': lesson.status === 'Rejected' || lesson.status === 'Changes Requested'
+                                      }" 
+                                      x-text="lesson.status">
+                                </span>
+                            </div>
+
+                            <div class="text-xs my-2 bg-slate-50 p-2.5 rounded border border-slate-200 flex justify-between items-center">
+                                <a :href="lesson.fileData" :download="lesson.fileName" class="text-indigo-600 hover:underline font-semibold flex items-center gap-1">
+                                    📎 <span x-text="lesson.fileName"></span>
+                                </a>
+                                <span class="text-slate-400 text-[10px]" x-text="'Submitted: ' + lesson.timestamp"></span>
+                            </div>
+
+                            <div x-show="lesson.feedback" class="bg-rose-50 border border-rose-200 p-2 rounded text-xs text-rose-900 mb-2">
+                                <strong>Reviewer Feedback:</strong> <span x-text="lesson.feedback"></span>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end space-x-3 border-t border-slate-100 pt-2 text-xs">
+                            <button @click="editSubmission(lesson)" class="text-indigo-600 hover:text-indigo-800 font-medium" x-show="lesson.status !== 'Approved'">Update File</button>
+                            <button @click="deleteLesson(lesson.id)" class="text-rose-600 hover:text-rose-800 font-medium">Delete</button>
+                        </div>
+                    </div>
+                </template>
+
+                <div x-show="teacherFilteredLessons.length === 0" class="text-center py-12 text-slate-400 text-sm">
+                    <p>No lesson submissions found.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function teacherApp() {
+            const defaultTeachers = [
+                { id: 'GES-0543', name: 'Felix Fleku', contact: '0543521863', subjects: 'Computing, Social Studies' }
+            ];
+
+            let teachers = JSON.parse(localStorage.getItem('school_teachers_v5')) || defaultTeachers;
+            let savedSession = localStorage.getItem('active_teacher_id') || teachers[0]?.id;
+
+            return {
+                teachers: teachers,
+                selectedTeacherId: savedSession,
+                lessons: JSON.parse(localStorage.getItem('school_lessons_v7') || '[]'),
+                editingId: null,
+                form: { subject: '', classLevel: '', week: '', year: '2026', fileName: '', fileData: '', status: 'Submitted', feedback: '' },
+
+                saveActiveSession() {
+                    localStorage.setItem('active_teacher_id', this.selectedTeacherId);
+                },
+
+                get activeTeacher() {
+                    return this.teachers.find(t => t.id === this.selectedTeacherId);
+                },
+
+                get activeTeacherSubjects() {
+                    if (!this.activeTeacher || !this.activeTeacher.subjects) return [];
+                    return this.activeTeacher.subjects.split(',').map(s => s.trim()).filter(Boolean);
+                },
+
+                handleFileUpload(event) {
+                    const file = event.target.files[0];
+                    if (!file) return;
+                    this.form.fileName = file.name;
+                    const reader = new FileReader();
+                    reader.onload = (e) => { this.form.fileData = e.target.result; };
+                    reader.readAsDataURL(file);
+                },
+
+                submitLessonFile() {
+                    const t = this.activeTeacher;
+                    if (!t) return;
+                    if (!this.form.fileName && !this.editingId) {
+                        alert('Please attach your Word or PDF lesson plan document.');
+                        return;
+                    }
+
+                    if (this.editingId) {
+                        const index = this.lessons.findIndex(l => l.id === this.editingId);
+                        if (index !== -1) {
+                            this.lessons[index] = { ...this.lessons[index], ...this.form, status: 'Submitted', timestamp: new Date().toLocaleDateString() };
+                        }
+                    } else {
+                        const newPlan = {
+                            ...this.form,
+                            id: Date.now().toString(),
+                            rawDate: Date.now(),
+                            teacherId: t.id,
+                            teacherName: t.name,
+                            teacherContact: t.contact,
+                            timestamp: new Date().toLocaleDateString(),
+                            isArchived: false,
+                            feedback: ''
+                        };
+                        this.lessons.unshift(newPlan);
+                    }
+                    localStorage.setItem('school_lessons_v7', JSON.stringify(this.lessons));
+                    this.resetForm();
+                    alert('Lesson plan successfully submitted!');
+                },
+
+                editSubmission(lesson) {
+                    this.editingId = lesson.id;
+                    this.form = { ...lesson };
+                },
+
+                deleteLesson(id) {
+                    if (confirm('Delete this submission?')) {
+                        this.lessons = this.lessons.filter(l => l.id !== id);
+                        localStorage.setItem('school_lessons_v7', JSON.stringify(this.lessons));
+                    }
+                },
+
+                resetForm() {
+                    this.editingId = null;
+                    this.form = { subject: '', classLevel: '', week: '', year: '2026', fileName: '', fileData: '', status: 'Submitted', feedback: '' };
+                },
+
+                get teacherFilteredLessons() {
+                    return this.lessons.filter(l => l.teacherId === this.selectedTeacherId);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
