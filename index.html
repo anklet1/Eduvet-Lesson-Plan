@@ -3,35 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School Lesson Plan Cloud Portal</title>
+    <title>School Lesson Plan Portal</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <!-- Firebase Compat SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col" x-data="schoolApp()">
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col overflow-x-hidden" x-data="schoolApp()">
 
     <!-- Header -->
     <header class="bg-indigo-700 text-white shadow-md">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <h1 class="text-xl font-bold tracking-tight">📚 School Cloud Lesson Hub</h1>
-                <span class="bg-indigo-800 text-indigo-100 text-xs px-3 py-1 rounded-full font-medium border border-indigo-600" 
-                      x-text="portalMode === 'teacher' ? '👤 Teacher: ' + (activeTeacher ? activeTeacher.name + ' (' + activeTeacher.id + ')' : '') : '👑 Reviewer Cloud Dashboard'">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+            <div class="flex flex-col sm:flex-row items-center sm:space-x-3 text-center sm:text-left">
+                <h1 class="text-lg sm:text-xl font-bold tracking-tight">📚 School Lesson Hub</h1>
+                <span class="bg-indigo-800 text-indigo-100 text-[11px] sm:text-xs px-2.5 py-1 rounded-full font-medium border border-indigo-600 mt-1 sm:mt-0" 
+                      x-text="portalMode === 'teacher' ? '👤 Teacher: ' + (activeTeacher ? activeTeacher.name + ' (' + activeTeacher.id + ')' : '') : '👑 Reviewer Dashboard'">
                 </span>
             </div>
 
-            <div class="flex items-center gap-3 text-sm">
-                <span class="text-xs bg-emerald-600 text-white px-2.5 py-1 rounded-full font-medium flex items-center gap-1">
-                    <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span> Live Cloud Sync Active
-                </span>
-
-                <div x-show="portalMode === 'teacher'" class="flex items-center gap-2">
-                    <label class="text-xs text-indigo-200">Switch Profile:</label>
-                    <select x-model="selectedTeacherId" @change="saveActiveSession()" class="bg-indigo-800 text-white border border-indigo-600 rounded-lg px-3 py-1.5 text-xs focus:outline-none">
+            <div class="flex flex-wrap items-center justify-center gap-2 text-sm w-full sm:w-auto">
+                <!-- Teacher Profile Selector -->
+                <div x-show="portalMode === 'teacher'" class="flex items-center gap-1 w-full sm:w-auto justify-center">
+                    <label class="text-xs text-indigo-200 hidden md:inline">Profile:</label>
+                    <select x-model="selectedTeacherId" @change="saveActiveSession()" class="bg-indigo-800 text-white border border-indigo-600 rounded-lg px-2 py-1.5 text-xs focus:outline-none w-full sm:w-48">
                         <template x-for="t in sortedTeachers" :key="t.id">
                             <option :value="t.id" x-text="t.id + ' - ' + t.name"></option>
                         </template>
@@ -45,13 +39,14 @@
     </header>
 
     <!-- Main Container -->
-    <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full">
+    <main class="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8 flex-grow w-full">
 
         <!-- ==================== PORTAL 1: TEACHER WORKSPACE ==================== -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8" x-show="portalMode === 'teacher'">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8" x-show="portalMode === 'teacher'">
             
+            <!-- Left Column: Metrics & Upload Form -->
             <div class="space-y-6 lg:col-span-1">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-slate-200">
                     <h2 class="text-base font-bold text-indigo-900 mb-3">My Performance Metrics</h2>
                     <div class="space-y-2 text-sm">
                         <div class="flex justify-between bg-slate-50 p-2 rounded">
@@ -69,8 +64,8 @@
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <h2 class="text-lg font-semibold mb-1 text-indigo-900" x-text="editingId ? 'Update Lesson Plan' : 'Submit Prepared Plan'"></h2>
+                <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-slate-200">
+                    <h2 class="text-base sm:text-lg font-semibold mb-1 text-indigo-900" x-text="editingId ? 'Update Lesson Plan' : 'Submit Prepared Plan'"></h2>
                     <p class="text-xs text-slate-500 mb-4" x-text="'Staff ID: ' + (activeTeacher ? activeTeacher.id : '')"></p>
                     
                     <form @submit.prevent="submitLessonFile" class="space-y-4">
@@ -89,10 +84,10 @@
                             <input type="text" x-model="form.classLevel" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="e.g. Basic 4 / JHS 2">
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-xs font-medium text-slate-700 mb-1">Week</label>
-                                <select x-model="form.week" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm">
+                                <select x-model="form.week" required class="w-full rounded-lg border-slate-300 border px-2 py-2 text-sm">
                                     <option value="">Select week...</option>
                                     <template x-for="w in 15" :key="w">
                                         <option :value="'Week ' + w" x-text="'Week ' + w"></option>
@@ -101,7 +96,7 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-slate-700 mb-1">Year</label>
-                                <select x-model="form.year" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm">
+                                <select x-model="form.year" required class="w-full rounded-lg border-slate-300 border px-2 py-2 text-sm">
                                     <option value="2026">2026</option>
                                     <option value="2027">2027</option>
                                 </select>
@@ -111,7 +106,7 @@
                         <div>
                             <label class="block text-xs font-medium text-slate-700 mb-1">Upload Document (Word / PDF)</label>
                             <input type="file" @change="handleFileUpload($event)" accept=".pdf,.doc,.docx" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700">
-                            <span class="text-xs text-emerald-600 mt-1 block font-medium" x-show="form.fileName" x-text="'Attached: ' + form.fileName"></span>
+                            <span class="text-xs text-emerald-600 mt-1 block font-medium break-all" x-show="form.fileName" x-text="'Attached: ' + form.fileName"></span>
                         </div>
 
                         <div class="flex space-x-2 pt-2">
@@ -122,18 +117,19 @@
                 </div>
             </div>
 
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-2 flex flex-col">
+            <!-- Right Column: Submission History -->
+            <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-2 flex flex-col">
                 <h2 class="text-lg font-semibold text-indigo-900 mb-4">My Submitted Lesson Plans</h2>
 
                 <div class="space-y-4 flex-grow overflow-y-auto max-h-[600px]">
                     <template x-for="lesson in teacherFilteredLessons" :key="lesson.id">
-                        <div class="border border-slate-200 rounded-xl p-4 bg-white flex flex-col justify-between hover:shadow-sm transition">
+                        <div class="border border-slate-200 rounded-xl p-3 sm:p-4 bg-white flex flex-col justify-between hover:shadow-sm transition">
                             <div>
-                                <div class="flex justify-between items-center mb-2">
-                                    <div class="flex items-center gap-2">
-                                        <span class="bg-indigo-100 text-indigo-800 text-xs font-semibold px-2 py-0.5 rounded" x-text="lesson.subject"></span>
-                                        <span class="bg-slate-100 text-slate-700 text-xs px-2 py-0.5 rounded" x-text="lesson.classLevel"></span>
-                                        <span class="bg-indigo-50 text-indigo-700 text-xs font-medium px-2 py-0.5 rounded" x-text="lesson.week + ' (' + lesson.year + ')'"></span>
+                                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
+                                    <div class="flex flex-wrap items-center gap-1.5">
+                                        <span class="bg-indigo-100 text-indigo-800 text-[11px] font-semibold px-2 py-0.5 rounded" x-text="lesson.subject"></span>
+                                        <span class="bg-slate-100 text-slate-700 text-[11px] px-2 py-0.5 rounded" x-text="lesson.classLevel"></span>
+                                        <span class="bg-indigo-50 text-indigo-700 text-[11px] font-medium px-2 py-0.5 rounded" x-text="lesson.week + ' (' + lesson.year + ')'"></span>
                                     </div>
                                     <span class="text-xs font-bold px-2.5 py-0.5 rounded-full" 
                                           :class="{
@@ -145,8 +141,8 @@
                                     </span>
                                 </div>
 
-                                <div class="text-xs my-2 bg-slate-50 p-2.5 rounded border border-slate-200 flex justify-between items-center">
-                                    <a :href="lesson.fileData" :download="lesson.fileName" class="text-indigo-600 hover:underline font-semibold flex items-center gap-1">
+                                <div class="text-xs my-2 bg-slate-50 p-2.5 rounded border border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                                    <a :href="lesson.fileData" :download="lesson.fileName" class="text-indigo-600 hover:underline font-semibold flex items-center gap-1 break-all">
                                         📎 <span x-text="lesson.fileName"></span>
                                     </a>
                                     <span class="text-slate-400 text-[10px]" x-text="'Submitted: ' + lesson.timestamp"></span>
@@ -174,20 +170,22 @@
         <!-- ==================== PORTAL 2: REVIEWER & INSPECTION DASHBOARD ==================== -->
         <div class="space-y-6" x-show="portalMode === 'reviewer'">
             
-            <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+            <!-- Management Bar -->
+            <div class="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 gap-3">
                 <div>
-                    <h2 class="text-base font-bold text-indigo-900">Reviewer & Inspection Control Panel (Cloud Synced)</h2>
-                    <p class="text-xs text-slate-500">Real-time database active across all school devices.</p>
+                    <h2 class="text-base font-bold text-indigo-900">Reviewer Panel</h2>
+                    <p class="text-xs text-slate-500">Cloud Synced</p>
                 </div>
-                <div class="flex gap-2">
-                    <button @click="showOnboarding = !showOnboarding" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-2 rounded font-medium transition" x-text="showOnboarding ? 'Close Directory' : 'Manage Teachers'"></button>
-                    <button @click="exportData()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs px-3 py-2 rounded font-medium transition">Backup JSON</button>
+                <div class="flex gap-2 w-full sm:w-auto">
+                    <button @click="showOnboarding = !showOnboarding" class="flex-1 sm:flex-initial bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-2 rounded font-medium transition" x-text="showOnboarding ? 'Close Directory' : 'Manage Teachers'"></button>
+                    <button @click="exportData()" class="flex-1 sm:flex-initial bg-slate-800 hover:bg-slate-900 text-white text-xs px-3 py-2 rounded font-medium transition">Backup JSON</button>
                 </div>
             </div>
 
-            <section x-show="showOnboarding" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+            <!-- Onboarding Directory Drawer -->
+            <section x-show="showOnboarding" class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-slate-200 overflow-x-hidden">
                 <h3 class="text-sm font-bold text-indigo-900 mb-3" x-text="editingTeacherId ? 'Edit Teacher Record' : 'Teacher Onboarding Directory'"></h3>
-                <form @submit.prevent="saveTeacherRecord" class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                <form @submit.prevent="saveTeacherRecord" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-4 bg-slate-50 p-3 sm:p-4 rounded-lg border border-slate-200">
                     <div>
                         <label class="block text-xs font-medium text-slate-700 mb-1">Full Name</label>
                         <input type="text" x-model="teacherForm.name" required class="w-full rounded border-slate-300 border px-3 py-1.5 text-sm" placeholder="Felix Fleku">
@@ -204,14 +202,14 @@
                         <label class="block text-xs font-medium text-slate-700 mb-1">Assigned Subjects (comma sep)</label>
                         <input type="text" x-model="teacherForm.subjects" required class="w-full rounded border-slate-300 border px-3 py-1.5 text-sm" placeholder="Computing, Mathematics">
                     </div>
-                    <div class="flex items-end gap-2">
+                    <div class="flex items-end gap-2 sm:col-span-2 lg:col-span-1">
                         <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-1.5 px-3 rounded" x-text="editingTeacherId ? 'Update' : 'Save'"></button>
                         <button type="button" @click="resetTeacherForm()" x-show="editingTeacherId" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm py-1.5 px-3 rounded">Cancel</button>
                     </div>
                 </form>
 
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm border-collapse">
+                    <table class="w-full text-left text-sm border-collapse min-w-[500px]">
                         <thead>
                             <tr class="bg-slate-100 text-slate-700 text-xs uppercase">
                                 <th class="p-3">Staff ID</th>
@@ -239,8 +237,9 @@
                 </div>
             </section>
 
+            <!-- Metrics Bar & Compliance Progress Overview -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-4">
+                <div class="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 space-y-4">
                     <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">System Overview</h3>
                     <div class="flex justify-between text-sm">
                         <span>Total Active Teachers:</span>
@@ -257,18 +256,18 @@
                     <button @click="triggerLaggingAlerts()" class="w-full bg-rose-600 hover:bg-rose-700 text-white text-xs py-2 rounded font-medium transition mt-2">🚨 Trigger Laggards SMS Alert</button>
                 </div>
 
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 lg:col-span-2">
+                <div class="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 lg:col-span-2">
                     <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Teacher Submission Progress & Compliance</h3>
                     <div class="space-y-3 max-h-[220px] overflow-y-auto pr-2">
                         <template x-for="t in sortedTeachers" :key="t.id">
                             <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-xs space-y-1">
-                                <div class="flex justify-between items-center">
+                                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1">
                                     <span class="font-bold font-mono text-indigo-900" x-text="t.id + ' — ' + t.name"></span>
                                     <div class="flex items-center gap-2">
-                                        <span class="text-slate-600" x-text="getTeacherSubmissionCount(t.id) + ' / 1 expected submissions'"></span>
+                                        <span class="text-slate-600 text-[11px]" x-text="getTeacherSubmissionCount(t.id) + ' / 1 expected'"></span>
                                         <span class="px-2 py-0.5 rounded-full font-bold text-[10px]"
                                               :class="getTeacherSubmissionCount(t.id) > 0 ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-rose-100 text-rose-800 border border-rose-200'"
-                                              x-text="getTeacherSubmissionCount(t.id) > 0 ? '🟢 Compliant' : '🔴 Flagged (Lagging)'">
+                                              x-text="getTeacherSubmissionCount(t.id) > 0 ? '🟢 Compliant' : '🔴 Flagged'">
                                         </span>
                                     </div>
                                 </div>
@@ -284,26 +283,28 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 border-b border-slate-100 pb-4">
-                    <div class="flex gap-2">
-                        <button @click="adminSubTab = 'queue'" :class="adminSubTab === 'queue' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700'" class="px-4 py-2 rounded-lg text-xs font-semibold transition">Vetting Queue</button>
-                        <button @click="adminSubTab = 'history'" :class="adminSubTab === 'history' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700'" class="px-4 py-2 rounded-lg text-xs font-semibold transition">General Teachers History</button>
-                        <button @click="adminSubTab = 'archive'" :class="adminSubTab === 'archive' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700'" class="px-4 py-2 rounded-lg text-xs font-semibold transition">Inspection Archive</button>
+            <!-- Reviewer Tabs -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6">
+                <div class="flex flex-col lg:flex-row justify-between items-center mb-6 gap-4 border-b border-slate-100 pb-4">
+                    <div class="flex flex-wrap gap-1.5 w-full lg:w-auto">
+                        <button @click="adminSubTab = 'queue'" :class="adminSubTab === 'queue' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700'" class="flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-lg text-xs font-semibold transition">Vetting Queue</button>
+                        <button @click="adminSubTab = 'history'" :class="adminSubTab === 'history' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700'" class="flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-lg text-xs font-semibold transition">Teachers History</button>
+                        <button @click="adminSubTab = 'archive'" :class="adminSubTab === 'archive' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700'" class="flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-lg text-xs font-semibold transition">Archive</button>
                     </div>
-                    <input type="text" x-model="adminSearchQuery" placeholder="Search teacher or subject..." class="rounded-lg border-slate-300 border px-3 py-1.5 text-sm w-full md:w-64">
+                    <input type="text" x-model="adminSearchQuery" placeholder="Search teacher or subject..." class="rounded-lg border-slate-300 border px-3 py-1.5 text-sm w-full lg:w-64">
                 </div>
 
+                <!-- Queue Tab -->
                 <div x-show="adminSubTab === 'queue'" class="space-y-4 max-h-[550px] overflow-y-auto">
                     <template x-for="lesson in adminFilteredActiveLessons" :key="lesson.id">
-                        <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                            <div class="space-y-1 flex-grow">
-                                <div class="flex flex-wrap items-center gap-2">
-                                    <span class="bg-indigo-100 text-indigo-800 text-xs font-semibold px-2 py-0.5 rounded" x-text="lesson.subject"></span>
-                                    <span class="bg-slate-200 text-slate-700 text-xs px-2 py-0.5 rounded" x-text="lesson.classLevel"></span>
-                                    <span class="bg-indigo-50 text-indigo-700 text-xs font-medium px-2 py-0.5 rounded" x-text="lesson.week + ' (' + lesson.year + ')'"></span>
-                                    <span class="text-xs font-semibold text-indigo-900 bg-white px-2 py-0.5 rounded border border-slate-200 font-mono" x-text="'ID: ' + lesson.teacherId + ' | ' + lesson.teacherName"></span>
-                                    <span class="text-xs font-bold px-2 py-0.5 rounded-full" 
+                        <div class="border border-slate-200 rounded-xl p-3 sm:p-4 bg-slate-50/50 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                            <div class="space-y-1.5 flex-grow w-full">
+                                <div class="flex flex-wrap items-center gap-1.5">
+                                    <span class="bg-indigo-100 text-indigo-800 text-[11px] font-semibold px-2 py-0.5 rounded" x-text="lesson.subject"></span>
+                                    <span class="bg-slate-200 text-slate-700 text-[11px] px-2 py-0.5 rounded" x-text="lesson.classLevel"></span>
+                                    <span class="bg-indigo-50 text-indigo-700 text-[11px] font-medium px-2 py-0.5 rounded" x-text="lesson.week + ' (' + lesson.year + ')'"></span>
+                                    <span class="text-[11px] font-semibold text-indigo-900 bg-white px-2 py-0.5 rounded border border-slate-200 font-mono" x-text="'ID: ' + lesson.teacherId + ' | ' + lesson.teacherName"></span>
+                                    <span class="text-[11px] font-bold px-2 py-0.5 rounded-full" 
                                           :class="{
                                               'bg-amber-100 text-amber-800': lesson.status === 'Submitted',
                                               'bg-emerald-100 text-emerald-800': lesson.status === 'Approved',
@@ -312,8 +313,8 @@
                                           x-text="lesson.status">
                                     </span>
                                 </div>
-                                <div class="text-xs pt-2">
-                                    <a :href="lesson.fileData" :download="lesson.fileName" class="text-indigo-600 hover:underline font-semibold inline-flex items-center gap-1 bg-white p-2 rounded border border-indigo-100">
+                                <div class="text-xs pt-1">
+                                    <a :href="lesson.fileData" :download="lesson.fileName" class="text-indigo-600 hover:underline font-semibold inline-flex items-center gap-1 bg-white p-2 rounded border border-indigo-100 break-all">
                                         📥 Download Document: <span x-text="lesson.fileName"></span>
                                     </a>
                                 </div>
@@ -322,18 +323,19 @@
                                 </div>
                             </div>
 
-                            <div class="flex flex-wrap items-center gap-2 shrink-0">
-                                <button @click="reviewAction(lesson, 'Approved')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded font-medium">Approve</button>
-                                <button @click="reviewAction(lesson, 'Changes Requested')" class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-3 py-1.5 rounded font-medium">Request Changes</button>
-                                <button @click="reviewAction(lesson, 'Rejected')" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded font-medium">Reject</button>
+                            <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-end">
+                                <button @click="reviewAction(lesson, 'Approved')" class="flex-1 lg:flex-initial bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded font-medium">Approve</button>
+                                <button @click="reviewAction(lesson, 'Changes Requested')" class="flex-1 lg:flex-initial bg-amber-600 hover:bg-amber-700 text-white text-xs px-3 py-1.5 rounded font-medium">Revisions</button>
+                                <button @click="reviewAction(lesson, 'Rejected')" class="flex-1 lg:flex-initial bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded font-medium">Reject</button>
                             </div>
                         </div>
                     </template>
                     <div x-show="adminFilteredActiveLessons.length === 0" class="text-center py-8 text-slate-400 text-sm">No submissions in queue.</div>
                 </div>
 
-                <div x-show="adminSubTab === 'history'" class="space-y-4 max-h-[550px] overflow-y-auto">
-                    <table class="w-full text-left text-sm border-collapse">
+                <!-- History Tab -->
+                <div x-show="adminSubTab === 'history'" class="space-y-4 max-h-[550px] overflow-x-auto">
+                    <table class="w-full text-left text-sm border-collapse min-w-[650px]">
                        <thead>
                            <tr class="bg-slate-100 text-slate-700 text-xs uppercase">
                                <th class="p-3">Staff ID & Name</th>
@@ -353,7 +355,7 @@
                                    <td class="p-3 text-xs"><span class="font-semibold" x-text="lesson.subject"></span> (<span x-text="lesson.classLevel"></span>)</td>
                                    <td class="p-3 text-xs text-slate-600" x-text="lesson.week + ' ' + lesson.year"></td>
                                    <td class="p-3"><span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="{'bg-amber-100 text-amber-800': lesson.status === 'Submitted', 'bg-emerald-100 text-emerald-800': lesson.status === 'Approved', 'bg-rose-100 text-rose-800': lesson.status === 'Rejected' || lesson.status === 'Changes Requested'}" x-text="lesson.status"></span></td>
-                                   <td class="p-3"><a :href="lesson.fileData" :download="lesson.fileName" class="text-indigo-600 text-xs hover:underline font-medium">📥 <span x-text="lesson.fileName"></span></a></td>
+                                   <td class="p-3"><a :href="lesson.fileData" :download="lesson.fileName" class="text-indigo-600 text-xs hover:underline font-medium break-all">📥 <span x-text="lesson.fileName"></span></a></td>
                                    <td class="p-3 text-right"><button @click="deleteLesson(lesson.id)" class="text-rose-600 hover:text-rose-800 text-xs font-medium">Delete</button></td>
                                </tr>
                            </template>
@@ -361,14 +363,15 @@
                     </table>
                 </div>
 
+                <!-- Archive Tab -->
                 <div x-show="adminSubTab === 'archive'" class="space-y-4 max-h-[550px] overflow-y-auto">
                     <template x-for="lesson in archivedLessons" :key="lesson.id">
-                        <div class="border border-slate-200 rounded-xl p-3 bg-slate-50 flex justify-between items-center text-xs">
+                        <div class="border border-slate-200 rounded-xl p-3 bg-slate-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs">
                             <div>
                                 <span class="font-bold font-mono text-indigo-900" x-text="lesson.teacherId + ' — ' + lesson.teacherName"></span> — <span x-text="lesson.subject + ' | ' + lesson.week + ' ' + lesson.year"></span>
-                                <a :href="lesson.fileData" :download="lesson.fileName" class="text-indigo-600 font-semibold ml-2 underline">📎 <span x-text="lesson.fileName"></span></a>
+                                <a :href="lesson.fileData" :download="lesson.fileName" class="text-indigo-600 font-semibold ml-0 sm:ml-2 underline block sm:inline break-all">📎 <span x-text="lesson.fileName"></span></a>
                             </div>
-                            <button @click="restoreFromArchive(lesson.id)" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded font-medium">Restore</button>
+                            <button @click="restoreFromArchive(lesson.id)" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded font-medium shrink-0">Restore</button>
                         </div>
                     </template>
                     <div x-show="archivedLessons.length === 0" class="text-center py-8 text-slate-400 text-sm">No archived records.</div>
@@ -378,6 +381,14 @@
         </div>
 
     </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 font-medium space-y-1">
+            <p>© Edubyte Africa. All rights reserved. 2026</p>
+            <p class="text-slate-400">Developed by Edubyte Africa Inc. | Contact: +233 543 521 863</p>
+        </div>
+    </footer>
 
     <!-- App Script Logic -->
     <script>
@@ -444,7 +455,6 @@
                 },
 
                 init() {
-                    // Real-time Firestore sync for Teachers
                     db.collection('teachers').onSnapshot((snapshot) => {
                         this.teachers = snapshot.docs.map(doc => ({ ...doc.data() }));
                         if (this.teachers.length > 0 && !this.teachers.some(t => t.id === this.selectedTeacherId)) {
@@ -452,7 +462,6 @@
                         }
                     });
 
-                    // Real-time Firestore sync for Lessons
                     db.collection('lessons').onSnapshot((snapshot) => {
                         this.lessons = snapshot.docs.map(doc => ({ ...doc.data() }));
                     });
