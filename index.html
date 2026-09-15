@@ -36,10 +36,31 @@
                 </div>
 
                 <button x-show="portalMode === 'reviewer'" @click="portalMode = 'teacher'" class="bg-indigo-600 hover:bg-indigo-500 px-3 py-1.5 rounded text-xs font-medium transition">Exit to Teacher Portal</button>
-                <button @click="promptReviewerAccess()" class="text-indigo-300 hover:text-white text-xs font-mono transition" title="Reviewer Access">🔒 Reviewer Login</button>
+                <button @click="showPinModal = true" class="text-indigo-300 hover:text-white text-xs font-mono transition" title="Reviewer Access">🔒 Reviewer Login</button>
             </div>
         </div>
     </header>
+
+    <!-- Secure PIN Modal Overlay (Concealed with *) -->
+    <div x-show="showPinModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display: none;">
+        <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 space-y-4 border border-slate-200" @click.away="showPinModal = false">
+            <div class="text-center">
+                <div class="text-3xl mb-1">🔐</div>
+                <h3 class="text-base font-bold text-indigo-900">Reviewer Authentication</h3>
+                <p class="text-xs text-slate-500 mt-1">Enter your secure PIN to access the inspection dashboard.</p>
+            </div>
+            
+            <form @submit.prevent="verifyPin()" class="space-y-3">
+                <div>
+                    <input type="password" x-model="enteredPin" placeholder="Enter PIN " autofocus class="w-full text-center tracking-widest text-lg rounded-lg border-slate-300 border px-3 py-2 focus:outline-none focus:border-indigo-600" maxlength="8" required>
+                </div>
+                <div class="flex gap-2 pt-1">
+                    <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium py-2.5 rounded-lg transition">Login</button>
+                    <button type="button" @click="showPinModal = false; enteredPin = ''" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium py-2.5 rounded-lg transition">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Main Container -->
     <main class="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8 flex-grow w-full">
@@ -404,8 +425,8 @@
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 py-4 mt-auto">
         <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 font-medium space-y-1">
-            <p>© Edubyte Africa. All rights reserved.</p>
-            <p class="text-slate-400">Developed by Edubyte Africa Inc. | Contact: +233 543 521 863</p>
+            <p>© Edubyte Africa. All rights reserved</p>
+            <p class="text-slate-400">Powered by Edubyte Africa Inc. | Contact: +233 543 521 863</p>
         </div>
     </footer>
 
@@ -435,6 +456,8 @@
                 showOnboarding: false,
                 adminSubTab: 'queue',
                 selectedTeacherId: localStorage.getItem('active_teacher_id') || '',
+                showPinModal: false,
+                enteredPin: '',
 
                 teachers: [],
                 lessons: [],
@@ -491,12 +514,14 @@
                     localStorage.setItem('active_teacher_id', this.selectedTeacherId);
                 },
 
-                promptReviewerAccess() {
-                    const pin = prompt('Enter Reviewer Security PIN:');
-                    if (pin === '0543') {
+                verifyPin() {
+                    if (this.enteredPin === '0543') {
                         this.portalMode = 'reviewer';
-                    } else if (pin !== null) {
+                        this.showPinModal = false;
+                        this.enteredPin = '';
+                    } else {
                         alert('Incorrect Security PIN!');
+                        this.enteredPin = '';
                     }
                 },
 
