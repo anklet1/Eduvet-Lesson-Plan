@@ -14,21 +14,66 @@
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col overflow-x-hidden" x-data="schoolApp()">
 
-    <!-- Header -->
+    <!-- ==================== SCHOOL GATEWAY / LOGIN & REGISTRATION OVERLAY ==================== -->
+    <div x-show="!authenticatedSchoolId" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8 space-y-6 border border-slate-200">
+            <div class="text-center">
+                <h1 class="text-xl font-bold text-indigo-900">📚 Multi-School Lesson Hub</h1>
+                <p class="text-xs text-slate-500 mt-1">Institutional Portal</p>
+            </div>
+
+            <!-- Tabs Selection -->
+            <div class="flex rounded-lg bg-slate-100 p-1 text-xs font-semibold">
+                <button @click="gatewayTab = 'login'" :class="gatewayTab === 'login' ? 'bg-white text-indigo-900 shadow-sm' : 'text-slate-600'" class="flex-1 py-2 rounded-md transition">School Login</button>
+                <button @click="gatewayTab = 'register'" :class="gatewayTab === 'register' ? 'bg-white text-indigo-900 shadow-sm' : 'text-slate-600'" class="flex-1 py-2 rounded-md transition">Register New School</button>
+            </div>
+
+            <!-- School Login Form -->
+            <form x-show="gatewayTab === 'login'" @submit.prevent="loginSchool()" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Enter School ID (e.g. ATAKORA-983)</label>
+                    <input type="text" x-model="loginInputId" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm uppercase font-mono tracking-wide" placeholder="ATAKORA-983">
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg text-sm transition shadow-sm">Access School Portal</button>
+            </form>
+
+            <!-- School Registration Form -->
+            <form x-show="gatewayTab === 'register'" @submit.prevent="registerSchool()" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Official School Name</label>
+                    <input type="text" x-model="regForm.name" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="Atakora D/A Junior High">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">District / Region Location</label>
+                    <input type="text" x-model="regForm.location" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="Kwahu Afram Plains North">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Administrator Contact</label>
+                    <input type="text" x-model="regForm.contact" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="0543521863">
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg text-sm transition shadow-sm mt-2">Generate School ID & Register</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Header / Active School Dashboard Bar -->
     <header class="bg-indigo-700 text-white shadow-md">
         <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-3">
             <div class="flex flex-col sm:flex-row items-center sm:space-x-3 text-center sm:text-left">
                 <h1 class="text-lg sm:text-xl font-bold tracking-tight">📚 School Lesson Hub</h1>
-                <span class="bg-indigo-800 text-indigo-100 text-[11px] sm:text-xs px-2.5 py-1 rounded-full font-medium border border-indigo-600 mt-1 sm:mt-0" 
-                      x-text="portalMode === 'teacher' ? '👤 Teacher: ' + (activeTeacher ? activeTeacher.name + ' (' + activeTeacher.id + ')' : '') : 'Reviewer Dashboard'">
-                </span>
+                <div class="flex items-center gap-2 bg-indigo-800 px-3 py-1 rounded-lg border border-indigo-600 mt-1 sm:mt-0 text-xs">
+                    <span class="text-indigo-200">Active Institution:</span>
+                    <span class="font-bold text-white uppercase font-mono" x-text="activeSchoolName + ' (' + authenticatedSchoolId + ')'"></span>
+                    <button @click="logoutSchool()" class="text-rose-300 hover:text-white text-[10px] underline ml-2 font-sans">Switch School</button>
+                </div>
             </div>
 
             <div class="flex flex-wrap items-center justify-center gap-2 text-sm w-full sm:w-auto">
-                <!-- Teacher Profile Selector -->
+                <!-- Teacher Profile Selector with Staff ID Lock -->
                 <div x-show="portalMode === 'teacher'" class="flex items-center gap-1 w-full sm:w-auto justify-center">
                     <label class="text-xs text-indigo-200 hidden md:inline">Profile:</label>
-                    <select x-model="selectedTeacherId" @change="saveActiveSession()" class="bg-indigo-800 text-white border border-indigo-600 rounded-lg px-2 py-1.5 text-xs focus:outline-none w-full sm:w-48">
+                    <select x-model="selectedTeacherId" @change="verifyTeacherSession($event)" class="bg-indigo-800 text-white border border-indigo-600 rounded-lg px-2 py-1.5 text-xs focus:outline-none w-full sm:w-48">
+                        <option value="">-- Select Teacher Profile --</option>
                         <template x-for="t in sortedTeachers" :key="t.id">
                             <option :value="t.id" x-text="t.id + ' - ' + t.name"></option>
                         </template>
@@ -41,18 +86,18 @@
         </div>
     </header>
 
-    <!-- Secure PIN Modal Overlay (Concealed with *) -->
+    <!-- Secure PIN Modal Overlay -->
     <div x-show="showPinModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display: none;">
         <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 space-y-4 border border-slate-200" @click.away="showPinModal = false">
             <div class="text-center">
                 <div class="text-3xl mb-1">🔐</div>
                 <h3 class="text-base font-bold text-indigo-900">Reviewer Authentication</h3>
-                <p class="text-xs text-slate-500 mt-1">Enter your secure PIN to access the inspection dashboard.</p>
+                <p class="text-xs text-slate-500 mt-1" x-text="'Login for ' + activeSchoolName"></p>
             </div>
             
             <form @submit.prevent="verifyPin()" class="space-y-3">
                 <div>
-                    <input type="password" x-model="enteredPin" placeholder="Enter PIN " autofocus class="w-full text-center tracking-widest text-lg rounded-lg border-slate-300 border px-3 py-2 focus:outline-none focus:border-indigo-600" maxlength="8" required>
+                    <input type="password" x-model="enteredPin" placeholder="Enter PIN" autofocus class="w-full text-center tracking-widest text-lg rounded-lg border-slate-300 border px-3 py-2 focus:outline-none focus:border-indigo-600" maxlength="8" required>
                 </div>
                 <div class="flex gap-2 pt-1">
                     <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium py-2.5 rounded-lg transition">Login</button>
@@ -63,7 +108,21 @@
     </div>
 
     <!-- Main Container -->
-    <main class="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8 flex-grow w-full">
+    <main class="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8 flex-grow w-full space-y-6" x-show="authenticatedSchoolId">
+
+        <!-- ==================== UNIVERSAL NOTICE BOARD (VISIBLE ON BOTH SIDES) ==================== -->
+        <template x-if="schoolNotification">
+            <div class="bg-indigo-50 border-l-4 border-indigo-600 p-4 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">📢</span>
+                    <div>
+                        <h3 class="text-sm font-bold text-indigo-900">Institutional Announcement & Notice Board</h3>
+                        <p class="text-xs text-indigo-700 font-medium" x-text="schoolNotification"></p>
+                    </div>
+                </div>
+                <button x-show="portalMode === 'reviewer'" @click="promptUpdateNotification()" class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded font-medium transition shrink-0">Edit Notice</button>
+            </div>
+        </template>
 
         <!-- ==================== PORTAL 1: TEACHER WORKSPACE ==================== -->
         <div class="space-y-6" x-show="portalMode === 'teacher'">
@@ -75,7 +134,7 @@
                         <span class="text-2xl">🚨</span>
                         <div>
                             <h3 class="text-sm font-bold text-rose-900">Compliance Warning: Missing Weekly Lesson Plan</h3>
-                            <p class="text-xs text-rose-700">Staff ID: <span class="font-mono font-bold" x-text="activeTeacher.id"></span> | Contact: <span x-text="activeTeacher.contact"></span>. Please submit your required lesson plan immediately to clear this flag.</p>
+                            <p class="text-xs text-rose-700">Staff ID: <span class="font-mono font-bold" x-text="activeTeacher.id"></span> | Contact: <span x-text="activeTeacher.contact"></span>. Please submit your required lesson plan immediately for <span x-text="activeSchoolName"></span>.</p>
                         </div>
                     </div>
                     <span class="bg-rose-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">Action Required</span>
@@ -86,7 +145,7 @@
                 <!-- Left Column: Metrics & Upload Form -->
                 <div class="space-y-6 lg:col-span-1">
                     <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-slate-200">
-                        <h2 class="text-base font-bold text-indigo-900 mb-3">My Performance Metrics</h2>
+                        <h2 class="text-base font-bold text-indigo-900 mb-3" x-text="activeSchoolName + ' - Metrics'"></h2>
                         <div class="space-y-2 text-sm">
                             <div class="flex justify-between bg-slate-50 p-2 rounded">
                                 <span class="text-slate-600">Total Submissions:</span>
@@ -200,7 +259,7 @@
                         </template>
 
                         <div x-show="teacherFilteredLessons.length === 0" class="text-center py-12 text-slate-400 text-sm">
-                            <p>No lesson submissions found.</p>
+                            <p>No lesson submissions found for this school partition.</p>
                         </div>
                     </div>
                 </div>
@@ -213,12 +272,13 @@
             <!-- Management Bar -->
             <div class="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 gap-3">
                 <div>
-                    <h2 class="text-base font-bold text-indigo-900">Reviewer & Inspection Control Panel</h2>
-                    <p class="text-xs text-slate-500">Cloud Sync is live</p>
+                    <h2 class="text-base font-bold text-indigo-900" x-text="activeSchoolName + ' - Reviewer Panel'"></h2>
+                    <p class="text-xs text-slate-500">Vertical Multi-Tenant Partition Active</p>
                 </div>
-                <div class="flex gap-2 w-full sm:w-auto">
-                    <button @click="showOnboarding = !showOnboarding" class="flex-1 sm:flex-initial bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-2 rounded font-medium transition" x-text="showOnboarding ? 'Close Directory' : 'Manage Teachers'"></button>
-                    <button @click="exportData()" class="flex-1 sm:flex-initial bg-slate-800 hover:bg-slate-900 text-white text-xs px-3 py-2 rounded font-medium transition">Backup JSON</button>
+                <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                    <button @click="promptUpdateNotification()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-3 py-2 rounded font-medium transition">📢 Broadcast Notice</button>
+                    <button @click="showOnboarding = !showOnboarding" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-2 rounded font-medium transition" x-text="showOnboarding ? 'Close Directory' : 'Manage Teachers'"></button>
+                    <button @click="exportData()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs px-3 py-2 rounded font-medium transition">Backup JSON</button>
                 </div>
             </div>
 
@@ -277,61 +337,16 @@
                 </div>
             </section>
 
-            <!-- Metrics Bar & Compliance Progress Overview -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 space-y-4">
-                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">System Overview</h3>
-                    <div class="flex justify-between text-sm">
-                        <span>Total Active Teachers:</span>
-                        <span class="font-bold text-indigo-900" x-text="sortedTeachers.length"></span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span>Active Submissions:</span>
-                        <span class="font-bold text-indigo-900" x-text="activeLessons.length"></span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span>Approved Plans:</span>
-                        <span class="font-bold text-emerald-600" x-text="lessons.filter(l => l.status === 'Approved').length"></span>
-                    </div>
-                    <button @click="triggerLaggingAlerts()" class="w-full bg-rose-600 hover:bg-rose-700 text-white text-xs py-2 rounded font-medium transition mt-2">🚨 Trigger Laggards SMS Alert</button>
-                </div>
-
-                <div class="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 lg:col-span-2">
-                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Teacher Submission Progress & Compliance</h3>
-                    <div class="space-y-3 max-h-[220px] overflow-y-auto pr-2">
-                        <template x-for="t in sortedTeachers" :key="t.id">
-                            <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-xs space-y-1">
-                                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1">
-                                    <span class="font-bold font-mono text-indigo-900" x-text="t.id + ' — ' + t.name"></span>
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-slate-600 text-[11px]" x-text="getTeacherSubmissionCount(t.id) + ' / 1 expected'"></span>
-                                        <span class="px-2 py-0.5 rounded-full font-bold text-[10px]"
-                                              :class="getTeacherSubmissionCount(t.id) > 0 ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-rose-100 text-rose-800 border border-rose-200'"
-                                              x-text="getTeacherSubmissionCount(t.id) > 0 ? '🟢 Compliant' : '🔴 Flagged'">
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
-                                    <div class="h-2 rounded-full transition-all duration-500"
-                                         :class="getTeacherSubmissionCount(t.id) > 0 ? 'bg-emerald-500' : 'bg-rose-500'"
-                                         :style="'width: ' + (getTeacherSubmissionCount(t.id) > 0 ? '100%': '5%')">
-                                    </div>
-                                </div>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Reviewer Tabs -->
+            <!-- Reviewer Navigation Sub-Tabs -->
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6">
                 <div class="flex flex-col lg:flex-row justify-between items-center mb-6 gap-4 border-b border-slate-100 pb-4">
                     <div class="flex flex-wrap gap-1.5 w-full lg:w-auto">
                         <button @click="adminSubTab = 'queue'" :class="adminSubTab === 'queue' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700'" class="flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-lg text-xs font-semibold transition">Vetting Queue</button>
                         <button @click="adminSubTab = 'history'" :class="adminSubTab === 'history' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700'" class="flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-lg text-xs font-semibold transition">Teachers History</button>
                         <button @click="adminSubTab = 'archive'" :class="adminSubTab === 'archive' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700'" class="flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-lg text-xs font-semibold transition">Archive</button>
+                        <button @click="adminSubTab = 'report'" :class="adminSubTab === 'report' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700'" class="flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-lg text-xs font-semibold transition">📊 Inspection Report</button>
                     </div>
-                    <input type="text" x-model="adminSearchQuery" placeholder="Search teacher or subject..." class="rounded-lg border-slate-300 border px-3 py-1.5 text-sm w-full lg:w-64">
+                    <input x-show="adminSubTab !== 'report'" type="text" x-model="adminSearchQuery" placeholder="Search teacher or subject..." class="rounded-lg border-slate-300 border px-3 py-1.5 text-sm w-full lg:w-64">
                 </div>
 
                 <!-- Queue Tab -->
@@ -416,6 +431,75 @@
                     </template>
                     <div x-show="archivedLessons.length === 0" class="text-center py-8 text-slate-400 text-sm">No archived records.</div>
                 </div>
+
+                <!-- ==================== INSPECTION REPORT & TRENDS TAB ==================== -->
+                <div x-show="adminSubTab === 'report'" class="space-y-6">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 pb-4">
+                        <div>
+                            <h3 class="text-base font-bold text-indigo-900">📑 Official Inspection Summary Report</h3>
+                            <div class="text-xs text-slate-600 space-x-2 mt-1">
+                                <span class="font-bold text-indigo-800" x-text="'School: ' + activeSchoolName"></span>
+                                <span>|</span>
+                                <span class="font-mono text-slate-700" x-text="'Code: ' + authenticatedSchoolId"></span>
+                                <span>|</span>
+                                <span x-text="'Date Generated: ' + new Date().toLocaleDateString()"></span>
+                            </div>
+                            <div class="text-xs font-semibold text-indigo-600 mt-1">
+                                <span>Current Academic Period: Term 3, Academic Year 2025/2026 (Week 8)</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button @click="window.print()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs px-3 py-2 rounded font-medium transition shadow-sm">🖨️ Print / Export Report</button>
+                        </div>
+                    </div>
+
+                    <!-- Summary Statistics Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-xl">
+                            <span class="text-xs text-indigo-600 font-semibold uppercase">Total Staff Onboarded</span>
+                            <h4 class="text-2xl font-extrabold text-indigo-900 mt-1" x-text="sortedTeachers.length"></h4>
+                        </div>
+                        <div class="bg-emerald-50 border border-emerald-100 p-4 rounded-xl">
+                            <span class="text-xs text-emerald-600 font-semibold uppercase">Compliant Submissions</span>
+                            <h4 class="text-2xl font-extrabold text-emerald-900 mt-1" x-text="activeLessons.length"></h4>
+                        </div>
+                        <div class="bg-amber-50 border border-amber-100 p-4 rounded-xl">
+                            <span class="text-xs text-amber-600 font-semibold uppercase">Approved Plans</span>
+                            <h4 class="text-2xl font-extrabold text-amber-900 mt-1" x-text="lessons.filter(l => l.status === 'Approved').length"></h4>
+                        </div>
+                        <div class="bg-rose-50 border border-rose-100 p-4 rounded-xl">
+                            <span class="text-xs text-rose-600 font-semibold uppercase">Pending / Unsubmitted</span>
+                            <h4 class="text-2xl font-extrabold text-rose-900 mt-1" x-text="laggingTeachers.length"></h4>
+                        </div>
+                    </div>
+
+                    <!-- Bar Graph Trend Visualizer -->
+                    <div class="bg-slate-50 p-4 sm:p-6 rounded-xl border border-slate-200 space-y-4">
+                        <h4 class="text-sm font-bold text-indigo-900">📈 Teacher Submission Progress & Trend Graph (Current Week)</h4>
+                        <div class="space-y-3">
+                            <template x-for="t in sortedTeachers" :key="t.id">
+                                <div class="bg-white p-3 rounded-lg border border-slate-200 space-y-1 shadow-sm">
+                                    <div class="flex justify-between text-xs font-semibold">
+                                        <span class="font-mono text-indigo-900" x-text="t.id + ' - ' + t.name"></span>
+                                        <span :class="getTeacherSubmissionCount(t.id) > 0 ? 'text-emerald-600 font-bold' : 'text-slate-400 font-bold'" 
+                                              x-text="getTeacherSubmissionCount(t.id) > 0 ? 'Submitted (100%)' : 'Pending (0%)'"></span>
+                                    </div>
+                                    <!-- Progress Bar -->
+                                    <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden flex border border-slate-200">
+                                        <div class="h-3 transition-all duration-500 rounded-full"
+                                             :class="getTeacherSubmissionCount(t.id) > 0 ? 'bg-emerald-500' : 'bg-slate-300 w-[5%]' "
+                                             :style="'width: ' + (getTeacherSubmissionCount(t.id) > 0 ? '100%': '5%')">
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                            <div x-show="sortedTeachers.length === 0" class="text-center py-6 text-slate-400 text-xs">
+                                No teachers registered in this school.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
         </div>
@@ -425,7 +509,7 @@
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 py-4 mt-auto">
         <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 font-medium space-y-1">
-            <p>© Edubyte Africa. All rights reserved</p>
+            <p>© Edubyte Africa. All rights reserved.</p>
             <p class="text-slate-400">Powered by Edubyte Africa Inc. | Contact: +233 543 521 863</p>
         </div>
     </footer>
@@ -455,9 +539,18 @@
                 portalMode: 'teacher',
                 showOnboarding: false,
                 adminSubTab: 'queue',
-                selectedTeacherId: localStorage.getItem('active_teacher_id') || '',
                 showPinModal: false,
                 enteredPin: '',
+
+                gatewayTab: 'login',
+                loginInputId: '',
+                // Session starts clean on refresh (No localStorage caching for school login)
+                authenticatedSchoolId: '',
+                activeSchoolName: '',
+                schoolNotification: '',
+                
+                regForm: { name: '', location: '', contact: '' },
+                selectedTeacherId: '',
 
                 teachers: [],
                 lessons: [],
@@ -498,20 +591,119 @@
                 },
 
                 init() {
-                    db.collection('teachers').onSnapshot((snapshot) => {
-                        this.teachers = snapshot.docs.map(doc => ({ ...doc.data() }));
-                        if (this.teachers.length > 0 && !this.teachers.some(t => t.id === this.selectedTeacherId)) {
-                            this.selectedTeacherId = this.teachers[0].id;
+                    // Session requires manual login every refresh
+                },
+
+                registerSchool() {
+                    const cleanName = this.regForm.name.trim();
+                    if (!cleanName) return;
+
+                    const prefix = cleanName.substring(0, 4).toUpperCase().replace(/[^A-Z]/g, 'SCH');
+                    const randomNum = Math.floor(100 + Math.random() * 900);
+                    const generatedId = `${prefix}-${randomNum}`;
+
+                    const schoolRecord = {
+                        id: generatedId,
+                        name: cleanName,
+                        location: this.regForm.location,
+                        contact: this.regForm.contact,
+                        notification: 'Welcome to the school portal! Please submit your weekly lesson plans on time.',
+                        createdAt: Date.now()
+                    };
+
+                    db.collection('registered_schools').doc(generatedId).set(schoolRecord)
+                      .then(() => {
+                          alert(`School Registered Successfully!\n\nYour Unique School ID is: ${generatedId}\n\nPlease copy this code and use it to log into your school portal.`);
+                          // Reset form and switch to login tab with pre-filled ID for convenience
+                          this.regForm = { name: '', location: '', contact: '' };
+                          this.gatewayTab = 'login';
+                          this.loginInputId = generatedId;
+                      })
+                      .catch(err => alert('Error registering school: ' + err.message));
+                },
+
+                loginSchool() {
+                    const inputId = this.loginInputId.trim().toUpperCase();
+                    if (!inputId) return;
+
+                    db.collection('registered_schools').doc(inputId).get()
+                      .then((doc) => {
+                          if (doc.exists) {
+                              const data = doc.data();
+                              this.authenticatedSchoolId = data.id;
+                              this.activeSchoolName = data.name;
+                              this.schoolNotification = data.notification || '';
+                              this.loadSchoolData();
+                          } else {
+                              alert('School ID not found! Please check your ID or register your school.');
+                          }
+                      })
+                      .catch(err => alert('Login error: ' + err.message));
+                },
+
+                logoutSchool() {
+                    if (confirm('Exit current school portal session?')) {
+                        this.authenticatedSchoolId = '';
+                        this.activeSchoolName = '';
+                        this.schoolNotification = '';
+                        this.loginInputId = '';
+                        this.selectedTeacherId = '';
+                        this.teachers = [];
+                        this.lessons = [];
+                    }
+                },
+
+                loadSchoolData() {
+                    db.collection('registered_schools').doc(this.authenticatedSchoolId).onSnapshot((doc) => {
+                        if (doc.exists && doc.data().notification) {
+                            this.schoolNotification = doc.data().notification;
                         }
                     });
 
-                    db.collection('lessons').onSnapshot((snapshot) => {
+                    db.collection('teachers').where('schoolId', '==', this.authenticatedSchoolId).onSnapshot((snapshot) => {
+                        this.teachers = snapshot.docs.map(doc => ({ ...doc.data() }));
+                    });
+
+                    db.collection('lessons').where('schoolId', '==', this.authenticatedSchoolId).onSnapshot((snapshot) => {
                         this.lessons = snapshot.docs.map(doc => ({ ...doc.data() }));
                     });
                 },
 
-                saveActiveSession() {
-                    localStorage.setItem('active_teacher_id', this.selectedTeacherId);
+                promptUpdateNotification() {
+                    const newNotice = prompt('Enter a notification message to broadcast to all teachers in this school:', this.schoolNotification);
+                    if (newNotice !== null) {
+                        this.updateNotification(newNotice);
+                    }
+                },
+
+                updateNotification(message) {
+                    db.collection('registered_schools').doc(this.authenticatedSchoolId).update({
+                        notification: message
+                    }).then(() => {
+                        this.schoolNotification = message;
+                        alert('Notification broadcasted successfully to all teachers!');
+                    }).catch(err => alert('Error updating notice: ' + err.message));
+                },
+
+                verifyTeacherSession(event) {
+                    const chosenId = event.target.value;
+                    if (!chosenId) {
+                        this.selectedTeacherId = '';
+                        return;
+                    }
+
+                    const targetTeacher = this.teachers.find(t => t.id === chosenId);
+                    if (!targetTeacher) return;
+
+                    const enteredStaffId = prompt(`Enter Staff ID for ${targetTeacher.name}:`);
+                    
+                    if (enteredStaffId && enteredStaffId.trim().toUpperCase() === targetTeacher.id) {
+                        this.selectedTeacherId = targetTeacher.id;
+                        alert(`Welcome, ${targetTeacher.name}! Workspace unlocked.`);
+                    } else {
+                        alert('Incorrect Staff ID! Access denied.');
+                        event.target.value = this.selectedTeacherId;
+                    }
                 },
 
                 verifyPin() {
@@ -553,11 +745,11 @@
 
                 saveTeacherRecord() {
                     const id = this.teacherForm.id.trim().toUpperCase();
-                    const teacherData = { ...this.teacherForm, id };
+                    const teacherData = { ...this.teacherForm, id, schoolId: this.authenticatedSchoolId };
                     
                     db.collection('teachers').doc(id).set(teacherData)
                       .then(() => {
-                          alert('Teacher saved to cloud successfully!');
+                          alert('Teacher saved to ' + this.activeSchoolName + ' partition successfully!');
                           this.resetTeacherForm();
                       })
                       .catch(err => alert('Error saving teacher: ' + err.message));
@@ -574,7 +766,7 @@
                 },
 
                 deleteTeacher(id) {
-                    if (confirm('Remove this teacher from cloud?')) {
+                    if (confirm('Remove this teacher from this school partition?')) {
                         db.collection('teachers').doc(id).delete()
                           .catch(err => alert('Error deleting: ' + err.message));
                     }
@@ -593,6 +785,7 @@
                         ...this.form,
                         id: lessonId,
                         rawDate: Date.now(),
+                        schoolId: this.authenticatedSchoolId,
                         teacherId: t.id,
                         teacherName: t.name,
                         teacherContact: t.contact,
@@ -603,7 +796,7 @@
 
                     db.collection('lessons').doc(lessonId).set(lessonData)
                       .then(() => {
-                          alert('Lesson plan successfully submitted to cloud!');
+                          alert('Lesson plan submitted successfully to ' + this.activeSchoolName + '!');
                           this.resetForm();
                       })
                       .catch(err => alert('Error submitting: ' + err.message));
@@ -615,7 +808,7 @@
                 },
 
                 deleteLesson(id) {
-                    if (confirm('Delete this record from cloud?')) {
+                    if (confirm('Delete this record?')) {
                         db.collection('lessons').doc(id).delete()
                           .catch(err => alert('Error deleting: ' + err.message));
                     }
@@ -663,18 +856,18 @@
 
                 triggerLaggingAlerts() {
                     if (this.laggingTeachers.length === 0) { 
-                        alert('All onboarded teachers are compliant and have submitted their weekly lesson plans!'); 
+                        alert('All onboarded teachers in ' + this.activeSchoolName + ' are compliant!'); 
                         return; 
                     }
-                    alert('🚨 LAGGING TEACHERS FLAGGED:\nThe following teachers have failed to meet weekly submission requirements:\n\n' + this.laggingTeachers.map(t => `${t.id} - ${t.name} (${t.contact})`).join('\n'));
+                    alert('🚨 LAGGING TEACHERS FLAGGED (' + this.activeSchoolName + '):\n\n' + this.laggingTeachers.map(t => `${t.id} - ${t.name} (${t.contact})`).join('\n'));
                 },
 
                 exportData() {
-                    const backup = { teachers: this.teachers, lessons: this.lessons };
+                    const backup = { schoolId: this.authenticatedSchoolId, schoolName: this.activeSchoolName, teachers: this.teachers, lessons: this.lessons };
                     const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
                     const a = document.createElement('a');
                     a.href = URL.createObjectURL(blob);
-                    a.download = `school_cloud_backup_${new Date().toISOString().split('T')[0]}.json`;
+                    a.download = `${this.authenticatedSchoolId}_backup_${new Date().toISOString().split('T')[0]}.json`;
                     a.click();
                 }
             }
