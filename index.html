@@ -32,7 +32,7 @@
             <form x-show="gatewayTab === 'login'" @submit.prevent="loginSchool()" class="space-y-4">
                 <div>
                     <label class="block text-xs font-medium text-slate-700 mb-1">Enter School ID (e.g. OHO-001)</label>
-                    <input type="text" x-model="loginInputId" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm uppercase font-mono tracking-wide" placeholder="ATAKORA-983">
+                    <input type="text" x-model="loginInputId" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm uppercase font-mono tracking-wide" placeholder="OYOHO-983">
                 </div>
                 <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg text-sm transition shadow-sm">Access School Portal</button>
             </form>
@@ -41,7 +41,7 @@
             <form x-show="gatewayTab === 'register'" @submit.prevent="registerSchool()" class="space-y-3">
                 <div>
                     <label class="block text-xs font-medium text-slate-700 mb-1">Official School Name</label>
-                    <input type="text" x-model="regForm.name" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="Atakora D/A Junior High">
+                    <input type="text" x-model="regForm.name" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="Pigfarms Junior High">
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-slate-700 mb-1">District / Region Location</label>
@@ -277,7 +277,7 @@
             <div class="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 gap-3">
                 <div>
                     <h2 class="text-base font-bold text-indigo-900" x-text="activeSchoolName + ' - Reviewer Panel'"></h2>
-                    <p class="text-xs text-slate-500">Vertical Multi-Tenant Partition Active</p>
+                    <p class="text-xs text-slate-500">Active Tenant Partition</p>
                 </div>
                 <div class="flex flex-wrap gap-2 w-full sm:w-auto">
                     <button @click="promptUpdateNotification()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-3 py-2 rounded font-medium transition">📢 Broadcast Notice</button>
