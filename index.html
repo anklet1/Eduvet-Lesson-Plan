@@ -18,7 +18,7 @@
     <div x-show="!authenticatedSchoolId" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8 space-y-6 border border-slate-200">
             <div class="text-center">
-                <h1 class="text-xl font-bold text-indigo-900">📚 Multi-School Lesson Hub</h1>
+                <h1 class="text-xl font-bold text-indigo-900">📚 School Lesson Hub</h1>
                 <p class="text-xs text-slate-500 mt-1">Institutional Portal</p>
             </div>
 
@@ -31,7 +31,7 @@
             <!-- School Login Form -->
             <form x-show="gatewayTab === 'login'" @submit.prevent="loginSchool()" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-medium text-slate-700 mb-1">Enter School ID (e.g. ATAKORA-983)</label>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Enter School ID (e.g. OHO-001)</label>
                     <input type="text" x-model="loginInputId" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm uppercase font-mono tracking-wide" placeholder="ATAKORA-983">
                 </div>
                 <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg text-sm transition shadow-sm">Access School Portal</button>
@@ -45,11 +45,11 @@
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-slate-700 mb-1">District / Region Location</label>
-                    <input type="text" x-model="regForm.location" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="Kwahu Afram Plains North">
+                    <input type="text" x-model="regForm.location" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="Accra Metropolitan">
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-slate-700 mb-1">Administrator Contact</label>
-                    <input type="text" x-model="regForm.contact" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="0543521863">
+                    <input type="text" x-model="regForm.contact" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="054xxxxxxx">
                 </div>
                 <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg text-sm transition shadow-sm mt-2">Generate School ID & Register</button>
             </form>
@@ -116,7 +116,7 @@
                 <div class="flex items-center space-x-3">
                     <span class="text-2xl">📢</span>
                     <div>
-                        <h3 class="text-sm font-bold text-indigo-900">Institutional Announcement & Notice Board</h3>
+                        <h3 class="text-sm font-bold text-indigo-900">School Announcement & Notice Board</h3>
                         <p class="text-xs text-indigo-700 font-medium" x-text="schoolNotification"></p>
                     </div>
                 </div>
@@ -168,7 +168,7 @@
                         
                         <form @submit.prevent="submitLessonFile" class="space-y-4">
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Subject (NaCCA / GES Curriculum)</label>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Subject </label>
                                 <select x-model="form.subject" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm">
                                     <option value="">Select subject...</option>
                                     <template x-for="subj in allAvailableSubjects" :key="subj">
@@ -195,8 +195,12 @@
                                 <div>
                                     <label class="block text-xs font-medium text-slate-700 mb-1">Year</label>
                                     <select x-model="form.year" required class="w-full rounded-lg border-slate-300 border px-2 py-2 text-sm">
-                                        <option value="2026">2026</option>
-                                        <option value="2027">2027</option>
+                                        <option value="2026">2026/2027 Academic Year</option>
+                                        <option value="2027">2027/2028 Academic Year</option>
+                                        <option value="2027">2028/2029 Academic Year</option>
+                                        <option value="2027">2029/2030 Academic Year</option>
+                                        
+                
                                     </select>
                                 </div>
                             </div>
@@ -288,15 +292,15 @@
                 <form @submit.prevent="saveTeacherRecord" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-4 bg-slate-50 p-3 sm:p-4 rounded-lg border border-slate-200">
                     <div>
                         <label class="block text-xs font-medium text-slate-700 mb-1">Full Name</label>
-                        <input type="text" x-model="teacherForm.name" required class="w-full rounded border-slate-300 border px-3 py-1.5 text-sm" placeholder="Felix Fleku">
+                        <input type="text" x-model="teacherForm.name" required class="w-full rounded border-slate-300 border px-3 py-1.5 text-sm" placeholder="Kwaku John">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-slate-700 mb-1">Unique Staff ID</label>
-                        <input type="text" x-model="teacherForm.id" required class="w-full rounded border-slate-300 border px-3 py-1.5 text-sm uppercase" placeholder="GES-0543" :disabled="editingTeacherId">
+                        <input type="text" x-model="teacherForm.id" required class="w-full rounded border-slate-300 border px-3 py-1.5 text-sm uppercase" placeholder="GES-0531" :disabled="editingTeacherId">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-slate-700 mb-1">Phone Contact</label>
-                        <input type="text" x-model="teacherForm.contact" required class="w-full rounded border-slate-300 border px-3 py-1.5 text-sm" placeholder="0543521863">
+                        <input type="text" x-model="teacherForm.contact" required class="w-full rounded border-slate-300 border px-3 py-1.5 text-sm" placeholder="054xxxxxxx">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-slate-700 mb-1">Assigned Subjects (comma sep)</label>
@@ -436,7 +440,7 @@
                 <div x-show="adminSubTab === 'report'" class="space-y-6">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 pb-4">
                         <div>
-                            <h3 class="text-base font-bold text-indigo-900">📑 Official Inspection Summary Report</h3>
+                            <h3 class="text-base font-bold text-indigo-900">Summary Report</h3>
                             <div class="text-xs text-slate-600 space-x-2 mt-1">
                                 <span class="font-bold text-indigo-800" x-text="'School: ' + activeSchoolName"></span>
                                 <span>|</span>
@@ -445,7 +449,7 @@
                                 <span x-text="'Date Generated: ' + new Date().toLocaleDateString()"></span>
                             </div>
                             <div class="text-xs font-semibold text-indigo-600 mt-1">
-                                <span>Current Academic Period: Term 3, Academic Year 2025/2026 (Week 8)</span>
+                                <span>Current Academic Period: Term 1, Academic Year 2026/2027 (Week 1)</span>
                             </div>
                         </div>
                         <div class="flex gap-2">
