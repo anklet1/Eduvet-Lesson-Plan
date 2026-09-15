@@ -45,126 +45,142 @@
     <main class="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8 flex-grow w-full">
 
         <!-- ==================== PORTAL 1: TEACHER WORKSPACE ==================== -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8" x-show="portalMode === 'teacher'">
+        <div class="space-y-6" x-show="portalMode === 'teacher'">
             
-            <!-- Left Column: Metrics & Upload Form -->
-            <div class="space-y-6 lg:col-span-1">
-                <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-slate-200">
-                    <h2 class="text-base font-bold text-indigo-900 mb-3">My Performance Metrics</h2>
-                    <div class="space-y-2 text-sm">
-                        <div class="flex justify-between bg-slate-50 p-2 rounded">
-                            <span class="text-slate-600">Total Submissions:</span>
-                            <span class="font-bold text-indigo-900" x-text="teacherFilteredLessons.length"></span>
-                        </div>
-                        <div class="flex justify-between bg-slate-50 p-2 rounded">
-                            <span class="text-slate-600">Approved Plans:</span>
-                            <span class="font-bold text-emerald-600" x-text="teacherFilteredLessons.filter(l => l.status === 'Approved').length"></span>
-                        </div>
-                        <div class="flex justify-between bg-slate-50 p-2 rounded">
-                            <span class="text-slate-600">Pending / Revisions:</span>
-                            <span class="font-bold text-amber-600" x-text="teacherFilteredLessons.filter(l => l.status !== 'Approved').length"></span>
+            <!-- Personalized Teacher Lagging Alert Banner -->
+            <template x-if="activeTeacher && isTeacherLagging(activeTeacher.id)">
+                <div class="bg-rose-50 border-l-4 border-rose-500 p-4 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-2xl">🚨</span>
+                        <div>
+                            <h3 class="text-sm font-bold text-rose-900">Compliance Warning: Missing Weekly Lesson Plan</h3>
+                            <p class="text-xs text-rose-700">Staff ID: <span class="font-mono font-bold" x-text="activeTeacher.id"></span> | Contact: <span x-text="activeTeacher.contact"></span>. Please submit your required lesson plan immediately to clear this flag.</p>
                         </div>
                     </div>
+                    <span class="bg-rose-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">Action Required</span>
                 </div>
+            </template>
 
-                <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-slate-200">
-                    <h2 class="text-base sm:text-lg font-semibold mb-1 text-indigo-900" x-text="editingId ? 'Update Lesson Plan' : 'Submit Prepared Plan'"></h2>
-                    <p class="text-xs text-slate-500 mb-4" x-text="'Staff ID: ' + (activeTeacher ? activeTeacher.id : '')"></p>
-                    
-                    <form @submit.prevent="submitLessonFile" class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-medium text-slate-700 mb-1">Subject (NaCCA / GES Curriculum)</label>
-                            <select x-model="form.subject" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm">
-                                <option value="">Select subject...</option>
-                                <template x-for="subj in allAvailableSubjects" :key="subj">
-                                    <option :value="subj" x-text="subj"></option>
-                                </template>
-                            </select>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+                <!-- Left Column: Metrics & Upload Form -->
+                <div class="space-y-6 lg:col-span-1">
+                    <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-slate-200">
+                        <h2 class="text-base font-bold text-indigo-900 mb-3">My Performance Metrics</h2>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between bg-slate-50 p-2 rounded">
+                                <span class="text-slate-600">Total Submissions:</span>
+                                <span class="font-bold text-indigo-900" x-text="teacherFilteredLessons.length"></span>
+                            </div>
+                            <div class="flex justify-between bg-slate-50 p-2 rounded">
+                                <span class="text-slate-600">Approved Plans:</span>
+                                <span class="font-bold text-emerald-600" x-text="teacherFilteredLessons.filter(l => l.status === 'Approved').length"></span>
+                            </div>
+                            <div class="flex justify-between bg-slate-50 p-2 rounded">
+                                <span class="text-slate-600">Pending / Revisions:</span>
+                                <span class="font-bold text-amber-600" x-text="teacherFilteredLessons.filter(l => l.status !== 'Approved').length"></span>
+                            </div>
                         </div>
+                    </div>
 
-                        <div>
-                            <label class="block text-xs font-medium text-slate-700 mb-1">Class Level</label>
-                            <input type="text" x-model="form.classLevel" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="e.g. Basic 4 / JHS 2">
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-slate-200">
+                        <h2 class="text-base sm:text-lg font-semibold mb-1 text-indigo-900" x-text="editingId ? 'Update Lesson Plan' : 'Submit Prepared Plan'"></h2>
+                        <p class="text-xs text-slate-500 mb-4" x-text="'Staff ID: ' + (activeTeacher ? activeTeacher.id : '')"></p>
+                        
+                        <form @submit.prevent="submitLessonFile" class="space-y-4">
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Week</label>
-                                <select x-model="form.week" required class="w-full rounded-lg border-slate-300 border px-2 py-2 text-sm">
-                                    <option value="">Select week...</option>
-                                    <template x-for="w in 15" :key="w">
-                                        <option :value="'Week ' + w" x-text="'Week ' + w"></option>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Subject (NaCCA / GES Curriculum)</label>
+                                <select x-model="form.subject" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm">
+                                    <option value="">Select subject...</option>
+                                    <template x-for="subj in allAvailableSubjects" :key="subj">
+                                        <option :value="subj" x-text="subj"></option>
                                     </template>
                                 </select>
                             </div>
+
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Year</label>
-                                <select x-model="form.year" required class="w-full rounded-lg border-slate-300 border px-2 py-2 text-sm">
-                                    <option value="2026">2026</option>
-                                    <option value="2027">2027</option>
-                                </select>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Class Level</label>
+                                <input type="text" x-model="form.classLevel" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="e.g. Basic 4 / JHS 2">
                             </div>
-                        </div>
 
-                        <div>
-                            <label class="block text-xs font-medium text-slate-700 mb-1">Upload Document (Word / PDF)</label>
-                            <input type="file" @change="handleFileUpload($event)" accept=".pdf,.doc,.docx" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700">
-                            <span class="text-xs text-emerald-600 mt-1 block font-medium break-all" x-show="form.fileName" x-text="'Attached: ' + form.fileName"></span>
-                        </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-700 mb-1">Week</label>
+                                    <select x-model="form.week" required class="w-full rounded-lg border-slate-300 border px-2 py-2 text-sm">
+                                        <option value="">Select week...</option>
+                                        <template x-for="w in 15" :key="w">
+                                            <option :value="'Week ' + w" x-text="'Week ' + w"></option>
+                                        </template>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-700 mb-1">Year</label>
+                                    <select x-model="form.year" required class="w-full rounded-lg border-slate-300 border px-2 py-2 text-sm">
+                                        <option value="2026">2026</option>
+                                        <option value="2027">2027</option>
+                                    </select>
+                                </div>
+                            </div>
 
-                        <div class="flex space-x-2 pt-2">
-                            <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg text-sm transition" x-text="editingId ? 'Update' : 'Submit'"></button>
-                            <button type="button" @click="resetForm()" x-show="editingId" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium py-2 px-4 rounded-lg text-sm">Cancel</button>
-                        </div>
-                    </form>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Upload Document (Word / PDF)</label>
+                                <input type="file" @change="handleFileUpload($event)" accept=".pdf,.doc,.docx" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700">
+                                <span class="text-xs text-emerald-600 mt-1 block font-medium break-all" x-show="form.fileName" x-text="'Attached: ' + form.fileName"></span>
+                            </div>
+
+                            <div class="flex space-x-2 pt-2">
+                                <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg text-sm transition" x-text="editingId ? 'Update' : 'Submit'"></button>
+                                <button type="button" @click="resetForm()" x-show="editingId" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium py-2 px-4 rounded-lg text-sm">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Right Column: Submission History -->
-            <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-2 flex flex-col">
-                <h2 class="text-lg font-semibold text-indigo-900 mb-4">My Submitted Lesson Plans</h2>
+                <!-- Right Column: Submission History -->
+                <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-2 flex flex-col">
+                    <h2 class="text-lg font-semibold text-indigo-900 mb-4">My Submitted Lesson Plans</h2>
 
-                <div class="space-y-4 flex-grow overflow-y-auto max-h-[600px]">
-                    <template x-for="lesson in teacherFilteredLessons" :key="lesson.id">
-                        <div class="border border-slate-200 rounded-xl p-3 sm:p-4 bg-white flex flex-col justify-between hover:shadow-sm transition">
-                            <div>
-                                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
-                                    <div class="flex flex-wrap items-center gap-1.5">
-                                        <span class="bg-indigo-100 text-indigo-800 text-[11px] font-semibold px-2 py-0.5 rounded" x-text="lesson.subject"></span>
-                                        <span class="bg-slate-100 text-slate-700 text-[11px] px-2 py-0.5 rounded" x-text="lesson.classLevel"></span>
-                                        <span class="bg-indigo-50 text-indigo-700 text-[11px] font-medium px-2 py-0.5 rounded" x-text="lesson.week + ' (' + lesson.year + ')'"></span>
+                    <div class="space-y-4 flex-grow overflow-y-auto max-h-[600px]">
+                        <template x-for="lesson in teacherFilteredLessons" :key="lesson.id">
+                            <div class="border border-slate-200 rounded-xl p-3 sm:p-4 bg-white flex flex-col justify-between hover:shadow-sm transition">
+                                <div>
+                                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
+                                        <div class="flex flex-wrap items-center gap-1.5">
+                                            <span class="bg-indigo-100 text-indigo-800 text-[11px] font-semibold px-2 py-0.5 rounded" x-text="lesson.subject"></span>
+                                            <span class="bg-slate-100 text-slate-700 text-[11px] px-2 py-0.5 rounded" x-text="lesson.classLevel"></span>
+                                            <span class="bg-indigo-50 text-indigo-700 text-[11px] font-medium px-2 py-0.5 rounded" x-text="lesson.week + ' (' + lesson.year + ')'"></span>
+                                        </div>
+                                        <span class="text-xs font-bold px-2.5 py-0.5 rounded-full" 
+                                              :class="{
+                                                  'bg-amber-100 text-amber-800': lesson.status === 'Submitted',
+                                                  'bg-emerald-100 text-emerald-800': lesson.status === 'Approved',
+                                                  'bg-rose-100 text-rose-800': lesson.status === 'Rejected' || lesson.status === 'Changes Requested'
+                                              }" 
+                                              x-text="lesson.status">
+                                        </span>
                                     </div>
-                                    <span class="text-xs font-bold px-2.5 py-0.5 rounded-full" 
-                                          :class="{
-                                              'bg-amber-100 text-amber-800': lesson.status === 'Submitted',
-                                              'bg-emerald-100 text-emerald-800': lesson.status === 'Approved',
-                                              'bg-rose-100 text-rose-800': lesson.status === 'Rejected' || lesson.status === 'Changes Requested'
-                                          }" 
-                                          x-text="lesson.status">
-                                    </span>
+
+                                    <div class="text-xs my-2 bg-slate-50 p-2.5 rounded border border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                                        <a :href="lesson.fileData" :download="lesson.fileName" class="text-indigo-600 hover:underline font-semibold flex items-center gap-1 break-all">
+                                            📎 <span x-text="lesson.fileName"></span>
+                                        </a>
+                                        <span class="text-slate-400 text-[10px]" x-text="'Submitted: ' + lesson.timestamp"></span>
+                                    </div>
+
+                                    <div x-show="lesson.feedback" class="bg-rose-50 border border-rose-200 p-2 rounded text-xs text-rose-900 mb-2">
+                                        <strong>Reviewer Feedback:</strong> <span x-text="lesson.feedback"></span>
+                                    </div>
                                 </div>
 
-                                <div class="text-xs my-2 bg-slate-50 p-2.5 rounded border border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                                    <a :href="lesson.fileData" :download="lesson.fileName" class="text-indigo-600 hover:underline font-semibold flex items-center gap-1 break-all">
-                                        📎 <span x-text="lesson.fileName"></span>
-                                    </a>
-                                    <span class="text-slate-400 text-[10px]" x-text="'Submitted: ' + lesson.timestamp"></span>
-                                </div>
-
-                                <div x-show="lesson.feedback" class="bg-rose-50 border border-rose-200 p-2 rounded text-xs text-rose-900 mb-2">
-                                    <strong>Reviewer Feedback:</strong> <span x-text="lesson.feedback"></span>
+                                <div class="flex justify-end space-x-3 border-t border-slate-100 pt-2 text-xs">
+                                    <button @click="editSubmission(lesson)" class="text-indigo-600 hover:text-indigo-800 font-medium" x-show="lesson.status !== 'Approved'">Update File</button>
+                                    <button @click="deleteLesson(lesson.id)" class="text-rose-600 hover:text-rose-800 font-medium">Delete</button>
                                 </div>
                             </div>
+                        </template>
 
-                            <div class="flex justify-end space-x-3 border-t border-slate-100 pt-2 text-xs">
-                                <button @click="editSubmission(lesson)" class="text-indigo-600 hover:text-indigo-800 font-medium" x-show="lesson.status !== 'Approved'">Update File</button>
-                                <button @click="deleteLesson(lesson.id)" class="text-rose-600 hover:text-rose-800 font-medium">Delete</button>
-                            </div>
+                        <div x-show="teacherFilteredLessons.length === 0" class="text-center py-12 text-slate-400 text-sm">
+                            <p>No lesson submissions found.</p>
                         </div>
-                    </template>
-
-                    <div x-show="teacherFilteredLessons.length === 0" class="text-center py-12 text-slate-400 text-sm">
-                        <p>No lesson submissions found.</p>
                     </div>
                 </div>
             </div>
@@ -388,9 +404,8 @@
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 py-4 mt-auto">
         <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 font-medium space-y-1">
-            <p>© Edubyte Africa. All rights reserved. 2026</p>
-            <p class="text-slate-400">Developed by Edubyte Africa Inc. </p>
-            <p class="text-slate-400"></p> Contact: +233 543 521 863</p>
+            <p>© Edubyte Africa. All rights reserved.</p>
+            <p class="text-slate-400">Developed by Edubyte Africa Inc. | Contact: +233 543 521 863</p>
         </div>
     </footer>
 
@@ -409,7 +424,6 @@
             measurementId: "G-90YYJC66X3"
         };
 
-        // Initialize Firebase safely before Alpine runs
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
@@ -420,7 +434,7 @@
                 portalMode: 'teacher',
                 showOnboarding: false,
                 adminSubTab: 'queue',
-                selectedTeacherId: '',
+                selectedTeacherId: localStorage.getItem('active_teacher_id') || '',
 
                 teachers: [],
                 lessons: [],
@@ -496,6 +510,11 @@
 
                 getTeacherSubmissionCount(teacherId) {
                     return this.activeLessons.filter(l => l.teacherId === teacherId).length;
+                },
+
+                isTeacherLagging(teacherId) {
+                    const hasSubmitted = this.activeLessons.some(l => l.teacherId === teacherId);
+                    return !hasSubmitted;
                 },
 
                 handleFileUpload(event) {
