@@ -17,9 +17,17 @@
     <!-- ==================== SCHOOL GATEWAY / LOGIN & REGISTRATION OVERLAY ==================== -->
     <div x-show="!authenticatedSchoolId" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8 space-y-6 border border-slate-200">
-            <div class="text-center">
-                <h1 class="text-xl font-bold text-indigo-900">📚 School Lesson Hub</h1>
-                <p class="text-xs text-slate-500 mt-1">Institutional Portal</p>
+            <div class="text-center flex flex-col items-center">
+                <!-- Eduvet SVG Logo Icon -->
+                <div class="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-md mb-2">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0v6"/>
+                    </svg>
+                </div>
+                <h1 class="text-xl font-bold text-indigo-900">Eduvet School Hub</h1>
+                <p class="text-xs text-slate-500 mt-1">Trusted Vetting Portal</p>
             </div>
 
             <!-- Tabs Selection -->
@@ -31,8 +39,8 @@
             <!-- School Login Form -->
             <form x-show="gatewayTab === 'login'" @submit.prevent="loginSchool()" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-medium text-slate-700 mb-1">Enter School ID (e.g. OHO-001)</label>
-                    <input type="text" x-model="loginInputId" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm uppercase font-mono tracking-wide" placeholder="OYOHO-983">
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Enter School ID (e.g. ATAK-983)</label>
+                    <input type="text" x-model="loginInputId" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm uppercase font-mono tracking-wide" placeholder="ATAK-983">
                 </div>
                 <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg text-sm transition shadow-sm">Access School Portal</button>
             </form>
@@ -41,11 +49,11 @@
             <form x-show="gatewayTab === 'register'" @submit.prevent="registerSchool()" class="space-y-3">
                 <div>
                     <label class="block text-xs font-medium text-slate-700 mb-1">Official School Name</label>
-                    <input type="text" x-model="regForm.name" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="Pigfarms Junior High">
+                    <input type="text" x-model="regForm.name" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="Atakora D/A Junior High">
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-slate-700 mb-1">District / Region Location</label>
-                    <input type="text" x-model="regForm.location" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="Accra Metropolitan">
+                    <input type="text" x-model="regForm.location" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="Kwahu Afram Plains North">
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-slate-700 mb-1">Administrator Contact</label>
@@ -58,13 +66,21 @@
 
     <!-- Header / Active School Dashboard Bar -->
     <header class="bg-indigo-700 text-white shadow-md">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-3">
-            <div class="flex flex-col sm:flex-row items-center sm:space-x-3 text-center sm:text-left">
-                <h1 class="text-lg sm:text-xl font-bold tracking-tight">📚 School Lesson Hub</h1>
-                <div class="flex items-center gap-2 bg-indigo-800 px-3 py-1 rounded-lg border border-indigo-600 mt-1 sm:mt-0 text-xs">
-                    <span class="text-indigo-200">Active Institution:</span>
-                    <span class="font-bold text-white uppercase font-mono" x-text="activeSchoolName + ' (' + authenticatedSchoolId + ')'"></span>
-                    <button @click="logoutSchool()" class="text-rose-300 hover:text-white text-[10px] underline ml-2 font-sans">Switch School</button>
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-3">
+            <div class="flex items-center space-x-3 text-center sm:text-left">
+                <!-- Eduvet Logo SVG in Header -->
+                <div class="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center text-white border border-indigo-500">
+                    <svg class="w-5 h-5 text-indigo-100" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-bold tracking-tight">Eduvet School Hub</h1>
+                    <div class="flex items-center gap-2 text-[11px] text-indigo-200">
+                        <span class="font-bold text-white uppercase font-mono" x-text="activeSchoolName + ' (' + authenticatedSchoolId + ')'"></span>
+                        <button @click="logoutSchool()" class="text-rose-300 hover:text-white underline font-sans">[Switch School]</button>
+                    </div>
                 </div>
             </div>
 
@@ -168,7 +184,7 @@
                         
                         <form @submit.prevent="submitLessonFile" class="space-y-4">
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Subject </label>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Subject</label>
                                 <select x-model="form.subject" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm">
                                     <option value="">Select subject...</option>
                                     <template x-for="subj in allAvailableSubjects" :key="subj">
@@ -193,14 +209,12 @@
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-medium text-slate-700 mb-1">Year</label>
+                                    <label class="block text-xs font-medium text-slate-700 mb-1">Academic Year</label>
                                     <select x-model="form.year" required class="w-full rounded-lg border-slate-300 border px-2 py-2 text-sm">
-                                        <option value="2026">2026/2027 Academic Year</option>
-                                        <option value="2027">2027/2028 Academic Year</option>
-                                        <option value="2027">2028/2029 Academic Year</option>
-                                        <option value="2027">2029/2030 Academic Year</option>
-                                        
-                
+                                        <option value="2026/2027">2026/2027 Academic Year</option>
+                                        <option value="2027/2028">2027/2028 Academic Year</option>
+                                        <option value="2028/2029">2028/2029 Academic Year</option>
+                                        <option value="2029/2030">2029/2030 Academic Year</option>
                                     </select>
                                 </div>
                             </div>
@@ -292,15 +306,15 @@
                 <form @submit.prevent="saveTeacherRecord" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-4 bg-slate-50 p-3 sm:p-4 rounded-lg border border-slate-200">
                     <div>
                         <label class="block text-xs font-medium text-slate-700 mb-1">Full Name</label>
-                        <input type="text" x-model="teacherForm.name" required class="w-full rounded border-slate-300 border px-3 py-1.5 text-sm" placeholder="Kwaku John">
+                        <input type="text" x-model="teacherForm.name" required class="w-full rounded border-slate-300 border px-3 py-1.5 text-sm" placeholder="Felix Fleku">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-slate-700 mb-1">Unique Staff ID</label>
-                        <input type="text" x-model="teacherForm.id" required class="w-full rounded border-slate-300 border px-3 py-1.5 text-sm uppercase" placeholder="GES-0531" :disabled="editingTeacherId">
+                        <input type="text" x-model="teacherForm.id" required class="w-full rounded border-slate-300 border px-3 py-1.5 text-sm uppercase" placeholder="GES-0543" :disabled="editingTeacherId">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-slate-700 mb-1">Phone Contact</label>
-                        <input type="text" x-model="teacherForm.contact" required class="w-full rounded border-slate-300 border px-3 py-1.5 text-sm" placeholder="054xxxxxxx">
+                        <input type="text" x-model="teacherForm.contact" required class="w-full rounded border-slate-300 border px-3 py-1.5 text-sm" placeholder="0543521863">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-slate-700 mb-1">Assigned Subjects (comma sep)</label>
@@ -350,7 +364,17 @@
                         <button @click="adminSubTab = 'archive'" :class="adminSubTab === 'archive' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700'" class="flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-lg text-xs font-semibold transition">Archive</button>
                         <button @click="adminSubTab = 'report'" :class="adminSubTab === 'report' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700'" class="flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-lg text-xs font-semibold transition">📊 Inspection Report</button>
                     </div>
-                    <input x-show="adminSubTab !== 'report'" type="text" x-model="adminSearchQuery" placeholder="Search teacher or subject..." class="rounded-lg border-slate-300 border px-3 py-1.5 text-sm w-full lg:w-64">
+
+                    <!-- Filter / Sort controls for Reviewer Queue -->
+                    <div class="flex items-center gap-2 w-full lg:w-auto justify-end">
+                        <select x-show="adminSubTab === 'queue' || adminSubTab === 'history'" x-model="reviewerWeekFilter" class="rounded-lg border-slate-300 border px-3 py-1.5 text-xs bg-white text-slate-700">
+                            <option value="">Filter by Week (All)</option>
+                            <template x-for="w in 15" :key="w">
+                                <option :value="'Week ' + w" x-text="'Week ' + w"></option>
+                            </template>
+                        </select>
+                        <input x-show="adminSubTab !== 'report'" type="text" x-model="adminSearchQuery" placeholder="Search teacher or subject..." class="rounded-lg border-slate-300 border px-3 py-1.5 text-sm w-full lg:w-48">
+                    </div>
                 </div>
 
                 <!-- Queue Tab -->
@@ -382,18 +406,21 @@
                                 </div>
                             </div>
 
-                            <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-end">
-                                <button @click="reviewAction(lesson, 'Approved')" class="flex-1 lg:flex-initial bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded font-medium">Approve</button>
-                                <button @click="reviewAction(lesson, 'Changes Requested')" class="flex-1 lg:flex-initial bg-amber-600 hover:bg-amber-700 text-white text-xs px-3 py-1.5 rounded font-medium">Revisions</button>
-                                <button @click="reviewAction(lesson, 'Rejected')" class="flex-1 lg:flex-initial bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded font-medium">Reject</button>
+                            <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-end"
+                                 :class="lesson.status === 'Approved' ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''"
+                                 :title="lesson.status === 'Approved' ? 'Approved plans cannot be modified.' : ''">
+                                <button @click="reviewAction(lesson, 'Approved')" class="flex-1 lg:flex-initial bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded font-medium transition">Approve</button>
+                                <button @click="reviewAction(lesson, 'Changes Requested')" class="flex-1 lg:flex-initial bg-amber-600 hover:bg-amber-700 text-white text-xs px-3 py-1.5 rounded font-medium transition">Revisions</button>
+                                <button @click="reviewAction(lesson, 'Rejected')" class="flex-1 lg:flex-initial bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded font-medium transition">Reject</button>
                             </div>
                         </div>
                     </template>
-                    <div x-show="adminFilteredActiveLessons.length === 0" class="text-center py-8 text-slate-400 text-sm">No submissions in queue.</div>
+                    <div x-show="adminFilteredActiveLessons.length === 0" class="text-center py-8 text-slate-400 text-sm">No submissions in queue matching filter.</div>
                 </div>
 
-                <!-- History Tab -->
+                <!-- History Tab (Grouped & Sorted) -->
                 <div x-show="adminSubTab === 'history'" class="space-y-4 max-h-[550px] overflow-x-auto">
+                    <div class="text-xs text-slate-500 mb-2 font-medium">📋 Submissions grouped by Teacher Name, ID, Subject, and Week Number:</div>
                     <table class="w-full text-left text-sm border-collapse min-w-[650px]">
                        <thead>
                            <tr class="bg-slate-100 text-slate-700 text-xs uppercase">
@@ -412,7 +439,7 @@
                                    <td class="p-3"><div class="text-xs font-mono font-bold text-indigo-700" x-text="lesson.teacherId"></div><div class="font-medium text-slate-900 text-xs" x-text="lesson.teacherName"></div></td>
                                    <td class="p-3 text-slate-600 text-xs" x-text="lesson.teacherContact"></td>
                                    <td class="p-3 text-xs"><span class="font-semibold" x-text="lesson.subject"></span> (<span x-text="lesson.classLevel"></span>)</td>
-                                   <td class="p-3 text-xs text-slate-600" x-text="lesson.week + ' ' + lesson.year"></td>
+                                   <td class="p-3 text-xs text-slate-600 font-semibold text-indigo-700" x-text="lesson.week + ' ' + lesson.year"></td>
                                    <td class="p-3"><span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="{'bg-amber-100 text-amber-800': lesson.status === 'Submitted', 'bg-emerald-100 text-emerald-800': lesson.status === 'Approved', 'bg-rose-100 text-rose-800': lesson.status === 'Rejected' || lesson.status === 'Changes Requested'}" x-text="lesson.status"></span></td>
                                    <td class="p-3"><a :href="lesson.fileData" :download="lesson.fileName" class="text-indigo-600 text-xs hover:underline font-medium break-all">📥 <span x-text="lesson.fileName"></span></a></td>
                                    <td class="p-3 text-right"><button @click="deleteLesson(lesson.id)" class="text-rose-600 hover:text-rose-800 text-xs font-medium">Delete</button></td>
@@ -548,7 +575,6 @@
 
                 gatewayTab: 'login',
                 loginInputId: '',
-                // Session starts clean on refresh (No localStorage caching for school login)
                 authenticatedSchoolId: '',
                 activeSchoolName: '',
                 schoolNotification: '',
@@ -578,6 +604,7 @@
                 ],
 
                 adminSearchQuery: '',
+                reviewerWeekFilter: '',
                 editingId: null,
                 editingTeacherId: null,
 
@@ -587,7 +614,7 @@
                     subject: '',
                     classLevel: '',
                     week: '',
-                    year: '2026',
+                    year: '2026/2027',
                     fileName: '',
                     fileData: '',
                     status: 'Submitted',
@@ -596,6 +623,18 @@
 
                 init() {
                     // Session requires manual login every refresh
+                },
+
+                // Helper utility to calculate current active academic week of the term
+                getCurrentSystemWeekNumber() {
+                    const termStart = new Date('2026-09-07'); // Term Start Date
+                    const now = new Date();
+                    const diffTime = now - termStart;
+                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                    let currentWeek = Math.floor(diffDays / 7) + 1;
+                    if (currentWeek < 1) currentWeek = 1;
+                    if (currentWeek > 15) currentWeek = 15;
+                    return currentWeek;
                 },
 
                 registerSchool() {
@@ -618,7 +657,6 @@
                     db.collection('registered_schools').doc(generatedId).set(schoolRecord)
                       .then(() => {
                           alert(`School Registered Successfully!\n\nYour Unique School ID is: ${generatedId}\n\nPlease copy this code and use it to log into your school portal.`);
-                          // Reset form and switch to login tab with pre-filled ID for convenience
                           this.regForm = { name: '', location: '', contact: '' };
                           this.gatewayTab = 'login';
                           this.loginInputId = generatedId;
@@ -779,6 +817,23 @@
                 submitLessonFile() {
                     const t = this.activeTeacher;
                     if (!t) return;
+
+                    // Future submission restriction check: Teachers cannot submit to future weeks
+                    const selectedWeekNum = parseInt(this.form.week.replace('Week ', '')) || 1;
+                    const currentSystemWeek = this.getCurrentSystemWeekNumber();
+                    const now = new Date();
+                    const dayOfWeek = now.getDay(); // 0 is Sunday, 5 is Friday
+
+                    if (selectedWeekNum > currentSystemWeek) {
+                        alert(`❌ Restriction Notice:\nYou cannot submit lesson plans for future weeks (Week ${selectedWeekNum}). Current active week is Week ${currentSystemWeek}.`);
+                        return;
+                    }
+
+                    if (selectedWeekNum === currentSystemWeek + 1 && dayOfWeek < 5 && dayOfWeek !== 0) {
+                        alert(`⏳ Submission Window Locked:\nYou cannot submit lessons for Week ${selectedWeekNum} until Friday of the current week (Week ${currentSystemWeek}).`);
+                        return;
+                    }
+
                     if (!this.form.fileName && !this.editingId) {
                         alert('Please attach your Word or PDF lesson plan document.');
                         return;
@@ -836,21 +891,69 @@
 
                 resetForm() {
                     this.editingId = null;
-                    this.form = { subject: '', classLevel: '', week: '', year: '2026', fileName: '', fileData: '', status: 'Submitted', feedback: '' };
+                    this.form = { subject: '', classLevel: '', week: '', year: '2026/2027', fileName: '', fileData: '', status: 'Submitted', feedback: '' };
                 },
 
                 get activeLessons() { return this.lessons.filter(l => !l.isArchived); },
                 get archivedLessons() { return this.lessons.filter(l => l.isArchived); },
                 get teacherFilteredLessons() { return this.lessons.filter(l => l.teacherId === this.selectedTeacherId); },
                 
+                // Filtered & Sorted Reviewer Queue grouped strictly by Teacher Name, ID, Subject, and Week
                 get adminFilteredActiveLessons() {
+                    let items = [...this.activeLessons];
+                    
+                    if (this.reviewerWeekFilter) {
+                        items = items.filter(l => l.week === this.reviewerWeekFilter);
+                    }
+
                     const q = this.adminSearchQuery.toLowerCase();
-                    return this.activeLessons.filter(l => !q || l.teacherName.toLowerCase().includes(q) || l.subject.toLowerCase().includes(q) || l.teacherId.toLowerCase().includes(q));
+                    if (q) {
+                        items = items.filter(l => l.teacherName.toLowerCase().includes(q) || l.subject.toLowerCase().includes(q) || l.teacherId.toLowerCase().includes(q));
+                    }
+
+                    return items.sort((a, b) => {
+                        const nameComp = a.teacherName.localeCompare(b.teacherName);
+                        if (nameComp !== 0) return nameComp;
+
+                        const idComp = a.teacherId.localeCompare(b.teacherId);
+                        if (idComp !== 0) return idComp;
+
+                        const subjComp = a.subject.localeCompare(b.subject);
+                        if (subjComp !== 0) return subjComp;
+
+                        const weekA = parseInt(a.week.replace('Week ', '')) || 0;
+                        const weekB = parseInt(b.week.replace('Week ', '')) || 0;
+                        return weekA - weekB;
+                    });
                 },
                 
+                // Grouped & Sorted History Tab
                 get adminFilteredAllLessons() {
+                    let items = [...this.lessons];
+
+                    if (this.reviewerWeekFilter) {
+                        items = items.filter(l => l.week === this.reviewerWeekFilter);
+                    }
+
                     const q = this.adminSearchQuery.toLowerCase();
-                    return [...this.lessons].sort((a, b) => a.teacherId.localeCompare(b.teacherId)).filter(l => !q || l.teacherName.toLowerCase().includes(q) || l.subject.toLowerCase().includes(q) || l.teacherId.toLowerCase().includes(q));
+                    if (q) {
+                        items = items.filter(l => l.teacherName.toLowerCase().includes(q) || l.subject.toLowerCase().includes(q) || l.teacherId.toLowerCase().includes(q));
+                    }
+
+                    return items.sort((a, b) => {
+                        const nameComp = a.teacherName.localeCompare(b.teacherName);
+                        if (nameComp !== 0) return nameComp;
+
+                        const idComp = a.teacherId.localeCompare(b.teacherId);
+                        if (idComp !== 0) return idComp;
+
+                        const subjComp = a.subject.localeCompare(b.subject);
+                        if (subjComp !== 0) return subjComp;
+
+                        const weekA = parseInt(a.week.replace('Week ', '')) || 0;
+                        const weekB = parseInt(b.week.replace('Week ', '')) || 0;
+                        return weekA - weekB;
+                    });
                 },
 
                 get laggingTeachers() {
