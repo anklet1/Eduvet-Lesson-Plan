@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School Lesson Plan Portal</title>
+    <title>Eduvet School Hub</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Firebase Compat SDKs (Loaded first in head) -->
@@ -11,23 +11,55 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- Print-Only Styling Rules to isolate the Inspection Report cleanly into PDF -->
+    <style>
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printable-report, #printable-report * {
+                visibility: visible;
+            }
+            #printable-report {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 20px;
+                background: white !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col overflow-x-hidden" x-data="schoolApp()">
 
     <!-- ==================== SCHOOL GATEWAY / LOGIN & REGISTRATION OVERLAY ==================== -->
     <div x-show="!authenticatedSchoolId" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8 space-y-6 border border-slate-200">
-            <div class="text-center flex flex-col items-center">
-                <!-- Eduvet SVG Logo Icon -->
-                <div class="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-md mb-2">
-                    <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0v6"/>
+            
+            <!-- Branded Logo Header -->
+            <div class="flex flex-col items-center text-center">
+                <div class="flex items-center space-x-3 mb-2">
+                    <svg class="w-12 h-12" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 25C10 25 25 35 45 28V75C25 82 10 70 10 70V25Z" fill="#2563EB"/>
+                        <path d="M90 25C90 25 75 35 55 28V75C75 82 90 70 90 70V25Z" fill="#0D9488"/>
+                        <path d="M28 50L44 65L74 32" stroke="#F97316" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
+                    <div class="text-left">
+                        <div class="text-2xl font-black tracking-tight text-slate-900 leading-none">
+                            edu<span class="text-teal-600">vet</span>
+                        </div>
+                        <div class="text-[10px] font-bold tracking-[0.25em] text-slate-500 uppercase mt-1">
+                            School Hub
+                        </div>
+                    </div>
                 </div>
-                <h1 class="text-xl font-bold text-indigo-900">Eduvet School Hub</h1>
-                <p class="text-xs text-slate-500 mt-1">Trusted Vetting Portal</p>
+                <p class="text-xs text-slate-500 mt-1">Multi-Tenant Institutional Lesson Plan Portal</p>
             </div>
 
             <!-- Tabs Selection -->
@@ -56,8 +88,12 @@
                     <input type="text" x-model="regForm.location" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="Kwahu Afram Plains North">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-slate-700 mb-1">Administrator Contact</label>
-                    <input type="text" x-model="regForm.contact" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="054xxxxxxx">
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Headteacher / Administrator Name</label>
+                    <input type="text" x-model="regForm.headName" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="Mr. John Doe">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Headteacher Contact</label>
+                    <input type="text" x-model="regForm.headContact" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="054xxxxxxx">
                 </div>
                 <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg text-sm transition shadow-sm mt-2">Generate School ID & Register</button>
             </form>
@@ -65,45 +101,48 @@
     </div>
 
     <!-- Header / Active School Dashboard Bar -->
-    <header class="bg-indigo-700 text-white shadow-md">
+    <header class="bg-indigo-900 text-white shadow-md no-print">
         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-3">
+            
             <div class="flex items-center space-x-3 text-center sm:text-left">
-                <!-- Eduvet Logo SVG in Header -->
-                <div class="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center text-white border border-indigo-500">
-                    <svg class="w-5 h-5 text-indigo-100" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+                <div class="w-9 h-9 bg-white rounded-lg flex items-center justify-center shadow-sm p-1">
+                    <svg class="w-full h-full" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 25C10 25 25 35 45 28V75C25 82 10 70 10 70V25Z" fill="#2563EB"/>
+                        <path d="M90 25C90 25 75 35 55 28V75C75 82 90 70 90 70V25Z" fill="#0D9488"/>
+                        <path d="M28 50L44 65L74 32" stroke="#F97316" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </div>
                 <div>
-                    <h1 class="text-base sm:text-lg font-bold tracking-tight">Eduvet School Hub</h1>
-                    <div class="flex items-center gap-2 text-[11px] text-indigo-200">
+                    <div class="text-base font-black tracking-tight leading-none text-white">
+                        edu<span class="text-teal-400">vet</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-[10px] text-indigo-200 mt-0.5">
                         <span class="font-bold text-white uppercase font-mono" x-text="activeSchoolName + ' (' + authenticatedSchoolId + ')'"></span>
-                        <button @click="logoutSchool()" class="text-rose-300 hover:text-white underline font-sans">[Switch School]</button>
                     </div>
                 </div>
             </div>
 
             <div class="flex flex-wrap items-center justify-center gap-2 text-sm w-full sm:w-auto">
-                <!-- Teacher Profile Selector with Staff ID Lock -->
+                <!-- Teacher Profile Selector with Staff ID Security Guard -->
                 <div x-show="portalMode === 'teacher'" class="flex items-center gap-1 w-full sm:w-auto justify-center">
                     <label class="text-xs text-indigo-200 hidden md:inline">Profile:</label>
                     <select x-model="selectedTeacherId" @change="verifyTeacherSession($event)" class="bg-indigo-800 text-white border border-indigo-600 rounded-lg px-2 py-1.5 text-xs focus:outline-none w-full sm:w-48">
-                        <option value="">-- Select Teacher Profile --</option>
+                        <option value="">-- Select Your Name --</option>
                         <template x-for="t in sortedTeachers" :key="t.id">
-                            <option :value="t.id" x-text="t.id + ' - ' + t.name"></option>
+                            <option :value="t.id" x-text="t.name"></option>
                         </template>
                     </select>
                 </div>
 
                 <button x-show="portalMode === 'reviewer'" @click="portalMode = 'teacher'" class="bg-indigo-600 hover:bg-indigo-500 px-3 py-1.5 rounded text-xs font-medium transition">Exit to Teacher Portal</button>
                 <button @click="showPinModal = true" class="text-indigo-300 hover:text-white text-xs font-mono transition" title="Reviewer Access">🔒 Reviewer Login</button>
+                <button @click="logoutSchool()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded text-xs font-semibold transition shadow-sm flex items-center gap-1">🚪 Logout</button>
             </div>
         </div>
     </header>
 
     <!-- Secure PIN Modal Overlay -->
-    <div x-show="showPinModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display: none;">
+    <div x-show="showPinModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print" style="display: none;">
         <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 space-y-4 border border-slate-200" @click.away="showPinModal = false">
             <div class="text-center">
                 <div class="text-3xl mb-1">🔐</div>
@@ -126,9 +165,9 @@
     <!-- Main Container -->
     <main class="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8 flex-grow w-full space-y-6" x-show="authenticatedSchoolId">
 
-        <!-- ==================== UNIVERSAL NOTICE BOARD (VISIBLE ON BOTH SIDES) ==================== -->
+        <!-- ==================== UNIVERSAL NOTICE BOARD ==================== -->
         <template x-if="schoolNotification">
-            <div class="bg-indigo-50 border-l-4 border-indigo-600 p-4 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div class="bg-indigo-50 border-l-4 border-indigo-600 p-4 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 no-print">
                 <div class="flex items-center space-x-3">
                     <span class="text-2xl">📢</span>
                     <div>
@@ -141,7 +180,7 @@
         </template>
 
         <!-- ==================== PORTAL 1: TEACHER WORKSPACE ==================== -->
-        <div class="space-y-6" x-show="portalMode === 'teacher'">
+        <div class="space-y-6 no-print" x-show="portalMode === 'teacher'">
             
             <!-- Personalized Teacher Lagging Alert Banner -->
             <template x-if="activeTeacher && isTeacherLagging(activeTeacher.id)">
@@ -150,7 +189,7 @@
                         <span class="text-2xl">🚨</span>
                         <div>
                             <h3 class="text-sm font-bold text-rose-900">Compliance Warning: Missing Weekly Lesson Plan</h3>
-                            <p class="text-xs text-rose-700">Staff ID: <span class="font-mono font-bold" x-text="activeTeacher.id"></span> | Contact: <span x-text="activeTeacher.contact"></span>. Please submit your required lesson plan immediately for <span x-text="activeSchoolName"></span>.</p>
+                            <p class="text-xs text-rose-700">Staff ID: <span class="font-mono font-bold" x-text="activeTeacher.id"></span> | Contact: <span x-text="activeTeacher.contact"></span>. Please submit your required lesson plan immediately for <span x-text="activeSchoolName"></span>[cite: 5].</p>
                         </div>
                     </div>
                     <span class="bg-rose-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">Action Required</span>
@@ -198,10 +237,19 @@
                                 <input type="text" x-model="form.classLevel" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="e.g. Basic 4 / JHS 2">
                             </div>
 
-                            <div class="grid grid-cols-2 gap-3">
+                            <div class="grid grid-cols-3 gap-2">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-700 mb-1">Term</label>
+                                    <select x-model="form.term" required class="w-full rounded-lg border-slate-300 border px-2 py-2 text-xs">
+                                        <option value="">Select term...</option>
+                                        <option value="Term 1">Term 1</option>
+                                        <option value="Term 2">Term 2</option>
+                                        <option value="Term 3">Term 3</option>
+                                    </select>
+                                </div>
                                 <div>
                                     <label class="block text-xs font-medium text-slate-700 mb-1">Week</label>
-                                    <select x-model="form.week" required class="w-full rounded-lg border-slate-300 border px-2 py-2 text-sm">
+                                    <select x-model="form.week" required class="w-full rounded-lg border-slate-300 border px-2 py-2 text-xs">
                                         <option value="">Select week...</option>
                                         <template x-for="w in 15" :key="w">
                                             <option :value="'Week ' + w" x-text="'Week ' + w"></option>
@@ -209,12 +257,11 @@
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-medium text-slate-700 mb-1">Academic Year</label>
-                                    <select x-model="form.year" required class="w-full rounded-lg border-slate-300 border px-2 py-2 text-sm">
-                                        <option value="2026/2027">2026/2027 Academic Year</option>
-                                        <option value="2027/2028">2027/2028 Academic Year</option>
-                                        <option value="2028/2029">2028/2029 Academic Year</option>
-                                        <option value="2029/2030">2029/2030 Academic Year</option>
+                                    <label class="block text-xs font-medium text-slate-700 mb-1">Year</label>
+                                    <select x-model="form.year" required class="w-full rounded-lg border-slate-300 border px-2 py-2 text-xs">
+                                        <option value="2026/2027">2026/2027</option>
+                                        <option value="2027/2028">2027/2028</option>
+                                        <option value="2028/2029">2028/2029</option>
                                     </select>
                                 </div>
                             </div>
@@ -245,7 +292,7 @@
                                         <div class="flex flex-wrap items-center gap-1.5">
                                             <span class="bg-indigo-100 text-indigo-800 text-[11px] font-semibold px-2 py-0.5 rounded" x-text="lesson.subject"></span>
                                             <span class="bg-slate-100 text-slate-700 text-[11px] px-2 py-0.5 rounded" x-text="lesson.classLevel"></span>
-                                            <span class="bg-indigo-50 text-indigo-700 text-[11px] font-medium px-2 py-0.5 rounded" x-text="lesson.week + ' (' + lesson.year + ')'"></span>
+                                            <span class="bg-indigo-50 text-indigo-700 text-[11px] font-medium px-2 py-0.5 rounded" x-text="lesson.term + ' | ' + lesson.week + ' (' + lesson.year + ')'"></span>
                                         </div>
                                         <span class="text-xs font-bold px-2.5 py-0.5 rounded-full" 
                                               :class="{
@@ -288,28 +335,27 @@
         <div class="space-y-6" x-show="portalMode === 'reviewer'">
             
             <!-- Management Bar -->
-            <div class="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 gap-3">
+            <div class="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 gap-3 no-print">
                 <div>
-                    <h2 class="text-base font-bold text-indigo-900" x-text="activeSchoolName + ' - Reviewer Panel'"></h2>
+                    <h2 class="text-base font-bold text-indigo-900" x-text="activeSchoolName + ' - Inspection Dashboard'"></h2>
                     <p class="text-xs text-slate-500">Active Tenant Partition</p>
                 </div>
                 <div class="flex flex-wrap gap-2 w-full sm:w-auto">
-                    <button @click="promptUpdateNotification()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-3 py-2 rounded font-medium transition">📢 Broadcast Notice</button>
-                    <button @click="showOnboarding = !showOnboarding" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-2 rounded font-medium transition" x-text="showOnboarding ? 'Close Directory' : 'Manage Teachers'"></button>
-                    <button @click="exportData()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs px-3 py-2 rounded font-medium transition">Backup JSON</button>
+                    <button @click="promptUpdateSchoolInfo()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-2 rounded font-medium transition">⚙️ Edit School & Head Info</button>
+                    <button @click="showOnboarding = !showOnboarding" class="bg-slate-800 hover:bg-slate-900 text-white text-xs px-3 py-2 rounded font-medium transition" x-text="showOnboarding ? 'Close Directory' : 'Manage Teachers'"></button>
                 </div>
             </div>
 
             <!-- Onboarding Directory Drawer -->
-            <section x-show="showOnboarding" class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-slate-200 overflow-x-hidden">
-                <h3 class="text-sm font-bold text-indigo-900 mb-3" x-text="editingTeacherId ? 'Edit Teacher Record' : 'Teacher Onboarding Directory'"></h3>
+            <section x-show="showOnboarding" class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-slate-200 overflow-x-hidden no-print">
+                <h3 class="text-sm font-bold text-indigo-900 mb-1" x-text="editingTeacherId ? 'Edit Teacher Record' : 'Teacher Onboarding Directory'"></h3>
                 <form @submit.prevent="saveTeacherRecord" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-4 bg-slate-50 p-3 sm:p-4 rounded-lg border border-slate-200">
                     <div>
                         <label class="block text-xs font-medium text-slate-700 mb-1">Full Name</label>
                         <input type="text" x-model="teacherForm.name" required class="w-full rounded border-slate-300 border px-3 py-1.5 text-sm" placeholder="Felix Fleku">
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-slate-700 mb-1">Unique Staff ID</label>
+                        <label class="block text-xs font-medium text-slate-700 mb-1">Unique Staff ID (PIN)</label>
                         <input type="text" x-model="teacherForm.id" required class="w-full rounded border-slate-300 border px-3 py-1.5 text-sm uppercase" placeholder="GES-0543" :disabled="editingTeacherId">
                     </div>
                     <div>
@@ -330,7 +376,7 @@
                     <table class="w-full text-left text-sm border-collapse min-w-[500px]">
                         <thead>
                             <tr class="bg-slate-100 text-slate-700 text-xs uppercase">
-                                <th class="p-3">Staff ID</th>
+                                <th class="p-3">Staff ID (Code)</th>
                                 <th class="p-3">Name</th>
                                 <th class="p-3">Contact</th>
                                 <th class="p-3">Subjects</th>
@@ -357,7 +403,7 @@
 
             <!-- Reviewer Navigation Sub-Tabs -->
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6">
-                <div class="flex flex-col lg:flex-row justify-between items-center mb-6 gap-4 border-b border-slate-100 pb-4">
+                <div class="flex flex-col lg:flex-row justify-between items-center mb-6 gap-4 border-b border-slate-100 pb-4 no-print">
                     <div class="flex flex-wrap gap-1.5 w-full lg:w-auto">
                         <button @click="adminSubTab = 'queue'" :class="adminSubTab === 'queue' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700'" class="flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-lg text-xs font-semibold transition">Vetting Queue</button>
                         <button @click="adminSubTab = 'history'" :class="adminSubTab === 'history' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700'" class="flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-lg text-xs font-semibold transition">Teachers History</button>
@@ -365,8 +411,14 @@
                         <button @click="adminSubTab = 'report'" :class="adminSubTab === 'report' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700'" class="flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-lg text-xs font-semibold transition">📊 Inspection Report</button>
                     </div>
 
-                    <!-- Filter / Sort controls for Reviewer Queue -->
+                    <!-- Filter controls -->
                     <div class="flex items-center gap-2 w-full lg:w-auto justify-end">
+                        <select x-show="adminSubTab === 'queue' || adminSubTab === 'history'" x-model="reviewerTermFilter" class="rounded-lg border-slate-300 border px-3 py-1.5 text-xs bg-white text-slate-700">
+                            <option value="">Filter by Term (All)</option>
+                            <option value="Term 1">Term 1</option>
+                            <option value="Term 2">Term 2</option>
+                            <option value="Term 3">Term 3</option>
+                        </select>
                         <select x-show="adminSubTab === 'queue' || adminSubTab === 'history'" x-model="reviewerWeekFilter" class="rounded-lg border-slate-300 border px-3 py-1.5 text-xs bg-white text-slate-700">
                             <option value="">Filter by Week (All)</option>
                             <template x-for="w in 15" :key="w">
@@ -378,14 +430,14 @@
                 </div>
 
                 <!-- Queue Tab -->
-                <div x-show="adminSubTab === 'queue'" class="space-y-4 max-h-[550px] overflow-y-auto">
+                <div x-show="adminSubTab === 'queue'" class="space-y-4 max-h-[550px] overflow-y-auto no-print">
                     <template x-for="lesson in adminFilteredActiveLessons" :key="lesson.id">
                         <div class="border border-slate-200 rounded-xl p-3 sm:p-4 bg-slate-50/50 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                             <div class="space-y-1.5 flex-grow w-full">
                                 <div class="flex flex-wrap items-center gap-1.5">
                                     <span class="bg-indigo-100 text-indigo-800 text-[11px] font-semibold px-2 py-0.5 rounded" x-text="lesson.subject"></span>
                                     <span class="bg-slate-200 text-slate-700 text-[11px] px-2 py-0.5 rounded" x-text="lesson.classLevel"></span>
-                                    <span class="bg-indigo-50 text-indigo-700 text-[11px] font-medium px-2 py-0.5 rounded" x-text="lesson.week + ' (' + lesson.year + ')'"></span>
+                                    <span class="bg-indigo-50 text-indigo-700 text-[11px] font-medium px-2 py-0.5 rounded" x-text="lesson.term + ' | ' + lesson.week + ' (' + lesson.year + ')'"></span>
                                     <span class="text-[11px] font-semibold text-indigo-900 bg-white px-2 py-0.5 rounded border border-slate-200 font-mono" x-text="'ID: ' + lesson.teacherId + ' | ' + lesson.teacherName"></span>
                                     <span class="text-[11px] font-bold px-2 py-0.5 rounded-full" 
                                           :class="{
@@ -419,7 +471,7 @@
                 </div>
 
                 <!-- History Tab (Grouped & Sorted) -->
-                <div x-show="adminSubTab === 'history'" class="space-y-4 max-h-[550px] overflow-x-auto">
+                <div x-show="adminSubTab === 'history'" class="space-y-4 max-h-[550px] overflow-x-auto no-print">
                     <div class="text-xs text-slate-500 mb-2 font-medium">📋 Submissions grouped by Teacher Name, ID, Subject, and Week Number:</div>
                     <table class="w-full text-left text-sm border-collapse min-w-[650px]">
                        <thead>
@@ -427,7 +479,7 @@
                                <th class="p-3">Staff ID & Name</th>
                                <th class="p-3">Contact</th>
                                <th class="p-3">Subject & Class</th>
-                               <th class="p-3">Week / Year</th>
+                               <th class="p-3">Term & Week</th>
                                <th class="p-3">Status</th>
                                <th class="p-3">File</th>
                                <th class="p-3 text-right">Action</th>
@@ -439,7 +491,7 @@
                                    <td class="p-3"><div class="text-xs font-mono font-bold text-indigo-700" x-text="lesson.teacherId"></div><div class="font-medium text-slate-900 text-xs" x-text="lesson.teacherName"></div></td>
                                    <td class="p-3 text-slate-600 text-xs" x-text="lesson.teacherContact"></td>
                                    <td class="p-3 text-xs"><span class="font-semibold" x-text="lesson.subject"></span> (<span x-text="lesson.classLevel"></span>)</td>
-                                   <td class="p-3 text-xs text-slate-600 font-semibold text-indigo-700" x-text="lesson.week + ' ' + lesson.year"></td>
+                                   <td class="p-3 text-xs text-slate-600 font-semibold text-indigo-700" x-text="lesson.term + ' | ' + lesson.week + ' (' + lesson.year + ')'"></td>
                                    <td class="p-3"><span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="{'bg-amber-100 text-amber-800': lesson.status === 'Submitted', 'bg-emerald-100 text-emerald-800': lesson.status === 'Approved', 'bg-rose-100 text-rose-800': lesson.status === 'Rejected' || lesson.status === 'Changes Requested'}" x-text="lesson.status"></span></td>
                                    <td class="p-3"><a :href="lesson.fileData" :download="lesson.fileName" class="text-indigo-600 text-xs hover:underline font-medium break-all">📥 <span x-text="lesson.fileName"></span></a></td>
                                    <td class="p-3 text-right"><button @click="deleteLesson(lesson.id)" class="text-rose-600 hover:text-rose-800 text-xs font-medium">Delete</button></td>
@@ -450,11 +502,11 @@
                 </div>
 
                 <!-- Archive Tab -->
-                <div x-show="adminSubTab === 'archive'" class="space-y-4 max-h-[550px] overflow-y-auto">
+                <div x-show="adminSubTab === 'archive'" class="space-y-4 max-h-[550px] overflow-y-auto no-print">
                     <template x-for="lesson in archivedLessons" :key="lesson.id">
                         <div class="border border-slate-200 rounded-xl p-3 bg-slate-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs">
                             <div>
-                                <span class="font-bold font-mono text-indigo-900" x-text="lesson.teacherId + ' — ' + lesson.teacherName"></span> — <span x-text="lesson.subject + ' | ' + lesson.week + ' ' + lesson.year"></span>
+                                <span class="font-bold font-mono text-indigo-900" x-text="lesson.teacherId + ' — ' + lesson.teacherName"></span> — <span x-text="lesson.subject + ' | ' + lesson.term + ' - ' + lesson.week + ' ' + lesson.year"></span>
                                 <a :href="lesson.fileData" :download="lesson.fileName" class="text-indigo-600 font-semibold ml-0 sm:ml-2 underline block sm:inline break-all">📎 <span x-text="lesson.fileName"></span></a>
                             </div>
                             <button @click="restoreFromArchive(lesson.id)" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded font-medium shrink-0">Restore</button>
@@ -463,69 +515,119 @@
                     <div x-show="archivedLessons.length === 0" class="text-center py-8 text-slate-400 text-sm">No archived records.</div>
                 </div>
 
-                <!-- ==================== INSPECTION REPORT & TRENDS TAB ==================== -->
-                <div x-show="adminSubTab === 'report'" class="space-y-6">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 pb-4">
-                        <div>
-                            <h3 class="text-base font-bold text-indigo-900">Summary Report</h3>
-                            <div class="text-xs text-slate-600 space-x-2 mt-1">
-                                <span class="font-bold text-indigo-800" x-text="'School: ' + activeSchoolName"></span>
-                                <span>|</span>
-                                <span class="font-mono text-slate-700" x-text="'Code: ' + authenticatedSchoolId"></span>
-                                <span>|</span>
-                                <span x-text="'Date Generated: ' + new Date().toLocaleDateString()"></span>
-                            </div>
-                            <div class="text-xs font-semibold text-indigo-600 mt-1">
-                                <span>Current Academic Period: Term 1, Academic Year 2026/2027 (Week 1)</span>
-                            </div>
+                <!-- ==================== PRINTABLE INSPECTION REPORT & RECORDS TAB ==================== -->
+                <div x-show="adminSubTab === 'report'" id="printable-report" class="space-y-6">
+                    
+                    <!-- Inspection Report starts directly with School Name as Heading 1 -->
+                    <div class="space-y-3 border-b border-slate-200 pb-4">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                            <h1 class="text-2xl sm:text-3xl font-black text-indigo-900 tracking-tight" x-text="activeSchoolName"></h1>
+                            <button @click="window.print()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs px-3 py-2 rounded font-medium transition shadow-sm no-print">🖨️ Print / Export Report</button>
                         </div>
-                        <div class="flex gap-2">
-                            <button @click="window.print()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs px-3 py-2 rounded font-medium transition shadow-sm">🖨️ Print / Export Report</button>
+                        <div class="text-xs text-slate-600 font-medium space-x-2">
+                            <span x-text="'Headteacher / Admin: ' + (activeHeadName || 'Not Set')"></span>
+                            <span>|</span>
+                            <span x-text="'Contact: ' + (activeHeadContact || 'Not Set')"></span>
+                            <span>|</span>
+                            <span x-text="'Date Generated: ' + new Date().toLocaleDateString()"></span>
                         </div>
                     </div>
 
-                    <!-- Summary Statistics Cards -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-xl">
-                            <span class="text-xs text-indigo-600 font-semibold uppercase">Total Staff Onboarded</span>
-                            <h4 class="text-2xl font-extrabold text-indigo-900 mt-1" x-text="sortedTeachers.length"></h4>
-                        </div>
-                        <div class="bg-emerald-50 border border-emerald-100 p-4 rounded-xl">
-                            <span class="text-xs text-emerald-600 font-semibold uppercase">Compliant Submissions</span>
-                            <h4 class="text-2xl font-extrabold text-emerald-900 mt-1" x-text="activeLessons.length"></h4>
-                        </div>
-                        <div class="bg-amber-50 border border-amber-100 p-4 rounded-xl">
-                            <span class="text-xs text-amber-600 font-semibold uppercase">Approved Plans</span>
-                            <h4 class="text-2xl font-extrabold text-amber-900 mt-1" x-text="lessons.filter(l => l.status === 'Approved').length"></h4>
-                        </div>
-                        <div class="bg-rose-50 border border-rose-100 p-4 rounded-xl">
-                            <span class="text-xs text-rose-600 font-semibold uppercase">Pending / Unsubmitted</span>
-                            <h4 class="text-2xl font-extrabold text-rose-900 mt-1" x-text="laggingTeachers.length"></h4>
-                        </div>
-                    </div>
+                    <!-- Official Summary & Audit Report Content -->
+                    <div class="space-y-4">
+                        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wider border-l-4 border-indigo-600 pl-2">Official Institutional Summary & Audit Report</h2>
 
-                    <!-- Bar Graph Trend Visualizer -->
-                    <div class="bg-slate-50 p-4 sm:p-6 rounded-xl border border-slate-200 space-y-4">
-                        <h4 class="text-sm font-bold text-indigo-900">📈 Teacher Submission Progress & Trend Graph (Current Week)</h4>
-                        <div class="space-y-3">
-                            <template x-for="t in sortedTeachers" :key="t.id">
-                                <div class="bg-white p-3 rounded-lg border border-slate-200 space-y-1 shadow-sm">
-                                    <div class="flex justify-between text-xs font-semibold">
-                                        <span class="font-mono text-indigo-900" x-text="t.id + ' - ' + t.name"></span>
-                                        <span :class="getTeacherSubmissionCount(t.id) > 0 ? 'text-emerald-600 font-bold' : 'text-slate-400 font-bold'" 
-                                              x-text="getTeacherSubmissionCount(t.id) > 0 ? 'Submitted (100%)' : 'Pending (0%)'"></span>
-                                    </div>
-                                    <!-- Progress Bar -->
-                                    <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden flex border border-slate-200">
-                                        <div class="h-3 transition-all duration-500 rounded-full"
-                                             :class="getTeacherSubmissionCount(t.id) > 0 ? 'bg-emerald-500' : 'bg-slate-300 w-[5%]' "
-                                             :style="'width: ' + (getTeacherSubmissionCount(t.id) > 0 ? '100%': '5%')">
+                        <!-- Summary Statistics Cards -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-xl">
+                                <span class="text-xs text-indigo-600 font-semibold uppercase">Total Staff Onboarded</span>
+                                <h4 class="text-2xl font-extrabold text-indigo-900 mt-1" x-text="sortedTeachers.length"></h4>
+                            </div>
+                            <div class="bg-emerald-50 border border-emerald-100 p-4 rounded-xl">
+                                <span class="text-xs text-emerald-600 font-semibold uppercase">Total Submissions</span>
+                                <h4 class="text-2xl font-extrabold text-emerald-900 mt-1" x-text="activeLessons.length"></h4>
+                            </div>
+                            <div class="bg-amber-50 border border-amber-100 p-4 rounded-xl">
+                                <span class="text-xs text-amber-600 font-semibold uppercase">Approved Plans</span>
+                                <h4 class="text-2xl font-extrabold text-amber-900 mt-1" x-text="lessons.filter(l => l.status === 'Approved').length"></h4>
+                            </div>
+                            <div class="bg-rose-50 border border-rose-100 p-4 rounded-xl">
+                                <span class="text-xs text-rose-600 font-semibold uppercase">Pending / Laggards</span>
+                                <h4 class="text-2xl font-extrabold text-rose-900 mt-1" x-text="laggingTeachers.length"></h4>
+                            </div>
+                        </div>
+
+                        <!-- Enhanced Teacher Record Breakdown Table -->
+                        <div class="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 space-y-4 shadow-sm">
+                            <h4 class="text-sm font-bold text-indigo-900">📋 Staff Compliance & Submission Audit Breakdown</h4>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm border-collapse min-w-[500px]">
+                                    <thead>
+                                        <tr class="bg-slate-100 text-slate-700 text-xs uppercase">
+                                            <th class="p-3">Teacher Name</th>
+                                            <th class="p-3">Contact</th>
+                                            <th class="p-3 text-center">Total Uploads</th>
+                                            <th class="p-3 text-center">Approved</th>
+                                            <th class="p-3 text-right">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-200">
+                                        <template x-for="t in sortedTeachers" :key="t.id">
+                                            <tr>
+                                                <td class="p-3 font-medium" x-text="t.name"></td>
+                                                <td class="p-3 text-slate-600 text-xs" x-text="t.contact"></td>
+                                                <td class="p-3 text-center font-bold" x-text="getTeacherSubmissionCount(t.id)"></td>
+                                                <td class="p-3 text-center text-emerald-600 font-bold" x-text="activeLessons.filter(l => l.teacherId === t.id && l.status === 'Approved').length"></td>
+                                                <td class="p-3 text-right">
+                                                    <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full"
+                                                          :class="getTeacherSubmissionCount(t.id) > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'"
+                                                          x-text="getTeacherSubmissionCount(t.id) > 0 ? '🟢 Compliant' : '🔴 Flagged (Laggard)'">
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Bar Graph Trend Visualizer -->
+                        <div class="bg-slate-50 p-4 sm:p-6 rounded-xl border border-slate-200 space-y-4">
+                            <h4 class="text-sm font-bold text-indigo-900">📈 Teacher Submission Progress & Trend Graph</h4>
+                            <div class="space-y-3">
+                                <template x-for="t in sortedTeachers" :key="t.id">
+                                    <div class="bg-white p-3 rounded-lg border border-slate-200 space-y-1 shadow-sm">
+                                        <div class="flex justify-between text-xs font-semibold">
+                                            <span class="font-medium text-indigo-900" x-text="t.name"></span>
+                                            <span :class="getTeacherSubmissionCount(t.id) > 0 ? 'text-emerald-600 font-bold' : 'text-slate-400 font-bold'" 
+                                                  x-text="getTeacherSubmissionCount(t.id) > 0 ? getTeacherSubmissionCount(t.id) + ' Plan(s) Submitted (100%)' : '0 Plans (Pending)'"></span>
+                                        </div>
+                                        <!-- Progress Bar -->
+                                        <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden flex border border-slate-200">
+                                            <div class="h-3 transition-all duration-500 rounded-full"
+                                                 :class="getTeacherSubmissionCount(t.id) > 0 ? 'bg-emerald-500' : 'bg-slate-300 w-[5%]' "
+                                                 :style="'width: ' + (getTeacherSubmissionCount(t.id) > 0 ? '100%': '5%')">
+                                            </div>
                                         </div>
                                     </div>
+                                </template>
+                                <div x-show="sortedTeachers.length === 0" class="text-center py-6 text-slate-400 text-xs">
+                                    No teachers registered in this school.
                                 </div>
-                            </template>
-                            <div x-show="sortedTeachers.length === 0" class="text-center py-6 text-slate-400 text-xs">
-                                No teachers registered in this school.
+                            </div>
+                        </div>
+
+                        <!-- Sign-off & Metadata Fields for Headteacher and Academics -->
+                        <div class="grid grid-cols-2 gap-8 pt-8 mt-8 border-t border-slate-200 text-xs">
+                            <div class="space-y-6">
+                                <p class="font-bold text-slate-700">Headteacher / Administrator Signature:</p>
+                                <div class="border-b border-slate-400 pb-1 font-semibold text-indigo-900" x-text="activeHeadName || '__________________________'"></div>
+                                <p class="text-slate-500">Date: ............................................</p>
+                            </div>
+                            <div class="space-y-6">
+                                <p class="font-bold text-slate-700">Academic Department Review Sign-off:</p>
+                                <div class="border-b border-slate-400 pb-1 font-semibold text-indigo-900">Academic Coordinator</div>
+                                <p class="text-slate-500">Date: ............................................</p>
                             </div>
                         </div>
                     </div>
@@ -537,11 +639,11 @@
 
     </main>
 
-    <!-- Footer -->
+    <!-- Footer generated by Edubyte Africa Inc. -->
     <footer class="bg-white border-t border-slate-200 py-4 mt-auto">
         <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 font-medium space-y-1">
-            <p>© Edubyte Africa. All rights reserved.</p>
-            <p class="text-slate-400">Powered by Edubyte Africa Inc. | Contact: +233 543 521 863</p>
+            <p>© 2026 Edubyte Africa Inc. All rights reserved.</p>
+            <p class="text-slate-400">Eduvet School Hub — Powered by Edubyte Africa Inc. | Contact: +233 543 521 863</p>
         </div>
     </footer>
 
@@ -577,9 +679,11 @@
                 loginInputId: '',
                 authenticatedSchoolId: '',
                 activeSchoolName: '',
+                activeHeadName: '',
+                activeHeadContact: '',
                 schoolNotification: '',
                 
-                regForm: { name: '', location: '', contact: '' },
+                regForm: { name: '', location: '', headName: '', headContact: '' },
                 selectedTeacherId: '',
 
                 teachers: [],
@@ -604,6 +708,7 @@
                 ],
 
                 adminSearchQuery: '',
+                reviewerTermFilter: '',
                 reviewerWeekFilter: '',
                 editingId: null,
                 editingTeacherId: null,
@@ -613,6 +718,7 @@
                 form: {
                     subject: '',
                     classLevel: '',
+                    term: '',
                     week: '',
                     year: '2026/2027',
                     fileName: '',
@@ -625,9 +731,8 @@
                     // Session requires manual login every refresh
                 },
 
-                // Helper utility to calculate current active academic week of the term
                 getCurrentSystemWeekNumber() {
-                    const termStart = new Date('2026-09-07'); // Term Start Date
+                    const termStart = new Date('2026-09-07');
                     const now = new Date();
                     const diffTime = now - termStart;
                     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
@@ -649,7 +754,8 @@
                         id: generatedId,
                         name: cleanName,
                         location: this.regForm.location,
-                        contact: this.regForm.contact,
+                        headName: this.regForm.headName,
+                        headContact: this.regForm.headContact,
                         notification: 'Welcome to the school portal! Please submit your weekly lesson plans on time.',
                         createdAt: Date.now()
                     };
@@ -657,7 +763,7 @@
                     db.collection('registered_schools').doc(generatedId).set(schoolRecord)
                       .then(() => {
                           alert(`School Registered Successfully!\n\nYour Unique School ID is: ${generatedId}\n\nPlease copy this code and use it to log into your school portal.`);
-                          this.regForm = { name: '', location: '', contact: '' };
+                          this.regForm = { name: '', location: '', headName: '', headContact: '' };
                           this.gatewayTab = 'login';
                           this.loginInputId = generatedId;
                       })
@@ -674,6 +780,8 @@
                               const data = doc.data();
                               this.authenticatedSchoolId = data.id;
                               this.activeSchoolName = data.name;
+                              this.activeHeadName = data.headName || '';
+                              this.activeHeadContact = data.headContact || '';
                               this.schoolNotification = data.notification || '';
                               this.loadSchoolData();
                           } else {
@@ -687,6 +795,8 @@
                     if (confirm('Exit current school portal session?')) {
                         this.authenticatedSchoolId = '';
                         this.activeSchoolName = '';
+                        this.activeHeadName = '';
+                        this.activeHeadContact = '';
                         this.schoolNotification = '';
                         this.loginInputId = '';
                         this.selectedTeacherId = '';
@@ -697,8 +807,12 @@
 
                 loadSchoolData() {
                     db.collection('registered_schools').doc(this.authenticatedSchoolId).onSnapshot((doc) => {
-                        if (doc.exists && doc.data().notification) {
-                            this.schoolNotification = doc.data().notification;
+                        if (doc.exists) {
+                            const data = doc.data();
+                            if (data.name) this.activeSchoolName = data.name;
+                            if (data.headName) this.activeHeadName = data.headName;
+                            if (data.headContact) this.activeHeadContact = data.headContact;
+                            if (data.notification) this.schoolNotification = data.notification;
                         }
                     });
 
@@ -709,6 +823,26 @@
                     db.collection('lessons').where('schoolId', '==', this.authenticatedSchoolId).onSnapshot((snapshot) => {
                         this.lessons = snapshot.docs.map(doc => ({ ...doc.data() }));
                     });
+                },
+
+                promptUpdateSchoolInfo() {
+                    const newName = prompt('Update Official School Name:', this.activeSchoolName);
+                    if (newName === null) return;
+                    const newHeadName = prompt('Update Headteacher Name:', this.activeHeadName);
+                    if (newHeadName === null) return;
+                    const newHeadContact = prompt('Update Headteacher Contact:', this.activeHeadContact);
+                    if (newHeadContact === null) return;
+
+                    db.collection('registered_schools').doc(this.authenticatedSchoolId).update({
+                        name: newName.trim(),
+                        headName: newHeadName.trim(),
+                        headContact: newHeadContact.trim()
+                    }).then(() => {
+                        this.activeSchoolName = newName.trim();
+                        this.activeHeadName = newHeadName.trim();
+                        this.activeHeadContact = newHeadContact.trim();
+                        alert('School & Headteacher details updated successfully!');
+                    }).catch(err => alert('Error updating details: ' + err.message));
                 },
 
                 promptUpdateNotification() {
@@ -744,7 +878,8 @@
                         alert(`Welcome, ${targetTeacher.name}! Workspace unlocked.`);
                     } else {
                         alert('Incorrect Staff ID! Access denied.');
-                        event.target.value = this.selectedTeacherId;
+                        this.selectedTeacherId = '';
+                        event.target.value = '';
                     }
                 },
 
@@ -760,7 +895,7 @@
                 },
 
                 get sortedTeachers() {
-                    return [...this.teachers].sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
+                    return [...this.teachers].sort((a, b) => a.name.localeCompare(b.name));
                 },
 
                 get activeTeacher() {
@@ -818,11 +953,10 @@
                     const t = this.activeTeacher;
                     if (!t) return;
 
-                    // Future submission restriction check: Teachers cannot submit to future weeks
                     const selectedWeekNum = parseInt(this.form.week.replace('Week ', '')) || 1;
                     const currentSystemWeek = this.getCurrentSystemWeekNumber();
                     const now = new Date();
-                    const dayOfWeek = now.getDay(); // 0 is Sunday, 5 is Friday
+                    const dayOfWeek = now.getDay();
 
                     if (selectedWeekNum > currentSystemWeek) {
                         alert(`❌ Restriction Notice:\nYou cannot submit lesson plans for future weeks (Week ${selectedWeekNum}). Current active week is Week ${currentSystemWeek}.`);
@@ -891,17 +1025,19 @@
 
                 resetForm() {
                     this.editingId = null;
-                    this.form = { subject: '', classLevel: '', week: '', year: '2026/2027', fileName: '', fileData: '', status: 'Submitted', feedback: '' };
+                    this.form = { subject: '', classLevel: '', term: '', week: '', year: '2026/2027', fileName: '', fileData: '', status: 'Submitted', feedback: '' };
                 },
 
                 get activeLessons() { return this.lessons.filter(l => !l.isArchived); },
                 get archivedLessons() { return this.lessons.filter(l => l.isArchived); },
                 get teacherFilteredLessons() { return this.lessons.filter(l => l.teacherId === this.selectedTeacherId); },
                 
-                // Filtered & Sorted Reviewer Queue grouped strictly by Teacher Name, ID, Subject, and Week
                 get adminFilteredActiveLessons() {
                     let items = [...this.activeLessons];
                     
+                    if (this.reviewerTermFilter) {
+                        items = items.filter(l => l.term === this.reviewerTermFilter);
+                    }
                     if (this.reviewerWeekFilter) {
                         items = items.filter(l => l.week === this.reviewerWeekFilter);
                     }
@@ -927,10 +1063,12 @@
                     });
                 },
                 
-                // Grouped & Sorted History Tab
                 get adminFilteredAllLessons() {
                     let items = [...this.lessons];
 
+                    if (this.reviewerTermFilter) {
+                        items = items.filter(l => l.term === this.reviewerTermFilter);
+                    }
                     if (this.reviewerWeekFilter) {
                         items = items.filter(l => l.week === this.reviewerWeekFilter);
                     }
