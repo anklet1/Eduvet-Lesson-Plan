@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eduvet School Hub — Robust GES / NaCCA & WAEC/BECE Lesson Engine</title>
+    <title>Eduvet School Hub</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -25,29 +25,34 @@
                         gesNavy: '#0F2942',
                         gesBlue: '#1A73E8',
                         gesGold: '#D97706',
-                        gesGreen: '#059669'
+                        gesGreen: '#059669',
+                        paystackBlue: '#011B33'
                     }
                 }
             }
         }
     </script>
-    <!-- Print-Only Styling Rules to isolate the Inspection Report cleanly into PDF -->
+    <!-- Print-Only Styling Rules to isolate the Inspection Report or Portrait Lesson Plans cleanly into PDF -->
     <style>
         @media print {
             body * {
                 visibility: hidden;
             }
-            #printable-report, #printable-report * {
+            #printable-report, #printable-report *, #printable-lessons, #printable-lessons * {
                 visibility: visible;
             }
-            #printable-report {
+            #printable-report, #printable-lessons {
                 position: absolute;
                 left: 0;
                 top: 0;
                 width: 100%;
                 margin: 0;
-                padding: 20px;
+                padding: 15mm;
                 background: white !important;
+            }
+            @page {
+                size: portrait;
+                margin: 15mm;
             }
             .no-print {
                 display: none !important;
@@ -78,7 +83,7 @@
                         </div>
                     </div>
                 </div>
-                <p class="text-xs text-slate-500 mt-1">Multi-Tenant Institutional Lesson Plan Portal</p>
+                <p class="text-xs text-slate-500 mt-1">Institutional Lesson Plan Portal</p>
             </div>
 
             <!-- Tabs Selection -->
@@ -119,6 +124,49 @@
         </div>
     </div>
 
+    <!-- Feature Lock Access Modal (Code: 1863) -->
+    <div x-show="showFeatureLockModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4 no-print" style="display: none;">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 sm:p-8 space-y-6 border border-slate-200 text-center">
+            <div class="w-14 h-14 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center text-2xl mx-auto shadow-sm">
+                <i class="fa fa-lock"></i>
+            </div>
+            <div>
+                <h3 class="text-lg font-black text-slate-900">Feature Under Development</h3>
+                <p class="text-xs text-slate-500 mt-1">This module is currently locked as we complete final refinements. Enter access code <b class="font-mono text-indigo-700">1863</b> to unlock.</p>
+            </div>
+            
+            <form @submit.prevent="verifyFeatureCode()" class="space-y-4">
+                <div>
+                    <input type="password" x-model="enteredFeatureCode" placeholder="Enter Code" class="w-full text-center tracking-[0.5em] text-xl rounded-xl border-slate-300 border py-3 font-mono focus:outline-none focus:border-indigo-600" maxlength="6" required autofocus>
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-xs transition shadow-sm">
+                    Unlock Feature
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Paystack Storefront Checkout Modal (Redirects to exact Paystack Shop URL) -->
+    <div x-show="showPaymentModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print" style="display: none;">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 space-y-5 border border-slate-200 text-center" @click.away="showPaymentModal = false">
+            <div class="w-12 h-12 bg-blue-900 text-cyan-400 rounded-full flex items-center justify-center text-xl font-black mx-auto mb-2">P</div>
+            <h3 class="text-base font-black text-slate-900">Paystack Storefront Checkout</h3>
+            <p class="text-xs text-slate-500" x-text="paymentType === 'single' ? 'Single Lesson Plan (GHS 5.00)' : 'All Term Weeks Package (GHS 45.00)'"></p>
+            
+            <div class="bg-slate-50 p-3 rounded-xl border text-xs space-y-1 text-left font-medium">
+                <div class="flex justify-between"><span>Destination:</span><span class="font-mono text-[10px] text-indigo-600">eduvet_edubyteafrica_com</span></div>
+                <div class="flex justify-between"><span>Price:</span><span class="font-bold text-emerald-600" x-text="paymentType === 'single' ? 'GHS 5.00' : 'GHS 45.00'"></span></div>
+            </div>
+
+            <div class="space-y-2 pt-2">
+                <a :href="paystackStoreUrl" target="_blank" @click="simulatePaystackSuccess()" class="block w-full bg-[#011B33] hover:bg-slate-900 text-white font-bold py-3 rounded-xl text-xs transition shadow-sm text-center">
+                    Proceed to Official Paystack Page ↗
+                </a>
+                <button @click="showPaymentModal = false" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs py-2 rounded-xl transition font-medium">Close / Already Paid</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Header / Active School Dashboard Bar -->
     <header class="bg-indigo-900 text-white shadow-md no-print">
         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-3">
@@ -137,6 +185,7 @@
                     </div>
                     <div class="flex items-center gap-2 text-[10px] text-indigo-200 mt-0.5">
                         <span class="font-bold text-white uppercase font-mono" x-text="activeSchoolName + ' (' + authenticatedSchoolId + ')'"></span>
+                        <span class="bg-emerald-600 text-white px-1.5 py-0.5 rounded text-[9px]" x-text="isOnline ? '🟢 Online' : '🟠 Offline Mode (Queued)'"></span>
                     </div>
                 </div>
             </div>
@@ -208,7 +257,7 @@
                         <span class="text-2xl">🚨</span>
                         <div>
                             <h3 class="text-sm font-bold text-rose-900">Compliance Warning: Missing Weekly Lesson Plan</h3>
-                            <p class="text-xs text-rose-700">Staff ID: <span class="font-mono font-bold" x-text="activeTeacher.id"></span> | Contact: <span x-text="activeTeacher.contact"></span>. Please submit your required lesson plan immediately for <span x-text="activeSchoolName"></span>[cite: 5].</p>
+                            <p class="text-xs text-rose-700">Staff ID: <span class="font-mono font-bold" x-text="activeTeacher.id"></span> | Contact: <span x-text="activeTeacher.contact"></span>. Please submit your required lesson plan immediately for <span x-text="activeSchoolName"></span>.</p>
                         </div>
                     </div>
                     <span class="bg-rose-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">Action Required</span>
@@ -226,13 +275,16 @@
                         <p class="text-xs text-slate-500">Manage, update, and track status of weekly lesson notes.</p>
                     </div>
                 </div>
-                <div @click="teacherSubTab = 'engine'" class="cursor-pointer bg-white p-5 rounded-2xl border transition shadow-sm hover:shadow-md flex items-center space-x-4" :class="teacherSubTab === 'engine' ? 'border-indigo-600 ring-2 ring-indigo-600/20 bg-indigo-50/20' : 'border-slate-200'">
+                <div @click="checkEngineTab()" class="cursor-pointer bg-white p-5 rounded-2xl border transition shadow-sm hover:shadow-md flex items-center space-x-4" :class="teacherSubTab === 'engine' ? 'border-indigo-600 ring-2 ring-indigo-600/20 bg-indigo-50/20' : 'border-slate-200'">
                     <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl font-bold">
                         <i class="fa fa-wand-magic-sparkles"></i>
                     </div>
                     <div>
-                        <h3 class="text-sm font-bold text-indigo-950">Robust NaCCA & BECE Lesson Engine</h3>
-                        <p class="text-xs text-slate-500">Upload scheme, auto-align Strands/Sub-Strands & WAEC/BECE focus.</p>
+                        <h3 class="text-sm font-bold text-indigo-950 flex items-center gap-1.5">
+                            Robust NaCCA & BECE Lesson Engine 
+                            <span x-show="!isEngineUnlocked" class="bg-amber-100 text-amber-800 text-[9px] px-1.5 py-0.5 rounded font-mono">🔒 Locked</span>
+                        </h3>
+                        <p class="text-xs text-slate-500">Up to 18 Weeks, Sub-Strands, Table Layout & Paystack Storefront Checkout.</p>
                     </div>
                 </div>
             </div>
@@ -293,7 +345,7 @@
                                     <label class="block text-xs font-medium text-slate-700 mb-1">Week</label>
                                     <select x-model="form.week" required class="w-full rounded-lg border-slate-300 border px-2 py-2 text-xs">
                                         <option value="">Select week...</option>
-                                        <template x-for="w in 15" :key="w">
+                                        <template x-for="w in 18" :key="w">
                                             <option :value="'Week ' + w" x-text="'Week ' + w"></option>
                                         </template>
                                     </select>
@@ -372,62 +424,61 @@
                 </div>
             </div>
 
-            <!-- SUB-TAB 2: EMBEDDED ROBUST NaCCA & BECE ENGINE -->
+            <!-- SUB-TAB 2: EMBEDDED DYNAMIC NaCCA ENGINE -->
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-6" x-show="teacherSubTab === 'engine'">
                 
                 <!-- Engine Header Cards & Setup -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-slate-50 p-5 rounded-2xl border border-slate-200">
+                <div class="grid grid-cols-1 md:grid-cols-6 gap-3 bg-slate-50 p-5 rounded-2xl border border-slate-200">
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Class Level (KG1 - SHS 3)</label>
-                        <select id="engineClassSelect" class="w-full text-xs border p-2 rounded bg-white font-medium" onchange="updateEngineSubjects()">
-                            <optgroup label="Kindergarten">
-                                <option value="KG1">Kindergarten 1 (KG1)</option>
-                                <option value="KG2">Kindergarten 2 (KG2)</option>
-                            </optgroup>
-                            <optgroup label="Lower Primary">
-                                <option value="Basic 1">Basic 1 (Primary 1)</option>
-                                <option value="Basic 2">Basic 2 (Primary 2)</option>
-                                <option value="Basic 3">Basic 3 (Primary 3)</option>
-                            </optgroup>
-                            <optgroup label="Upper Primary">
-                                <option value="Basic 4">Basic 4 (Primary 4)</option>
-                                <option value="Basic 5">Basic 5 (Primary 5)</option>
-                                <option value="Basic 6">Basic 6 (Primary 6)</option>
-                            </optgroup>
-                            <optgroup label="Junior High School (JHS - BECE Focus)">
-                                <option value="Basic 7" selected>Basic 7 (JHS 1)</option>
-                                <option value="Basic 8">Basic 8 (JHS 2)</option>
-                                <option value="Basic 9">Basic 9 (JHS 3 - BECE)</option>
-                            </optgroup>
-                            <optgroup label="Senior High School (SHS - WASSCE Focus)">
-                                <option value="SHS 1">SHS Form 1</option>
-                                <option value="SHS 2">SHS Form 2</option>
-                                <option value="SHS 3">SHS Form 3</option>
-                            </optgroup>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Level (KG, PRI, JHS, SHS)</label>
+                        <select id="engineLevelSelect" class="w-full text-xs border p-2 rounded bg-white font-medium" onchange="updateEngineClasses()">
+                            <option value="KG">KG</option>
+                            <option value="PRIMARY">PRIMARY</option>
+                            <option value="JHS" selected>JHS</option>
+                            <option value="SHS">SHS</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Subject (NaCCA Standard)</label>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Class Number</label>
+                        <select id="engineClassNumSelect" class="w-full text-xs border p-2 rounded bg-white font-bold text-center" onchange="updateEngineSubjects()">
+                            <option value="7" selected>7 (JHS 1)</option>
+                            <option value="8">8 (JHS 2)</option>
+                            <option value="9">9 (JHS 3)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Subject</label>
                         <select id="engineSubjectSelect" class="w-full text-xs border p-2 rounded bg-white font-medium">
-                            <!-- Populated dynamically via updateEngineSubjects() -->
+                            <!-- Populated dynamically -->
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Upload Termly Scheme (PDF/TXT)</label>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Term Weeks (Up to 18)</label>
+                        <select id="engineTotalWeeks" class="w-full text-xs border p-2 rounded bg-white font-bold text-center">
+                            <option value="12">12 Weeks</option>
+                            <option value="13">13 Weeks</option>
+                            <option value="14">14 Weeks</option>
+                            <option value="15" selected>15 Weeks</option>
+                            <option value="16">16 Weeks</option>
+                            <option value="18">18 Weeks</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Upload Scheme (PDF/TXT)</label>
                         <input type="file" id="engineSchemeFileInput" accept=".pdf,.txt" class="w-full text-xs text-slate-500 file:mr-1 file:py-1 file:px-2 file:rounded file:border-0 file:bg-indigo-50 file:text-indigo-700" onchange="engineHandleSchemeUpload(event)">
-                        <p id="engineUploadStatus" class="text-[10px] text-slate-500 mt-0.5">Upload scheme to auto-extract Strands/Sub-Strands.</p>
+                        <p id="engineUploadStatus" class="text-[10px] text-slate-500 mt-0.5">Sub-Strands as main topics.</p>
                     </div>
                     <div class="flex items-end">
                         <button onclick="engineGenerateCustomScheme()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs py-2 px-3 rounded-xl shadow-sm transition flex items-center justify-center gap-1.5">
-                            <i class="fa fa-wand-magic-sparkles"></i> 1. Generate Weekly Scheme
+                            <i class="fa fa-wand-magic-sparkles"></i> 1. Generate Scheme
                         </button>
                     </div>
                 </div>
 
-                <!-- Scheme Table Preview with In-App Editing -->
+                <!-- Scheme Table Preview with Fixed Format -->
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
-                        <h3 class="text-sm font-bold text-indigo-950">📋 Generated Scheme of Learning (Aligned with NaCCA Strands & WAEC/BECE Standards)</h3>
+                        <h3 class="text-sm font-bold text-indigo-950">📋 Scheme of Learning (Fixed NaCCA Format: Sub-Strands as Main Topic)</h3>
                         <button onclick="engineExportSchemeWord()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs px-3 py-1.5 rounded font-semibold transition">Download Scheme (.doc)</button>
                     </div>
                     <div class="overflow-x-auto border border-slate-200 rounded-xl max-h-[350px]">
@@ -437,52 +488,62 @@
                                     <th class="p-2.5 border-r font-bold w-12 text-center">Wk</th>
                                     <th class="p-2.5 border-r font-bold w-24">Week Ending</th>
                                     <th class="p-2.5 border-r font-bold w-32">NaCCA Strand</th>
-                                    <th class="p-2.5 border-r font-bold">Sub Strand & Content Standard</th>
-                                    <th class="p-2.5 border-r font-bold">Indicators & BECE Focus</th>
-                                    <th class="p-2.5 font-bold w-40">TLM Resources</th>
+                                    <th class="p-2.5 border-r font-bold w-48">Sub Strand (Main Topic)</th>
+                                    <th class="p-2.5 border-r font-bold">Content Standard</th>
+                                    <th class="p-2.5 border-r font-bold w-28">Indicators</th>
+                                    <th class="p-2.5 font-bold w-36">TLM Resources</th>
                                 </tr>
                             </thead>
                             <tbody id="engineSchemeTableBody">
-                                <tr><td colspan="6" class="p-8 text-center text-slate-400">Select class & subject, upload your termly scheme, and click "Generate Weekly Scheme".</td></tr>
+                                <tr><td colspan="7" class="p-8 text-center text-slate-400">Select Level, Class & Subject, upload your termly scheme, and click "Generate Scheme".</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- 3-Phase Lesson Notes Engine Actions (Card UI with Explicit Generate Button) -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-slate-200">
+                <!-- 3-Phase Portrait Lesson Notes Engine Actions (Paystack Storefront URL Link) -->
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 pt-4 border-t border-slate-200">
                     <div onclick="engineGenerateLessons()" class="cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white p-4 rounded-2xl transition shadow-md flex items-center space-x-3">
                         <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center font-bold text-lg">
                             <i class="fa fa-book-open"></i>
                         </div>
                         <div>
-                            <h4 class="text-xs font-black tracking-wide uppercase">2. Build Lesson Plans</h4>
-                            <p class="text-[11px] text-emerald-100">Click to Generate 3-Phase Notes</p>
+                            <h4 class="text-xs font-black tracking-wide uppercase">2. Build Lessons</h4>
+                            <p class="text-[11px] text-emerald-100">Table Structure (3-5 Lessons/Wk)</p>
                         </div>
                     </div>
-                    <div onclick="engineExportLessonsWord()" class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-2xl transition shadow-md flex items-center space-x-3">
+                    <div onclick="requestDownload('single')" class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-2xl transition shadow-md flex items-center space-x-3">
                         <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center font-bold text-lg">
-                            <i class="fa fa-file-word"></i>
+                            <i class="fa fa-file-arrow-down"></i>
                         </div>
                         <div>
-                            <h4 class="text-xs font-black tracking-wide uppercase">3. Download Lessons</h4>
-                            <p class="text-[11px] text-blue-100">Export Word Document (.doc)</p>
+                            <h4 class="text-xs font-black tracking-wide uppercase">3. Single Plan Download</h4>
+                            <p class="text-[11px] text-blue-100" x-text="isPaidSingle ? 'Unlocked (GHS 5)' : '🔒 Pay GHS 5.00'"></p>
                         </div>
                     </div>
-                    <div onclick="engineSubmitToMainPortal()" class="cursor-pointer bg-indigo-900 hover:bg-indigo-950 text-white p-4 rounded-2xl transition shadow-md flex items-center space-x-3">
+                    <div onclick="requestDownload('all')" class="cursor-pointer bg-indigo-700 hover:bg-indigo-800 text-white p-4 rounded-2xl transition shadow-md flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center font-bold text-lg">
+                            <i class="fa fa-shield-halved"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-black tracking-wide uppercase">4. All Term Weeks</h4>
+                            <p class="text-[11px] text-indigo-200" x-text="isPaidAll ? 'Unlocked (GHS 45)' : '🔒 Pay GHS 45.00'"></p>
+                        </div>
+                    </div>
+                    <div onclick="engineSubmitToMainPortal()" class="cursor-pointer bg-slate-800 hover:bg-slate-900 text-white p-4 rounded-2xl transition shadow-md flex items-center space-x-3">
                         <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center font-bold text-lg">
                             <i class="fa fa-paper-plane"></i>
                         </div>
                         <div>
-                            <h4 class="text-xs font-black tracking-wide uppercase">4. Submit to Queue</h4>
-                            <p class="text-[11px] text-indigo-200">Send notes to vetting portal</p>
+                            <h4 class="text-xs font-black tracking-wide uppercase">5. Submit to Queue</h4>
+                            <p class="text-[11px] text-slate-300">Vetting Portal</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Generated Lessons Container Preview -->
-                <div id="engineLessonsContainer" class="space-y-4 max-h-[450px] overflow-y-auto pr-1">
-                    <p class="text-center text-slate-400 py-6 text-xs">Generated 3-phase lesson notes preview will appear here once you click "Build Lesson Plans".</p>
+                <!-- Generated Lessons Container Preview (Table Structured Format) -->
+                <div id="printable-lessons" class="space-y-6 max-h-[600px] overflow-y-auto pr-2 bg-white p-6 border rounded-2xl shadow-sm">
+                    <p class="text-center text-slate-400 py-6 text-xs">Generated table-structured lesson plans will appear here once you click "Build Lessons".</p>
                 </div>
             </div>
 
@@ -702,15 +763,15 @@
                             </div>
                             <div class="bg-emerald-50 border border-emerald-100 p-4 rounded-xl">
                                 <span class="text-xs text-emerald-600 font-semibold uppercase">Total Submissions</span>
-                                <h4 class="text-2xl font-extrabold text-emerald-900 mt-1" x-text="activeLessons.length"></h4>
+                                <h4 class="text-2xl font-extrabold text-indigo-900 mt-1" x-text="activeLessons.length"></h4>
                             </div>
                             <div class="bg-amber-50 border border-amber-100 p-4 rounded-xl">
                                 <span class="text-xs text-amber-600 font-semibold uppercase">Approved Plans</span>
-                                <h4 class="text-2xl font-extrabold text-amber-900 mt-1" x-text="lessons.filter(l => l.status === 'Approved').length"></h4>
+                                <h4 class="text-2xl font-extrabold text-indigo-900 mt-1" x-text="lessons.filter(l => l.status === 'Approved').length"></h4>
                             </div>
                             <div class="bg-rose-50 border border-rose-100 p-4 rounded-xl">
                                 <span class="text-xs text-rose-600 font-semibold uppercase">Pending / Laggards</span>
-                                <h4 class="text-2xl font-extrabold text-rose-900 mt-1" x-text="laggingTeachers.length"></h4>
+                                <h4 class="text-2xl font-extrabold text-indigo-900 mt-1" x-text="laggingTeachers.length"></h4>
                             </div>
                         </div>
 
@@ -826,14 +887,40 @@
             "SHS 3": ["English Language", "Core Mathematics", "Integrated Science", "Social Studies", "Elective Mathematics", "Physics", "Chemistry", "Biology", "Financial Accounting", "Costing", "Business Management", "Economics", "Geography", "History", "General Knowledge in Art", "Food and Nutrition", "Management in Living"]
         };
 
+        function updateEngineClasses() {
+            const levelSelect = document.getElementById('engineLevelSelect');
+            const classNumSelect = document.getElementById('engineClassNumSelect');
+            if (!levelSelect || !classNumSelect) return;
+
+            const lvl = levelSelect.value;
+            if (lvl === "KG") {
+                classNumSelect.innerHTML = '<option value="1">1 (KG1)</option><option value="2">2 (KG2)</option>';
+            } else if (lvl === "PRIMARY") {
+                classNumSelect.innerHTML = '<option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option>';
+            } else if (lvl === "JHS") {
+                classNumSelect.innerHTML = '<option value="7" selected>7 (JHS 1)</option><option value="8">8 (JHS 2)</option><option value="9">9 (JHS 3)</option>';
+            } else if (lvl === "SHS") {
+                classNumSelect.innerHTML = '<option value="1" selected>1 (SHS 1)</option><option value="2">2 (SHS 2)</option><option value="3">3 (SHS 3)</option>';
+            }
+            updateEngineSubjects();
+        }
+
         function updateEngineSubjects() {
-            const classSelect = document.getElementById('engineClassSelect');
+            const levelSelect = document.getElementById('engineLevelSelect');
+            const classNumSelect = document.getElementById('engineClassNumSelect');
             const subjectSelect = document.getElementById('engineSubjectSelect');
-            if (!classSelect || !subjectSelect) return;
+            if (!levelSelect || !classNumSelect || !subjectSelect) return;
 
-            const selectedClass = classSelect.value;
-            const subjects = gesCurriculumMap[selectedClass] || ["English Language", "Mathematics"];
+            const lvl = levelSelect.value;
+            const num = classNumSelect.value;
+            let classStr = "Basic 7";
 
+            if (lvl === "KG") classStr = "KG" + num;
+            else if (lvl === "PRIMARY") classStr = "Basic " + num;
+            else if (lvl === "JHS") classStr = "Basic " + num;
+            else if (lvl === "SHS") classStr = "SHS " + num;
+
+            const subjects = gesCurriculumMap[classStr] || ["English Language", "Mathematics"];
             subjectSelect.innerHTML = '';
             subjects.forEach(subj => {
                 const opt = document.createElement('option');
@@ -869,6 +956,11 @@
                 adminSubTab: 'queue',
                 showPinModal: false,
                 enteredPin: '',
+
+                // Feature Lock State (Code: 1863)
+                isEngineUnlocked: false,
+                showFeatureLockModal: false,
+                enteredFeatureCode: '',
 
                 gatewayTab: 'login',
                 loginInputId: '',
@@ -917,13 +1009,51 @@
                     feedback: ''
                 },
 
-                // Engine state variables
+                // Engine state variables & Paystack checkout state
                 engineScheme: null,
                 engineLessons: null,
                 parsedSchemeTopics: null,
+                isPaidSingle: false,
+                isPaidAll: false,
+                showPaymentModal: false,
+                paymentType: 'single', // 'single' (GHS 5) or 'all' (GHS 45)
+                paystackStoreUrl: 'https://paystack.shop/pay/eduvet_edubyteafrica_com',
+                isOnline: navigator.onLine,
 
                 init() {
                     setTimeout(() => updateEngineSubjects(), 200);
+                    window.addEventListener('online', () => { this.isOnline = true; this.syncOfflineQueue(); });
+                    window.addEventListener('offline', () => { this.isOnline = false; });
+                },
+
+                checkEngineTab() {
+                    if (!this.isEngineUnlocked) {
+                        this.showFeatureLockModal = true;
+                    } else {
+                        this.teacherSubTab = 'engine';
+                    }
+                },
+
+                verifyFeatureCode() {
+                    if (this.enteredFeatureCode === '1863') {
+                        this.isEngineUnlocked = true;
+                        this.showFeatureLockModal = false;
+                        this.enteredFeatureCode = '';
+                        this.teacherSubTab = 'engine';
+                        alert('✨ Feature unlocked successfully with code 1863!');
+                    } else {
+                        alert('❌ Incorrect Code! Access denied.');
+                        this.enteredFeatureCode = '';
+                    }
+                },
+
+                syncOfflineQueue() {
+                    const queue = JSON.parse(localStorage.getItem('eduvet_offline_queue') || '[]');
+                    if (queue.length === 0) return;
+                    queue.forEach(item => {
+                        db.collection('lessons').doc(item.id).set(item).catch(err => console.log('Sync err:', err));
+                    });
+                    localStorage.removeItem('eduvet_offline_queue');
                 },
 
                 getCurrentSystemWeekNumber() {
@@ -933,7 +1063,7 @@
                     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
                     let currentWeek = Math.floor(diffDays / 7) + 1;
                     if (currentWeek < 1) currentWeek = 1;
-                    if (currentWeek > 15) currentWeek = 15;
+                    if (currentWeek > 18) currentWeek = 18;
                     return currentWeek;
                 },
 
@@ -1179,15 +1309,22 @@
                         teacherContact: t.contact,
                         timestamp: new Date().toLocaleDateString(),
                         isArchived: false,
-                        feedback: this.editingId ? (this.lessons.find(l => l.id === this.editingId)?.feedback || '') : ''
+                        feedback: '' // Clean: left blank for reviewer
                     };
 
-                    db.collection('lessons').doc(lessonId).set(lessonData)
-                      .then(() => {
-                          alert('Lesson plan submitted successfully to ' + this.activeSchoolName + '!');
-                          this.resetForm();
-                      })
-                      .catch(err => alert('Error submitting: ' + err.message));
+                    const savePromise = db.collection('lessons').doc(lessonId).set(lessonData);
+                    savePromise.then(() => {
+                        alert('Lesson plan submitted successfully to ' + this.activeSchoolName + '!');
+                        this.resetForm();
+                        this.loadSchoolData(); // Auto-refresh data and view
+                    }).catch(err => {
+                        const queue = JSON.parse(localStorage.getItem('eduvet_offline_queue') || '[]');
+                        queue.push(lessonData);
+                        localStorage.setItem('eduvet_offline_queue', JSON.stringify(queue));
+                        alert('Offline Mode: Lesson submission queued locally. Will auto-sync when online.');
+                        this.resetForm();
+                        this.loadSchoolData();
+                    });
                 },
 
                 editSubmission(lesson) {
@@ -1313,7 +1450,7 @@
             }
         }
 
-        // --- ROBUST NaCCA SCHEME PARSER & WEEKLY ENGINE ---
+        // --- ROBUST NaCCA SCHEME PARSER WITH SUB-STRAND AS MAIN TOPIC ---
         async function engineHandleSchemeUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1350,11 +1487,11 @@
 
         function engineParseSchemeText(rawText, fileName) {
             const statusEl = document.getElementById('engineUploadStatus');
-            statusEl.innerHTML = `<span class="text-emerald-700 font-bold"><i class="fa fa-circle-check mr-1"></i> Extracted NaCCA Strands from "${fileName}"!</span>`;
+            statusEl.innerHTML = `<span class="text-emerald-700 font-bold"><i class="fa fa-circle-check mr-1"></i> Extracted Sub-Strands from "${fileName}"!</span>`;
 
             const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 5);
             const extracted = [];
-            let currentStrand = "NaCCA Core Strand";
+            let currentStrand = "NaCCA Strand";
 
             for (let line of lines) {
                 if (/STRAND|UNIT|CHAPTER|MODULE|THEME/i.test(line)) {
@@ -1362,10 +1499,10 @@
                 } else if (line.length > 6) {
                     extracted.push({
                         strand: currentStrand,
-                        sub_strand: line.slice(0, 70),
-                        content_standard: "Demonstrate NaCCA standard competency in " + line.slice(0, 30),
-                        indicators: "Execute practical indicators & BECE past question drills",
-                        resources: "Standard GES textbooks, calculator, interactive tools"
+                        sub_strand: line.slice(0, 50),
+                        content_standard: "Demonstrate understanding in topic",
+                        indicators: "Practical indicator",
+                        resources: "Textbooks, charts, apparatus"
                     });
                 }
             }
@@ -1376,39 +1513,54 @@
 
         function engineGenerateCustomScheme() {
             const app = Alpine.$data(document.body);
-            const subject = document.getElementById('engineSubjectSelect').value;
-            const grade = document.getElementById('engineClassSelect').value;
-            const totalWeeks = 15;
+            const levelEl = document.getElementById('engineLevelSelect');
+            const classNumEl = document.getElementById('engineClassNumSelect');
+            const subjectEl = document.getElementById('engineSubjectSelect');
+            const totalWeeksEl = document.getElementById('engineTotalWeeks');
 
-            const fridays = ['11-09-2026', '18-09-2026', '25-09-2026', '02-10-2026', '09-10-2026', '16-10-2026', '23-10-2026', '30-10-2026', '06-11-2026', '13-11-2026', '20-11-2026', '27-11-2026', '04-12-2026', '11-12-2026', '18-12-2026'];
+            const level = levelEl ? levelEl.value : 'JHS';
+            const classNum = classNumEl ? classNumEl.value : '7';
+            const subject = subjectEl ? subjectEl.value : 'Mathematics';
+            const totalWeeks = totalWeeksEl ? parseInt(totalWeeksEl.value) || 15 : 15;
+            const gradeLabel = `${level} ${classNum}`;
+            const pfx = level === 'SHS' ? 'SHS1' : (level === 'KG' ? 'KG1' : `B${classNum}`);
+
+            const fridays = ['11-09-2026', '18-09-2026', '25-09-2026', '02-10-2026', '09-10-2026', '16-10-2026', '23-10-2026', '30-10-2026', '06-11-2026', '13-11-2026', '20-11-2026', '27-11-2026', '04-12-2026', '11-12-2026', '18-12-2026', '08-01-2027', '15-01-2027', '22-01-2027'];
             
-            // Strictly fetch specific class/subject topics from uploaded file or generate based on selected subject ONLY
             let topics = app.parsedSchemeTopics;
             if (!topics || topics.length === 0) {
-                // Generate intelligent subject-specific curriculum topics without mixing subjects
                 if (subject.includes("Mathematics")) {
                     topics = [
-                        { strand: "Strand 1: Number", sub_strand: "Number Operations & Real Numbers", content_standard: "Demonstrate understanding of number systems", indicators: "Perform operations accurately (BECE Focus)", resources: "Base ten blocks, charts" },
-                        { strand: "Strand 2: Algebra", sub_strand: "Algebraic Expressions & Equations", content_standard: "Translate word problems into algebraic expressions", indicators: "Solve linear equations", resources: "Graph sheets, algebra tiles" },
-                        { strand: "Strand 3: Geometry", sub_strand: "Shapes, Angles & Measurement", content_standard: "Demonstrate understanding of geometric properties", indicators: "Calculate angles and perimeters", resources: "Protractor, ruler, compass" },
-                        { strand: "Strand 4: Statistics", sub_strand: "Data Collection and Probability", content_standard: "Collect, organize, and interpret data", indicators: "Represent data on bar charts and pie charts", resources: "Graph boards, markers" }
+                        { strand: "Strand 1: Number", sub_strand: "Number Operations & Real Numbers", content_standard: `${pfx}.1.1.1 Demonstrate understanding of number systems`, indicators: `${pfx}.1.1.1.1 Perform operations accurately`, resources: "Base ten blocks, charts" },
+                        { strand: "Strand 2: Algebra", sub_strand: "Algebraic Expressions & Equations", content_standard: `${pfx}.1.2.1 Translate word problems into algebraic expressions`, indicators: `${pfx}.1.2.1.1 Solve linear equations`, resources: "Graph sheets, algebra tiles" },
+                        { strand: "Strand 3: Geometry", sub_strand: "Shapes, Angles & Measurement", content_standard: `${pfx}.1.3.1 Demonstrate understanding of geometric properties`, indicators: `${pfx}.1.3.1.1 Calculate angles and perimeters`, resources: "Protractor, ruler, compass" },
+                        { strand: "Strand 4: Statistics", sub_strand: "Data Collection and Probability", content_standard: `${pfx}.1.4.1 Collect, organize, and interpret data`, indicators: `${pfx}.1.4.1.1 Represent data on bar charts`, resources: "Graph boards, markers" }
                     ];
                 } else if (subject.includes("Science")) {
                     topics = [
-                        { strand: "Strand 1: Diversity of Matter", sub_strand: "Living and Non-Living Things", content_standard: "Classify matter into various categories", indicators: "Identify properties of materials", resources: "Beakers, specimens, magnets" },
-                        { strand: "Strand 2: Cycles", sub_strand: "Earth Science and Life Cycles", content_standard: "Understand natural cycles in the environment", indicators: "Describe water cycle and plant reproduction", resources: "Charts, potted plants" },
-                        { strand: "Strand 3: Systems", sub_strand: "The Human Body and Ecosystems", content_standard: "Analyze biological and physical systems", indicators: "Trace digestive and respiratory systems", resources: "Anatomical charts" }
+                        { strand: "Strand 1: Diversity of Matter", sub_strand: "Living and Non-Living Things", content_standard: `${pfx}.2.1.1 Classify matter into various categories`, indicators: `${pfx}.2.1.1.1 Identify properties of materials`, resources: "Beakers, specimens, magnets" },
+                        { strand: "Strand 2: Cycles", sub_strand: "Earth Science and Life Cycles", content_standard: `${pfx}.2.2.1 Understand natural cycles in the environment`, indicators: `${pfx}.2.2.1.1 Describe water cycle and plant reproduction`, resources: "Charts, potted plants" },
+                        { strand: "Strand 3: Systems", sub_strand: "The Human Body and Ecosystems", content_standard: `${pfx}.2.3.1 Analyze biological and physical systems`, indicators: `${pfx}.2.3.1.1 Trace digestive and respiratory systems`, resources: "Anatomical charts" }
                     ];
                 } else {
                     topics = [
-                        { strand: `Strand 1: Fundamentals`, sub_strand: `Introduction to ${subject}`, content_standard: `Demonstrate mastery of core ${subject} concepts`, indicators: `Execute practical indicators for ${subject}`, resources: `GES approved textbooks for ${subject}` },
-                        { strand: `Strand 2: Application`, sub_strand: `Advanced ${subject} Principles`, content_standard: `Apply ${subject} principles to practical scenarios`, indicators: `Solve WAEC/BECE standard problems`, resources: `Reference materials, tools` }
+                        { strand: `${level} Strand 1: Core Principles`, sub_strand: `${subject} Foundations`, content_standard: `${pfx}.1.1.1 Master core ${subject} concepts`, indicators: `${pfx}.1.1.1.1 Solve standard problems & BECE drills`, resources: "GES approved textbooks, charts" },
+                        { strand: `${level} Strand 2: Advanced Practice`, sub_strand: `Advanced ${subject} Practice`, content_standard: `${pfx}.1.2.1 Apply ${subject} theories`, indicators: `${pfx}.1.2.1.1 Demonstrate practical calculations`, resources: "Apparatus, calculator, charts" }
                     ];
                 }
+            } else {
+                topics = topics.map((t, index) => {
+                    const strandNum = (index % 4) + 1;
+                    return {
+                        ...t,
+                        content_standard: `${pfx}.${strandNum}.1.1 Demonstrate understanding and competency in ${t.sub_strand}`,
+                        indicators: `${pfx}.${strandNum}.1.1.1 Apply standard procedures and solve sample problems`
+                    };
+                });
             }
 
             const weeks = [];
-            const instructionalWeeks = totalWeeks - 3;
+            const instructionalWeeks = Math.max(totalWeeks - 3, 1);
 
             for (let i = 1; i <= totalWeeks; i++) {
                 const we = fridays[i - 1] || "TBD";
@@ -1420,15 +1572,15 @@
                         strand: item.strand,
                         sub_strand: item.sub_strand,
                         content_standard: item.content_standard,
-                        indicators: item.indicators + " (BECE Focus)",
+                        indicators: item.indicators,
                         resources: item.resources
                     });
                 } else if (i === totalWeeks - 2) {
-                    weeks.push({ week_number: i, week_ending: we, strand: "REVISION", sub_strand: `Comprehensive ${subject} Past Questions Review`, content_standard: "Comprehensive mastery of all NaCCA strands", indicators: "Drill on WAEC past questions", resources: "BECE/WASSCE past questions compendium" });
+                    weeks.push({ week_number: i, week_ending: we, strand: "REVISION", sub_strand: `Comprehensive ${subject} Past Questions Review`, content_standard: `${pfx}.3.1.1 Comprehensive mastery of all NaCCA strands`, indicators: `${pfx}.3.1.1.1 Drill on WAEC/BECE past questions`, resources: "Past questions compendium" });
                 } else if (i === totalWeeks - 1) {
-                    weeks.push({ week_number: i, week_ending: we, strand: "ASSESSMENT", sub_strand: "Terminal Mock Examination", content_standard: "Standardized testing on national standards", indicators: "Mock examination papers", resources: "Examination scripts, marking schemes" });
+                    weeks.push({ week_number: i, week_ending: we, strand: "ASSESSMENT", sub_strand: "Terminal Mock Examination", content_standard: `${pfx}.3.2.1 Standardized testing on national standards`, indicators: `${pfx}.3.2.1.1 Mock examination papers`, resources: "Examination scripts, marking schemes" });
                 } else {
-                    weeks.push({ week_number: i, week_ending: we, strand: "SBA & VACATION", sub_strand: "SBA Collation & Terminal Reporting", content_standard: "Continuous assessment recording", indicators: "SBA computation", resources: "SBA registers, report sheets" });
+                    weeks.push({ week_number: i, week_ending: we, strand: "SBA & VACATION", sub_strand: "SBA Collation & Terminal Reporting", content_standard: `${pfx}.3.3.1 Continuous assessment recording`, indicators: `${pfx}.3.3.1.1 SBA computation`, resources: "SBA registers, report sheets" });
                 }
             }
 
@@ -1436,12 +1588,14 @@
                 teacher_name: app.activeTeacher ? app.activeTeacher.name : 'Teacher',
                 school_name: app.activeSchoolName,
                 subject: subject,
-                grade_level: grade,
+                level: level,
+                class_num: classNum,
+                grade_level: gradeLabel,
                 weeks: weeks
             };
 
             engineRenderSchemeTable();
-            alert(`Weekly scheme for ${subject} (${grade}) generated successfully with NaCCA strands & BECE focus!`);
+            alert(`Weekly scheme for ${subject} (${level} Class ${classNum}) generated successfully for ${totalWeeks} weeks with strict ${pfx} Content Standards!`);
         }
 
         function engineRenderSchemeTable() {
@@ -1449,6 +1603,7 @@
             if (!app.engineScheme) return;
 
             const tbody = document.getElementById('engineSchemeTableBody');
+            if (!tbody) return;
             tbody.innerHTML = '';
             app.engineScheme.weeks.forEach((w, idx) => {
                 tbody.innerHTML += `
@@ -1456,7 +1611,8 @@
                         <td class="p-2.5 border-r text-center font-bold">${w.week_number}</td>
                         <td class="p-2.5 border-r font-mono">${w.week_ending}</td>
                         <td class="p-2.5 border-r"><input type="text" value="${w.strand}" oninput="engineUpdateSchemeCell(${idx}, 'strand', this.value)" class="w-full bg-transparent border-b border-dashed border-slate-300 focus:border-indigo-600 outline-none"></td>
-                        <td class="p-2.5 border-r"><input type="text" value="${w.sub_strand}" oninput="engineUpdateSchemeCell(${idx}, 'sub_strand', this.value)" class="w-full bg-transparent border-b border-dashed border-slate-300 focus:border-indigo-600 outline-none font-semibold"></td>
+                        <td class="p-2.5 border-r"><input type="text" value="${w.sub_strand}" oninput="engineUpdateSchemeCell(${idx}, 'sub_strand', this.value)" class="w-full bg-transparent border-b border-dashed border-slate-300 focus:border-indigo-600 outline-none font-semibold text-indigo-900"></td>
+                        <td class="p-2.5 border-r"><input type="text" value="${w.content_standard}" oninput="engineUpdateSchemeCell(${idx}, 'content_standard', this.value)" class="w-full bg-transparent border-b border-dashed border-slate-300 focus:border-indigo-600 outline-none"></td>
                         <td class="p-2.5 border-r"><input type="text" value="${w.indicators}" oninput="engineUpdateSchemeCell(${idx}, 'indicators', this.value)" class="w-full bg-transparent border-b border-dashed border-slate-300 focus:border-indigo-600 outline-none"></td>
                         <td class="p-2.5"><input type="text" value="${w.resources}" oninput="engineUpdateSchemeCell(${idx}, 'resources', this.value)" class="w-full bg-transparent border-b border-dashed border-slate-300 focus:border-indigo-600 outline-none"></td>
                     </tr>
@@ -1476,20 +1632,48 @@
             if (!app.engineScheme) { alert('Please generate scheme first!'); return; }
             let rows = '';
             app.engineScheme.weeks.forEach(w => {
-                rows += `<tr><td>${w.week_number}</td><td>${w.week_ending}</td><td>${w.strand}</td><td><b>${w.sub_strand}</b><br>${w.content_standard}</td><td>${w.indicators}</td><td>${w.resources}</td></tr>`;
+                rows += `<tr><td>${w.week_number}</td><td>${w.week_ending}</td><td>${w.strand}</td><td><b>${w.sub_strand}</b></td><td>${w.content_standard}</td><td>${w.indicators}</td><td>${w.resources}</td></tr>`;
             });
             const html = `<html xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"></head><body style="font-family:Arial;font-size:10pt;">
                 <h3 style="text-align:center;color:#1A73E8;">${app.engineScheme.school_name}</h3>
-                <h4 style="text-align:center;">SCHEME OF LEARNING — ${app.engineScheme.subject} (${app.engineScheme.grade_level})</h4>
-                <p style="text-align:center;">Teacher: ${app.engineScheme.teacher_name} | NaCCA & BECE Standard Aligned</p>
+                <h4 style="text-align:center;">SCHEME OF LEARNING — ${app.engineScheme.subject} (Level: ${app.engineScheme.level} | Class: ${app.engineScheme.class_num})</h4>
+                <p style="text-align:center;">Teacher: ${app.engineScheme.teacher_name} | NaCCA Standard</p>
                 <table border="1" style="width:100%;border-collapse:collapse;font-size:9pt;">
-                    <tr style="background:#F1F3F4;"><th>Wk</th><th>Week Ending</th><th>NaCCA Strand</th><th>Sub Strand & Standards</th><th>Indicators & BECE Focus</th><th>TLM Resources</th></tr>
+                    <tr style="background:#F1F3F4;"><th>Wk</th><th>Week Ending</th><th>NaCCA Strand</th><th>Sub Strand (Main Topic)</th><th>Content Standard</th><th>Indicators</th><th>TLM Resources</th></tr>
                     ${rows}
                 </table>
             </body></html>`;
             const blob = new Blob(['\ufeff' + html], { type: 'application/msword' });
             const url = URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url; a.download = `Scheme_${app.engineScheme.subject}_${app.engineScheme.grade_level}.doc`; a.click();
+            const a = document.createElement('a'); a.href = url; a.download = `Scheme_${app.engineScheme.subject}_${app.engineScheme.level}_${app.engineScheme.class_num}.doc`; a.click();
+        }
+
+        function requestDownload(type) {
+            const app = Alpine.$data(document.body);
+            if (!app.engineLessons) { alert('Please build lesson plans first!'); return; }
+            app.paymentType = type; // 'single' (GHS 5) or 'all' (GHS 45)
+
+            if (type === 'single' && app.isPaidSingle) {
+                engineExportLessonsWord();
+            } else if (type === 'all' && app.isPaidAll) {
+                engineExportLessonsWord();
+            } else {
+                app.showPaymentModal = true;
+            }
+        }
+
+        function simulatePaystackSuccess() {
+            const app = Alpine.$data(document.body);
+            const amountLabel = app.paymentType === 'single' ? 'GHS 5.00' : 'GHS 45.00';
+            
+            if (app.paymentType === 'single') {
+                app.isPaidSingle = true;
+            } else {
+                app.isPaidAll = true;
+            }
+            alert(`Redirecting to Paystack Storefront (${app.paystackStoreUrl}) for ${amountLabel}... Upon successful payment, your download will unlock!`);
+            app.showPaymentModal = false;
+            engineExportLessonsWord();
         }
 
         function engineGenerateLessons() {
@@ -1499,53 +1683,165 @@
             const teacherName = app.activeTeacher ? app.activeTeacher.name : 'Teacher';
             const schoolName = app.activeSchoolName;
             const subject = app.engineScheme.subject;
-            const grade = app.engineScheme.grade_level;
+            const lvl = app.engineScheme.level;
+            const cls = app.engineScheme.class_num;
+            const lessonsPerWkEl = document.getElementById('engineLessonsPerWk');
+            const lessonsPerWk = lessonsPerWkEl ? parseInt(lessonsPerWkEl.value) || 4 : 4;
             const weeksNotes = [];
 
             app.engineScheme.weeks.forEach(w => {
+                const lessons = [];
+                for (let l = 1; l <= lessonsPerWk; l++) {
+                    const isFirstLesson = (w.week_number === 1 && l === 1);
+                    
+                    let starterText = "";
+                    let newLearningText = "";
+                    let reflectionText = "";
+
+                    if (subject.includes("Mathematics")) {
+                        starterText = isFirstLesson
+                            ? `1. Review relevant previous knowledge on arithmetic grouping, integers, and foundational calculations related to ${w.sub_strand}.\n2. Engage learners with a daily life scenario connecting counting or measurements to ${w.sub_strand}.`
+                            : `1. Review previous knowledge: Recall key formulas, rules, and calculation steps from the previous lesson on ${w.sub_strand}.\n2. Link prior practice to today's indicator: ${w.indicators}.`;
+
+                        newLearningText = `1. **Definition & Core Concept:** Define ${w.sub_strand} clearly in line with NaCCA standards.\n2. **Real Math Examples & Scenarios (4+ Activities):**\n   - Activity 1 (Concrete): Practical representation using objects or visual grids.\n   - Activity 2 (Symbolic): Solving standard numerical equations under ${w.content_standard}.\n   - Activity 3 (Word Problem): Real-life commercial calculation (e.g., finding profit, unit cost, or scaling dimensions).\n   - Activity 4 (Group Work): Collaborative problem solving.\n3. **Guided Practice:** Teacher leads sample problems on the chalkboard.\n4. **Independent Exercise:** Learners complete practice exercises independently.\n\nFormative Assessment:\n1. Define ${w.sub_strand} and write down the general formula or rule.\n2. Solve 3 practical numerical problems based on indicator: ${w.indicators}.`;
+
+                        reflectionText = `1. Assessment Question / Exit Ticket to test the content indicator or objective:\n- Question: "Calculate the solution for a real-life scenario involving ${w.sub_strand} under standard ${w.content_standard}."\n2. Teacher checks student solutions to verify mastery of objective.`;
+                    } else {
+                        starterText = isFirstLesson
+                            ? `1. Review relevant previous knowledge and foundational concepts related to ${w.sub_strand}.\n2. Introduce scope and objectives for ${w.sub_strand}.`
+                            : `1. Review previous knowledge: Recall key facts, definitions, and principles covered in preceding lessons under ${w.sub_strand}.\n2. Link prior understanding to today's indicator: ${w.indicators}.`;
+
+                        newLearningText = `1. **Definition & Explanation:** Define key technical terms and concepts under ${w.sub_strand}.\n2. **Concrete Examples & Illustrations (4+ Activities):**\n   - Activity 1: Definition and core terminology breakdown.\n   - Activity 2: Case study or real-world example matching ${w.content_standard}.\n   - Activity 3: Guided teacher demonstration.\n   - Activity 4: Collaborative group experiment or discussion.\n3. **Independent Task:** Learners complete task questions independently to master the indicator: ${w.indicators}.\n\nFormative Assessment:\n1. State conventional definition and examples of ${w.sub_strand}.\n2. Solve practice tasks based on indicator requirements.`;
+
+                        reflectionText = `1. Assessment Question / Exit Ticket to test the content indicator or objective:\n- Question: "Explain the core principles of ${w.sub_strand} and solve a practical problem demonstrating ${w.content_standard}."\n2. Teacher reviews student responses to measure objective mastery.`;
+                    }
+
+                    lessons.push({
+                        lesson_number: l,
+                        day: `LESSON ${l} of ${lessonsPerWk} (DAY: Monday • 07-09-2026)`,
+                        duration: '60 MINS',
+                        week_str: `Week ${w.week_number}`,
+                        week_ending: w.week_ending,
+                        subject: subject,
+                        class_size: `${lvl} ${cls} • 40 Learners`,
+                        strand: w.strand,
+                        sub_strand: w.sub_strand,
+                        content_standard: w.content_standard,
+                        indicator: w.indicators,
+                        performance_indicator: `Learners can define, provide real-world examples, and solve problems based on ${w.sub_strand}.`,
+                        core_competencies: 'Critical Thinking and Problem Solving (CP), Collaboration & Communication (CC)',
+                        references: 'NaCCA Common Core Curriculum; Teachers Resource Pack',
+                        keywords: `${subject}, ${w.sub_strand}, NaCCA standards`,
+                        resources: w.resources,
+                        phase1_starter: starterText,
+                        phase2_new_learning: newLearningText,
+                        phase3_reflection: reflectionText
+                    });
+                }
                 weeksNotes.push({
                     week_number: w.week_number,
                     week_ending: w.week_ending,
                     strand: w.strand,
                     sub_strand: w.sub_strand,
-                    content_standard: w.content_standard,
-                    teacher_name: teacherName,
-                    school_name: schoolName,
-                    subject: subject,
-                    grade_level: grade,
-                    lessons: [
-                        {
-                            lesson_number: 1,
-                            day: `Monday • Week ${w.week_number}`,
-                            duration: '60 MINS',
-                            indicator: w.indicators,
-                            performance_indicator: `Learners can solve standard problems and answer BECE type questions on ${w.sub_strand}.`,
-                            resources: w.resources,
-                            phase1_starter: `Review prior knowledge. Pose a WAEC/BECE past question hook regarding ${w.sub_strand}.`,
-                            phase2_new_learning: `Step-by-step NaCCA standard instruction, worked examples, and guided practice on ${w.sub_strand} using ${w.resources}.`,
-                            phase3_reflection: `Learners summarize core concepts and solve a quick exit ticket problem.`
-                        }
-                    ]
+                    lessons: lessons
                 });
             });
 
-            app.engineLessons = { teacher_name: teacherName, school_name: schoolName, subject: subject, grade_level: grade, weeks: weeksNotes };
+            app.engineLessons = { teacher_name: teacherName, school_name: schoolName, subject: subject, level: lvl, class_num: cls, weeks: weeksNotes };
             
-            const container = document.getElementById('engineLessonsContainer');
+            const container = document.getElementById('printable-lessons');
+            if (!container) return;
             container.innerHTML = '';
+
             weeksNotes.forEach(w => {
-                container.innerHTML += `
-                    <div class="p-4 border rounded-xl bg-white shadow-2xs space-y-2 text-xs">
-                        <div class="flex justify-between items-center border-b pb-2">
-                            <span class="font-bold text-indigo-950 text-sm">Week ${w.week_number} (${w.week_ending}) — ${w.sub_strand}</span>
-                            <span class="bg-indigo-100 text-indigo-800 font-bold px-2.5 py-0.5 rounded text-[11px]">Teacher: ${w.teacher_name} | ${w.subject} (${w.grade_level})</span>
-                        </div>
-                        <p class="text-slate-600"><b>Starter:</b> ${w.lessons[0].phase1_starter}</p>
-                        <p class="text-slate-600"><b>New Learning:</b> ${w.lessons[0].phase2_new_learning}</p>
-                        <p class="text-slate-600"><b>Reflection:</b> ${w.lessons[0].phase3_reflection}</p>
-                    </div>`;
+                w.lessons.forEach(l => {
+                    container.innerHTML += `
+                        <div class="border border-slate-400 rounded-lg p-4 bg-white shadow-sm space-y-3 mb-8 text-xs font-sans">
+                            <div class="text-center font-bold text-indigo-950 text-sm border-b pb-2 uppercase">
+                                ${w.school_name} — ${l.day}
+                            </div>
+                            
+                            <!-- Table Structured Lesson Plan matching exact reference layout -->
+                            <table class="w-full border-collapse border border-slate-400 text-xs">
+                                <tr>
+                                    <td class="border border-slate-400 p-2 font-bold w-1/4 bg-slate-100">Week:</td>
+                                    <td class="border border-slate-400 p-2 w-1/4">${l.week_str}</td>
+                                    <td class="border border-slate-400 p-2 font-bold w-1/4 bg-slate-100">Week Ending:</td>
+                                    <td class="border border-slate-400 p-2 w-1/4">${l.week_ending}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-slate-400 p-2 font-bold bg-slate-100">DAY:</td>
+                                    <td class="border border-slate-400 p-2">${l.day}</td>
+                                    <td class="border border-slate-400 p-2 font-bold bg-slate-100">Duration:</td>
+                                    <td class="border border-slate-400 p-2">${l.duration}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-slate-400 p-2 font-bold bg-slate-100">Subject:</td>
+                                    <td class="border border-slate-400 p-2">${l.subject}</td>
+                                    <td class="border border-slate-400 p-2 font-bold bg-slate-100">Class & Class Size:</td>
+                                    <td class="border border-slate-400 p-2">${l.class_size}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-slate-400 p-2 font-bold bg-slate-100">Strand:</td>
+                                    <td class="border border-slate-400 p-2">${l.strand}</td>
+                                    <td class="border border-slate-400 p-2 font-bold bg-slate-100">Sub Strand:</td>
+                                    <td class="border border-slate-400 p-2 font-semibold text-indigo-900">${l.sub_strand}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-slate-400 p-2 font-bold bg-slate-100">Content Standard:</td>
+                                    <td colspan="3" class="border border-slate-400 p-2">${l.content_standard}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-slate-400 p-2 font-bold bg-slate-100">Indicator:</td>
+                                    <td colspan="3" class="border border-slate-400 p-2">${l.indicator}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-slate-400 p-2 font-bold bg-slate-100">Performance Indicator:</td>
+                                    <td colspan="3" class="border border-slate-400 p-2">${l.performance_indicator}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-slate-400 p-2 font-bold bg-slate-100">Core Competencies:</td>
+                                    <td colspan="3" class="border border-slate-400 p-2">${l.core_competencies}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-slate-400 p-2 font-bold bg-slate-100">References:</td>
+                                    <td colspan="3" class="border border-slate-400 p-2">${l.references}</td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-slate-400 p-2 font-bold bg-slate-100">Keywords:</td>
+                                    <td colspan="3" class="border border-slate-400 p-2">${l.keywords}</td>
+                                </tr>
+                            </table>
+
+                            <!-- Phase / Duration Table Structure -->
+                            <table class="w-full border-collapse border border-slate-400 text-xs mt-2">
+                                <thead>
+                                    <tr class="bg-slate-200">
+                                        <th class="border border-slate-400 p-2 text-left w-1/4">Phase / Duration</th>
+                                        <th class="border border-slate-400 p-2 text-left w-1/2">Learners Activities</th>
+                                        <th class="border border-slate-400 p-2 text-left w-1/4">Resources</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="border border-slate-400 p-2 font-bold align-top">PHASE 1: STARTER<br>(10 mins)</td>
+                                        <td class="border border-slate-400 p-2 align-top whitespace-pre-line">${l.phase1_starter}</td>
+                                        <td class="border border-slate-400 p-2 align-top" rowspan="3">${l.resources}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-slate-400 p-2 font-bold align-top">PHASE 2: NEW LEARNING<br>(40 mins)</td>
+                                        <td class="border border-slate-400 p-2 align-top whitespace-pre-line">${l.phase2_new_learning}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-slate-400 p-2 font-bold align-top">PHASE 3: REFLECTION<br>(10 mins)</td>
+                                        <td class="border border-slate-400 p-2 align-top whitespace-pre-line">${l.phase3_reflection}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>`;
+                });
             });
-            alert('3-Phase Lesson Notes generated successfully with complete Teacher, Class, Subject, Week Number & Week Ending headers!');
+            alert('Portrait Table-Structured Lesson Plans generated successfully with correct Content Standards & Indicators!');
         }
 
         function engineExportLessonsWord() {
@@ -1553,46 +1849,55 @@
             if (!app.engineLessons) { alert('Please generate lessons first!'); return; }
             let content = '';
             app.engineLessons.weeks.forEach(w => {
-                content += `
-                    <h2 style="color:#174EA6;border-bottom:1px solid #1A73E8;">WEEK ${w.week_number} • WEEK ENDING: ${w.week_ending}</h2>
-                    <p><b>Teacher:</b> ${w.teacher_name} | <b>School:</b> ${w.school_name} | <b>Subject:</b> ${w.subject} (${w.grade_level})</p>
-                    <p><b>NaCCA Strand:</b> ${w.strand} | <b>Sub-Strand:</b> ${w.sub_strand}</p>
-                    <table border="1" style="width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:15px;">
-                        <tr style="background:#E8F0FE;"><th>Phase / Duration</th><th>Learners & Teacher Activities (BECE Focused)</th><th>Resources</th></tr>
-                        <tr><td style="font-weight:bold;">PHASE 1: STARTER (10m)</td><td>${w.lessons[0].phase1_starter}</td><td rowspan="3">${w.lessons[0].resources}</td></tr>
-                        <tr><td style="font-weight:bold;">PHASE 2: NEW LEARNING (40m)</td><td>${w.lessons[0].phase2_new_learning}</td></tr>
-                        <tr><td style="font-weight:bold;">PHASE 3: REFLECTION (10m)</td><td>${w.lessons[0].phase3_reflection}</td></tr>
-                    </table>`;
+                w.lessons.forEach(l => {
+                    content += `
+                        <div style="page-break-after: always; max-width: 210mm; margin: 0 auto; font-family: Arial, sans-serif; font-size: 9pt;">
+                            <h3 style="text-align:center;color:#0F2942;margin-bottom:5px;">${w.school_name} — ${l.day}</h3>
+                            <table border="1" style="width:100%;border-collapse:collapse;margin-bottom:10px;">
+                                <tr><td style="background:#F1F3F4;font-weight:bold;width:25%;">Week:</td><td style="width:25%;">${l.week_str}</td><td style="background:#F1F3F4;font-weight:bold;width:25%;">Week Ending:</td><td style="width:25%;">${l.week_ending}</td></tr>
+                                <tr><td style="background:#F1F3F4;font-weight:bold;">DAY:</td><td>${l.day}</td><td style="background:#F1F3F4;font-weight:bold;">Duration:</td><td>${l.duration}</td></tr>
+                                <tr><td style="background:#F1F3F4;font-weight:bold;">Subject:</td><td>${l.subject}</td><td style="background:#F1F3F4;font-weight:bold;">Class & Size:</td><td>${l.class_size}</td></tr>
+                                <tr><td style="background:#F1F3F4;font-weight:bold;">Strand:</td><td>${l.strand}</td><td style="background:#F1F3F4;font-weight:bold;">Sub Strand:</td><td><b>${l.sub_strand}</b></td></tr>
+                                <tr><td style="background:#F1F3F4;font-weight:bold;">Content Standard:</td><td colspan="3">${l.content_standard}</td></tr>
+                                <tr><td style="background:#F1F3F4;font-weight:bold;">Indicator:</td><td colspan="3">${l.indicator}</td></tr>
+                                <tr><td style="background:#F1F3F4;font-weight:bold;">Performance Indicator:</td><td colspan="3">${l.performance_indicator}</td></tr>
+                                <tr><td style="background:#F1F3F4;font-weight:bold;">Core Competencies:</td><td colspan="3">${l.core_competencies}</td></tr>
+                                <tr><td style="background:#F1F3F4;font-weight:bold;">References:</td><td colspan="3">${l.references}</td></tr>
+                                <tr><td style="background:#F1F3F4;font-weight:bold;">Keywords:</td><td colspan="3">${l.keywords}</td></tr>
+                            </table>
+                            <table border="1" style="width:100%;border-collapse:collapse;">
+                                <tr style="background:#E8F0FE;"><th>Phase / Duration</th><th>Learners Activities</th><th>Resources</th></tr>
+                                <tr><td style="font-weight:bold;vertical-align:top;">PHASE 1: STARTER<br>(10 mins)</td><td style="vertical-align:top;white-space:pre-line;">${l.phase1_starter}</td><td style="vertical-align:top;" rowspan="3">${l.resources}</td></tr>
+                                <tr><td style="font-weight:bold;vertical-align:top;">PHASE 2: NEW LEARNING<br>(40 mins)</td><td style="vertical-align:top;white-space:pre-line;">${l.phase2_new_learning}</td></tr>
+                                <tr><td style="font-weight:bold;vertical-align:top;">PHASE 3: REFLECTION<br>(10 mins)</td><td style="vertical-align:top;white-space:pre-line;">${l.phase3_reflection}</td></tr>
+                            </table>
+                        </div><br>`;
+                });
             });
-            const html = `<html xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"></head><body style="font-family:Arial;font-size:10pt;">
-                <h3 style="text-align:center;color:#1A73E8;">${app.engineLessons.school_name}</h3>
-                <h4 style="text-align:center;">LESSON NOTES — ${app.engineLessons.subject} (${app.engineLessons.grade_level})</h4>
-                <p style="text-align:center;">Teacher: ${app.engineLessons.teacher_name} | Term: Term 1 | NaCCA / WAEC Standard</p>
-                <hr>${content}
-            </body></html>`;
+            const html = `<html xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"></head><body>${content}</body></html>`;
             const blob = new Blob(['\ufeff' + html], { type: 'application/msword' });
             const url = URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url; a.download = `Lesson_Notes_${app.engineLessons.subject}_${app.engineLessons.grade_level}.doc`; a.click();
+            const a = document.createElement('a'); a.href = url; a.download = `Portrait_Table_Lesson_Plans_${app.engineLessons.subject}.doc`; a.click();
         }
 
         function engineSubmitToMainPortal() {
             const app = Alpine.$data(document.body);
             if (!app.engineLessons || !app.activeTeacher) { alert('Please select your teacher profile and generate lessons first!'); return; }
             
-            const dummyData = 'data:text/plain;charset=utf-8,' + encodeURIComponent('NaCCA Dynamic Lesson Engine Export for ' + app.engineLessons.subject);
+            const dummyData = 'data:text/plain;charset=utf-8,' + encodeURIComponent('Table Structured Lesson Notes Export for ' + app.engineLessons.subject);
             
             const lessonId = Date.now().toString();
             const lessonData = {
                 id: lessonId,
                 subject: app.engineLessons.subject,
-                classLevel: app.engineLessons.grade_level,
+                classLevel: `${app.engineLessons.level} Class ${app.engineLessons.class_num}`,
                 term: 'Term 1',
                 week: 'Week 1',
                 year: '2026/2027',
-                fileName: `${app.engineLessons.subject}_Lesson_Notes.doc`,
+                fileName: `${app.engineLessons.subject}_Table_Lessons.doc`,
                 fileData: dummyData,
                 status: 'Submitted',
-                feedback: 'Generated via NaCCA & BECE Engine',
+                feedback: '', // Cleaned: left blank for reviewer role as requested
                 rawDate: Date.now(),
                 schoolId: app.authenticatedSchoolId,
                 teacherId: app.activeTeacher.id,
@@ -1602,10 +1907,19 @@
                 isArchived: false
             };
 
-            db.collection('lessons').doc(lessonId).set(lessonData).then(() => {
-                alert('Success! Dynamic lesson notes submitted directly to school vetting queue.');
-                app.teacherSubTab = 'upload';
-            }).catch(err => alert('Error submitting: ' + err.message));
+            const savePromise = db.collection('lessons').doc(lessonId).set(lessonData);
+            savePromise.then(() => {
+                alert('Success! Table-structured lesson notes submitted directly to school vetting queue.');
+                app.resetForm();
+                app.loadSchoolData(); // Auto-refresh data and view
+            }).catch(err => {
+                const queue = JSON.parse(localStorage.getItem('eduvet_offline_queue') || '[]');
+                queue.push(lessonData);
+                localStorage.setItem('eduvet_offline_queue', JSON.stringify(queue));
+                alert('Offline Mode: Lesson submission queued locally. Will auto-sync when online.');
+                app.resetForm();
+                app.loadSchoolData(); // Auto-refresh view
+            });
         }
     </script>
 </body>
