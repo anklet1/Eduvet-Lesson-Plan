@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-[#090d16] text-[#e2e8f0]">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DiasporaGuard — Enterprise PropTech, Escrow & Identity Gateway</title>
+  
+  <!-- Institutional Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+            },
+            surface: {
+              DEFAULT: '#0f172a',
+              subtle: '#1e293b',
+              border: '#334155',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #090d16; }
+    ::-webkit-scrollbar-thumb { background: #27354a; border-radius: 2px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3b4e6b; }
+  </style>
+</head>
+<body class="min-h-full flex flex-col font-sans text-sm selection:bg-emerald-500/20 selection:text-emerald-400">
+
+  <!-- TOP REGULATORY & TELEMETRY BAR -->
+  <header class="border-b border-surface-border/60 bg-[#090d16] px-4 py-2 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+    <div class="flex items-center gap-4 text-slate-400">
+      <span class="flex items-center gap-1.5 text-emerald-400 font-semibold tracking-wider">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        DIASPORAGUARD ENTERPRISE
+      </span>
+      <span class="hidden sm:inline-block text-slate-600">|</span>
+      <span class="hidden sm:inline-block">NIA VERIFIED GATEWAY</span>
+      <span class="hidden md:inline-block text-slate-600">|</span>
+      <span class="hidden md:inline-block">DATA PROTECTION ACT (ACT 843)</span>
+    </div>
+    
+    <div class="flex items-center gap-3">
+      <div class="bg-surface-subtle border border-surface-border px-2 py-0.5 rounded text-[11px] flex items-center gap-1.5">
+        <span class="text-slate-400">FX:</span>
+        <span class="text-emerald-400">£1=19.20GHS</span>
+        <span class="text-slate-600">•</span>
+        <span class="text-emerald-400">$1=15.40GHS</span>
+      </div>
+      <!-- User Profile Pill -->
+      <button onclick="openAuthModal()" id="authStatusPill" class="flex items-center gap-2 bg-surface-subtle border border-surface-border hover:border-emerald-500/60 px-2.5 py-1 rounded transition-colors text-left">
+        <!-- Injected via JS -->
+      </button>
+    </div>
+  </header>
+
+  <!-- NAVIGATION HEADER -->
+  <nav class="border-b border-surface-border bg-surface px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-6">
+      <div class="flex items-center gap-2 cursor-pointer" onclick="switchTab('marketplace')">
+        <div class="w-8 h-8 rounded bg-emerald-600 flex items-center justify-center font-bold text-white tracking-tighter">
+          DG
+        </div>
+        <div>
+          <div class="font-bold text-slate-100 tracking-tight text-base leading-none">DiasporaGuard</div>
+          <div class="text-[10px] text-slate-400 font-mono">GHANA PROPTECH & ESCROW</div>
+        </div>
+      </div>
+      
+      <!-- Primary Tab Controls -->
+      <div class="hidden lg:flex items-center gap-1 text-xs">
+        <button onclick="switchTab('marketplace')" id="tabBtn-marketplace" class="tab-btn px-3 py-1.5 rounded font-medium transition-colors bg-emerald-600 text-white">
+          Public Marketplace
+        </button>
+        <button onclick="switchTab('services')" id="tabBtn-services" class="tab-btn px-3 py-1.5 rounded font-medium text-slate-300 hover:text-white hover:bg-surface-subtle transition-colors">
+          Artisans & Handymen
+        </button>
+        <button onclick="switchTab('escrow')" id="tabBtn-escrow" class="tab-btn px-3 py-1.5 rounded font-medium text-slate-300 hover:text-white hover:bg-surface-subtle transition-colors">
+          Escrow & Key Handover
+        </button>
+        <button onclick="switchTab('my-listings')" id="tabBtn-my-listings" class="tab-btn px-3 py-1.5 rounded font-medium text-slate-300 hover:text-white hover:bg-surface-subtle transition-colors">
+          Inventory Control
+        </button>
+        <button onclick="switchTab('geofence')" id="tabBtn-geofence" class="tab-btn px-3 py-1.5 rounded font-medium text-slate-300 hover:text-white hover:bg-surface-subtle transition-colors">
+          Anti-Fraud GPS Sentinel
+        </button>
+      </div>
+    </div>
+
+    <!-- Actions & Currency Controls -->
+    <div class="flex items-center gap-2.5">
+      <div class="flex items-center border border-surface-border rounded bg-surface-subtle p-0.5 text-xs font-mono">
+        <button onclick="setCurrency('GHS')" id="curr-GHS" class="px-2 py-0.5 rounded font-semibold bg-emerald-600 text-white">GHS</button>
+        <button onclick="setCurrency('GBP')" id="curr-GBP" class="px-2 py-0.5 rounded text-slate-400 hover:text-white">GBP</button>
+        <button onclick="setCurrency('USD')" id="curr-USD" class="px-2 py-0.5 rounded text-slate-400 hover:text-white">USD</button>
+      </div>
+      
+      <button onclick="openProModal()" class="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded text-xs font-medium border border-amber-500/50 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 transition-all">
+        <i data-lucide="zap" class="w-3.5 h-3.5"></i> PRO Tier
+      </button>
+
+      <button onclick="openAddListingModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium bg-emerald-600 hover:bg-emerald-500 text-white transition-colors">
+        <i data-lucide="plus" class="w-4 h-4"></i> Add Listing
+      </button>
+    </div>
+  </nav>
+
+  <!-- MAIN VIEWPORT CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
+
+    <!-- SUB-NAV FOR MOBILE VIEWPORTS -->
+    <div class="flex lg:hidden overflow-x-auto gap-2 pb-2 text-xs font-medium border-b border-surface-border">
+      <button onclick="switchTab('marketplace')" class="px-3 py-1 rounded bg-surface-subtle text-white whitespace-nowrap">Properties</button>
+      <button onclick="switchTab('services')" class="px-3 py-1 rounded bg-surface-subtle text-slate-300 whitespace-nowrap">Artisans</button>
+      <button onclick="switchTab('escrow')" class="px-3 py-1 rounded bg-surface-subtle text-slate-300 whitespace-nowrap">Escrow Ledger</button>
+      <button onclick="switchTab('my-listings')" class="px-3 py-1 rounded bg-surface-subtle text-slate-300 whitespace-nowrap">My Inventory</button>
+      <button onclick="switchTab('geofence')" class="px-3 py-1 rounded bg-surface-subtle text-slate-300 whitespace-nowrap">GPS Radar</button>
+    </div>
+
+    <!-- VIEW 1: PUBLIC PROPERTY MARKETPLACE -->
+    <section id="view-marketplace" class="space-y-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-surface-border pb-4">
+        <div>
+          <h1 class="text-xl font-bold tracking-tight text-white">Verified Properties & Rooms</h1>
+          <p class="text-slate-400 text-xs mt-0.5">Title deed anchored, cadastral surveyed, GPS pinned, direct diaspora & verified agent listings.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <select id="filterLocation" onchange="renderMarketplace()" class="bg-surface-subtle border border-surface-border rounded px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
+            <option value="ALL">All Ghana Locations</option>
+            <option value="East Legon">East Legon, Accra</option>
+            <option value="Airport Hills">Airport Hills, Accra</option>
+            <option value="Cantonments">Cantonments, Accra</option>
+            <option value="Ahodwo">Ahodwo, Kumasi</option>
+          </select>
+          <select id="filterType" onchange="renderMarketplace()" class="bg-surface-subtle border border-surface-border rounded px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
+            <option value="ALL">All Unit Types</option>
+            <option value="Apartment">Apartments</option>
+            <option value="Room">Single/Self-Contained</option>
+            <option value="Villa">Executive Villas</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Properties Grid -->
+      <div id="propertyGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- Rendered via JS -->
+      </div>
+    </section>
+
+    <!-- VIEW 2: ARTISANS & SERVICE PROVIDERS -->
+    <section id="view-services" class="space-y-6 hidden">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-surface-border pb-4">
+        <div>
+          <h1 class="text-xl font-bold tracking-tight text-white">Vetted Field Artisans & Maintenance</h1>
+          <p class="text-slate-400 text-xs mt-0.5">GPS location-verified technicians with escrow release protection and zero middleman inflation.</p>
+        </div>
+        <button onclick="openAddListingModal('SERVICE')" class="text-xs font-medium px-3 py-1.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white transition-colors">
+          Register as an Artisan
+        </button>
+      </div>
+
+      <div id="servicesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- Rendered via JS -->
+      </div>
+    </section>
+
+    <!-- VIEW 3: ESCROW & SETTLEMENT ENGINE -->
+    <section id="view-escrow" class="space-y-6 hidden">
+      <div class="border-b border-surface-border pb-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div>
+          <h1 class="text-xl font-bold tracking-tight text-white">Rent Advance Escrow & 2-Step Key Handover</h1>
+          <p class="text-slate-400 text-xs mt-0.5">Strict compliance with Ghana Rent Act (Act 220). Landlord payouts disburse only after tenant inspection & key confirmation.</p>
+        </div>
+        <div class="bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 px-3 py-1 rounded text-xs font-mono flex items-center gap-1.5">
+          <i data-lucide="shield-check" class="w-4 h-4"></i> Escrow Regulatory Quota: 5%
+        </div>
+      </div>
+
+      <!-- Escrow Active Table -->
+      <div class="bg-surface border border-surface-border rounded-lg overflow-hidden">
+        <div class="p-4 border-b border-surface-border flex items-center justify-between bg-surface-subtle/50">
+          <h2 class="text-xs font-semibold text-slate-300 uppercase tracking-wider font-mono">Active Escrow Holding Vaults</h2>
+          <span class="text-xs text-slate-400">Automated MoMo (MTN/Telecel) Release Engine</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-surface-subtle text-slate-400 font-mono uppercase text-[11px] border-b border-surface-border">
+              <tr>
+                <th class="p-3">Reference / Unit</th>
+                <th class="p-3">Tenant & Verified ID</th>
+                <th class="p-3">Total Held</th>
+                <th class="p-3">Gov Quota (5%)</th>
+                <th class="p-3">Landlord Net</th>
+                <th class="p-3">State</th>
+                <th class="p-3 text-right">Key Handover Verification</th>
+              </tr>
+            </thead>
+            <tbody id="escrowTableBody" class="divide-y divide-surface-border text-slate-300">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: INVENTORY CONTROL -->
+    <section id="view-my-listings" class="space-y-6 hidden">
+      <div class="border-b border-surface-border pb-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div>
+          <h1 class="text-xl font-bold tracking-tight text-white">Live Inventory & Unit Availability</h1>
+          <p class="text-slate-400 text-xs mt-0.5">Toggle availability, modify monthly prices, and audit active lease terms across all units.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="openAddListingModal()" class="text-xs font-medium px-3 py-1.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white">
+            Add New Unit / Service
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-surface border border-surface-border rounded-lg overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-surface-subtle text-slate-400 font-mono uppercase text-[11px] border-b border-surface-border">
+              <tr>
+                <th class="p-3">Preview</th>
+                <th class="p-3">Listing Title & Location</th>
+                <th class="p-3">Exact GPS / GhanaPost</th>
+                <th class="p-3">Monthly Rate</th>
+                <th class="p-3">Live Status</th>
+                <th class="p-3 text-right">Action Controls</th>
+              </tr>
+            </thead>
+            <tbody id="inventoryTableBody" class="divide-y divide-surface-border text-slate-300">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 5: ANTI-FRAUD GEOFENCE SENTINEL -->
+    <section id="view-geofence" class="space-y-6 hidden">
+      <div class="border-b border-surface-border pb-4">
+        <h1 class="text-xl font-bold tracking-tight text-white">Anti-Fraud Field Geofencing Sentinel</h1>
+        <p class="text-slate-400 text-xs mt-0.5">Live EXIF coordinate auditing against registered property cadastral coordinates. Invoices cannot be submitted if drift exceeds 100 meters.</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 bg-surface border border-surface-border rounded-lg p-5 flex flex-col items-center justify-center space-y-4">
+          <div class="w-full flex items-center justify-between text-xs font-mono">
+            <span class="text-slate-400">MONITORED TARGET: EAST LEGON 4-PLEX</span>
+            <span id="geofenceDriftLabel" class="text-emerald-400 font-semibold">DRIFT: 14 METERS (IN BOUNDS)</span>
+          </div>
+          <div class="relative w-72 h-72 rounded-full border border-emerald-500/30 bg-[#060a12] flex items-center justify-center overflow-hidden">
+            <div class="absolute inset-4 rounded-full border border-emerald-500/20"></div>
+            <div class="absolute inset-16 rounded-full border border-emerald-500/20"></div>
+            <div class="absolute inset-28 rounded-full border border-emerald-500/10"></div>
+            <div class="absolute w-full h-[1px] bg-emerald-500/20"></div>
+            <div class="absolute h-full w-[1px] bg-emerald-500/20"></div>
+            
+            <div class="absolute w-3 h-3 rounded-full bg-emerald-500 ring-4 ring-emerald-500/30"></div>
+            <span class="absolute text-[9px] font-mono text-emerald-400 top-1/2 left-1/2 translate-x-2 -translate-y-4">Property Root</span>
+            
+            <div id="technicianDot" class="absolute w-3 h-3 rounded-full bg-cyan-400 ring-4 ring-cyan-400/30 transition-all duration-300" style="top: 45%; left: 52%;"></div>
+          </div>
+
+          <div class="w-full space-y-2">
+            <div class="flex items-center justify-between text-xs font-mono text-slate-400">
+              <span>SIMULATE TECHNICIAN DRIFT DISTANCE</span>
+              <span id="driftValueDisplay" class="text-white">14m</span>
+            </div>
+            <input id="driftRange" type="range" min="5" max="250" value="14" oninput="updateDriftSimulation(this.value)" class="w-full accent-emerald-500 bg-surface-subtle cursor-pointer">
+          </div>
+        </div>
+
+        <div class="bg-surface border border-surface-border rounded-lg p-5 space-y-4">
+          <h2 class="text-xs font-semibold text-slate-300 uppercase tracking-wider font-mono">Hardware EXIF Audit</h2>
+          
+          <div class="space-y-3 text-xs font-mono">
+            <div class="bg-surface-subtle p-3 rounded border border-surface-border space-y-1">
+              <div class="text-slate-400">REGISTERED PARCEL COORDINATES</div>
+              <div class="text-slate-200 font-semibold">5°39'02.1"N 0°09'14.3"W</div>
+              <div class="text-[10px] text-slate-500">LANDS COMMISSION DEED #GA-2940-2024</div>
+            </div>
+
+            <div class="bg-surface-subtle p-3 rounded border border-surface-border space-y-1">
+              <div class="text-slate-400">TECHNICIAN MOBILE GPS FIX</div>
+              <div id="techGpsFix" class="text-cyan-400 font-semibold">5°39'02.4"N 0°09'14.1"W</div>
+              <div class="text-[10px] text-slate-500">DEVICE: SM-A536B • NETWORK: MTN 4G</div>
+            </div>
+
+            <div id="fraudAlertStatus" class="p-3 rounded border border-emerald-500/30 bg-emerald-950/20 text-emerald-400">
+              <div class="font-bold flex items-center gap-1.5">
+                <i data-lucide="check-circle-2" class="w-4 h-4"></i> VERIFIED: ON PREMISES
+              </div>
+              <div class="text-[11px] text-slate-400 mt-1">Technician within 100m geofence radius. Repair photo invoice submissions unlocked.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL: ADD LISTING / SERVICE WITH IMAGE UPLOAD & EXACT GPS -->
+  <div id="addListingModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-surface border border-surface-border rounded-lg max-w-lg w-full max-h-[92vh] overflow-y-auto p-6 space-y-4 text-xs">
+      <div class="flex items-center justify-between border-b border-surface-border pb-3">
+        <div>
+          <h3 id="modalTitle" class="text-base font-bold text-white">Create New Verified Listing</h3>
+          <p class="text-[11px] text-slate-400 font-mono mt-0.5">Direct upload with hardware GPS and GhanaPost verification</p>
+        </div>
+        <button onclick="closeModal('addListingModal')" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <form id="createListingForm" onsubmit="handleCreateListing(event)" class="space-y-4">
+        <div>
+          <label class="block text-slate-400 font-mono mb-1">LISTING TYPE</label>
+          <select id="newListingType" onchange="toggleFormFields(this.value)" class="w-full bg-surface-subtle border border-surface-border rounded p-2 text-slate-200">
+            <option value="PROPERTY">Real Estate (Apartment / Room / Villa)</option>
+            <option value="SERVICE">Artisan / Maintenance Service</option>
+          </select>
+        </div>
+
+        <!-- IMAGE UPLOADER WITH INSTANT PREVIEW -->
+        <div class="bg-surface-subtle p-3 rounded border border-surface-border space-y-2">
+          <label class="block text-slate-300 font-mono font-bold text-[11px] flex items-center justify-between">
+            <span>PROPERTY / SERVICE MEDIA (REQUIRED)</span>
+            <span class="text-emerald-400 font-normal">PNG, JPG, WEBP</span>
+          </label>
+          
+          <div class="flex items-center gap-3">
+            <div class="w-20 h-20 rounded border border-surface-border bg-[#060a12] overflow-hidden shrink-0 flex items-center justify-center relative">
+              <img id="listingImagePreview" src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=400&q=80" class="w-full h-full object-cover">
+            </div>
+            <div class="flex-1 space-y-1.5">
+              <input type="file" id="listingFileInput" accept="image/*" onchange="previewListingImage(event)" class="text-[11px] text-slate-400 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-[11px] file:bg-surface file:text-emerald-400 file:cursor-pointer file:font-mono">
+              <input id="newImageUrl" placeholder="Or paste external image URL..." oninput="previewListingUrl(this.value)" class="w-full bg-[#090d16] border border-surface-border rounded p-1.5 text-slate-300 text-[11px]">
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 font-mono mb-1">TITLE</label>
+          <input id="newTitle" required placeholder="e.g. 2-Bedroom Luxury Suite, East Legon" class="w-full bg-surface-subtle border border-surface-border rounded p-2 text-slate-200">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-400 font-mono mb-1">NEIGHBORHOOD / METRO</label>
+            <select id="newLocation" class="w-full bg-surface-subtle border border-surface-border rounded p-2 text-slate-200">
+              <option value="East Legon">East Legon, Accra</option>
+              <option value="Airport Hills">Airport Hills, Accra</option>
+              <option value="Cantonments">Cantonments, Accra</option>
+              <option value="Ahodwo">Ahodwo, Kumasi</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-400 font-mono mb-1">RATE (GHS / MONTH OR HR)</label>
+            <input id="newRate" type="number" required placeholder="e.g. 4500" class="w-full bg-surface-subtle border border-surface-border rounded p-2 text-slate-200 font-mono">
+          </div>
+        </div>
+
+        <!-- EXACT LOCATION & GPS ENGINE -->
+        <div id="propertySpecificFields" class="space-y-3">
+          <div class="bg-surface-subtle p-3 rounded border border-surface-border space-y-2">
+            <div class="flex items-center justify-between">
+              <label class="text-slate-300 font-mono font-bold text-[11px]">EXACT GPS COORDINATES</label>
+              <button type="button" onclick="captureLiveGps()" class="text-[10px] text-emerald-400 font-mono flex items-center gap-1 hover:underline">
+                <i data-lucide="crosshair" class="w-3 h-3"></i> Get Current Device GPS
+              </button>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2">
+              <input id="newGpsLatLong" required placeholder="e.g. 5°39'02.1&quot;N 0°09'14.3&quot;W" class="bg-[#090d16] border border-surface-border rounded p-2 text-slate-200 font-mono text-[11px]">
+              <input id="newGhanaPost" required placeholder="GhanaPost: GA-183-9021" class="bg-[#090d16] border border-surface-border rounded p-2 text-slate-200 font-mono text-[11px] uppercase">
+            </div>
+            <p class="text-[10px] text-slate-500">Exact coordinates anchor the geofence perimeter and prevent double-leasing fraud.</p>
+          </div>
+
+          <div>
+            <label class="block text-slate-400 font-mono mb-1">CADASTRAL SURVEY NUMBER (LANDS COMMISSION)</label>
+            <input id="newCadastral" placeholder="e.g. LC/AR/2026/90218" class="w-full bg-surface-subtle border border-surface-border rounded p-2 text-slate-200 font-mono">
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-surface-border flex justify-end gap-2">
+          <button type="button" onclick="closeModal('addListingModal')" class="px-3 py-1.5 rounded border border-surface-border text-slate-300 hover:bg-surface-subtle">Cancel</button>
+          <button type="submit" class="px-4 py-1.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-medium">Publish Listing</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADVANCED AUTHENTICATION & IDENTITY GATEWAY -->
+  <div id="authModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-surface border border-surface-border rounded-lg max-w-xl w-full max-h-[92vh] overflow-y-auto p-6 space-y-5 text-xs">
+      
+      <div class="flex items-center justify-between border-b border-surface-border pb-3">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded bg-emerald-600 flex items-center justify-center font-bold text-white text-[11px]">NIA</div>
+          <h3 class="text-sm font-bold text-white font-mono">Identity & Access Gateway (Act 843 Compliant)</h3>
+        </div>
+        <button onclick="closeModal('authModal')" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <div class="flex border-b border-surface-border text-xs font-mono">
+        <button onclick="switchAuthTab('login')" id="authTab-login" class="px-4 py-2 border-b-2 border-emerald-500 text-emerald-400 font-bold">Sign In</button>
+        <button onclick="switchAuthTab('register')" id="authTab-register" class="px-4 py-2 border-b-2 border-transparent text-slate-400 hover:text-white">Register & Verify Ghana Card</button>
+        <button onclick="switchAuthTab('switcher')" id="authTab-switcher" class="px-4 py-2 border-b-2 border-transparent text-slate-400 hover:text-white">Demo Profiles</button>
+      </div>
+
+      <div id="authPane-login" class="space-y-4">
+        <form onsubmit="handleLoginSubmit(event)" class="space-y-3">
+          <div>
+            <label class="block text-slate-400 font-mono mb-1">EMAIL / GHANA CARD ID</label>
+            <input id="loginIdentifier" required placeholder="e.g. GHA-720193812-4 or email@example.com" class="w-full bg-surface-subtle border border-surface-border rounded p-2 text-slate-200 font-mono">
+          </div>
+          <div>
+            <label class="block text-slate-400 font-mono mb-1">PASSWORD / ACCESS PIN</label>
+            <input id="loginPassword" type="password" required placeholder="••••••••" class="w-full bg-surface-subtle border border-surface-border rounded p-2 text-slate-200">
+          </div>
+          <button type="submit" class="w-full py-2.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition-colors">
+            Authenticate Session
+          </button>
+        </form>
+      </div>
+
+      <div id="authPane-register" class="space-y-4 hidden">
+        <form id="registerForm" onsubmit="handleRegistrationSubmit(event)" class="space-y-3.5">
+          <div class="bg-surface-subtle p-3.5 rounded border border-surface-border flex items-center gap-4">
+            <div class="relative w-16 h-16 rounded-full border-2 border-emerald-500 overflow-hidden bg-[#060a12] shrink-0 flex items-center justify-center">
+              <img id="avatarPreview" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" class="w-full h-full object-cover">
+            </div>
+            <div class="flex-1 space-y-1">
+              <label class="block text-slate-300 font-mono text-[11px] font-bold">PROFILE PHOTO / HEADSHOT</label>
+              <input type="file" id="avatarFileInput" accept="image/*" onchange="previewAvatar(event)" class="text-[11px] text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-[11px] file:bg-surface file:text-emerald-400 file:cursor-pointer">
+              <p class="text-[10px] text-slate-500">Official headshot for biometric cross-checking.</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-400 font-mono mb-1">LEGAL FULL NAME</label>
+              <input id="regFullName" required placeholder="As shown on Ghana Card" class="w-full bg-surface-subtle border border-surface-border rounded p-2 text-slate-200">
+            </div>
+            <div>
+              <label class="block text-slate-400 font-mono mb-1">ACCOUNT ROLE</label>
+              <select id="regRole" class="w-full bg-surface-subtle border border-surface-border rounded p-2 text-slate-200 font-mono">
+                <option value="LANDLORD">Diaspora Landlord / Agent</option>
+                <option value="TENANT">Tenant / Room Seeker</option>
+                <option value="ARTISAN">Vetted Artisan / Contractor</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-400 font-mono mb-1">EMAIL ADDRESS</label>
+              <input id="regEmail" type="email" required placeholder="name@domain.com" class="w-full bg-surface-subtle border border-surface-border rounded p-2 text-slate-200">
+            </div>
+            <div>
+              <label class="block text-slate-400 font-mono mb-1">GHANA MOMO / PHONE</label>
+              <input id="regPhone" required placeholder="024 / 020 / 055..." class="w-full bg-surface-subtle border border-surface-border rounded p-2 text-slate-200 font-mono">
+            </div>
+          </div>
+
+          <div class="p-3 bg-surface-subtle rounded border border-surface-border space-y-2">
+            <div class="flex items-center justify-between">
+              <label class="text-slate-300 font-mono font-bold text-[11px]">NATIONAL IDENTITY (GHANA CARD)</label>
+              <span class="text-[10px] text-emerald-400 font-mono">NIA IVS API CHECK</span>
+            </div>
+            <input id="regGhanaCard" required placeholder="GHA-XXXXXXXXX-X" pattern="^GHA-[0-9]{9}-[0-9]$" class="w-full bg-[#090d16] border border-surface-border rounded p-2 text-slate-200 font-mono uppercase tracking-wider text-xs">
+            <p class="text-[10px] text-slate-500">Format: GHA-123456789-0. Raw ID is hashed (SHA-256) per Data Protection Act (Act 843).</p>
+          </div>
+
+          <div class="flex items-start gap-2 pt-1">
+            <input type="checkbox" id="statutoryConsent" required class="mt-0.5 accent-emerald-500">
+            <label for="statutoryConsent" class="text-[11px] text-slate-400 leading-tight">
+              I authorize DiasporaGuard to query the National Identification Authority (NIA) and perform cross-platform social footprint audits under the Ghana Data Protection Act, 2012 (Act 843).
+            </label>
+          </div>
+
+          <button type="submit" id="btnVerifyAndRegister" class="w-full py-2.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition-colors flex items-center justify-center gap-2">
+            <i data-lucide="fingerprint" class="w-4 h-4"></i> Run NIA & Social Identity Verification
+          </button>
+        </form>
+
+        <div id="osintTelemetryBox" class="bg-[#060a12] border border-emerald-500/40 p-4 rounded space-y-3 font-mono text-[11px] hidden">
+          <div class="flex items-center justify-between text-emerald-400 font-bold border-b border-emerald-500/20 pb-2">
+            <span>LIVE IDENTITY AUDIT IN PROGRESS...</span>
+            <span id="osintPercent">0%</span>
+          </div>
+          <div class="space-y-1.5 text-slate-300" id="osintLogList"></div>
+        </div>
+      </div>
+
+      <div id="authPane-switcher" class="space-y-2 hidden">
+        <div class="text-slate-400 font-mono text-[11px] mb-2">QUICK DEMO PREVIEWS</div>
+        <button onclick="switchRole('LANDLORD')" class="w-full p-2.5 rounded border border-surface-border hover:border-emerald-500 bg-surface-subtle text-left flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80" class="w-10 h-10 rounded-full object-cover border border-emerald-500">
+            <div>
+              <div class="font-bold text-white">Felix K. (Diaspora Landlord)</div>
+              <div class="text-[11px] text-slate-400 font-mono">GHA-789012345-1 • London, UK</div>
+            </div>
+          </div>
+          <span class="text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded">98% Verified</span>
+        </button>
+        
+        <button onclick="switchRole('TENANT')" class="w-full p-2.5 rounded border border-surface-border hover:border-emerald-500 bg-surface-subtle text-left flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" class="w-10 h-10 rounded-full object-cover border border-cyan-500">
+            <div>
+              <div class="font-bold text-white">Kwame Mensah (Room Seeker)</div>
+              <div class="text-[11px] text-slate-400 font-mono">GHA-551234098-9 • Accra, Ghana</div>
+            </div>
+          </div>
+          <span class="text-[10px] font-mono bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-2 py-0.5 rounded">94% Verified</span>
+        </button>
+
+        <button onclick="switchRole('ARTISAN')" class="w-full p-2.5 rounded border border-surface-border hover:border-emerald-500 bg-surface-subtle text-left flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&q=80" class="w-10 h-10 rounded-full object-cover border border-amber-500">
+            <div>
+              <div class="font-bold text-white">Kofi Tech (Vetted Electrician)</div>
+              <div class="text-[11px] text-slate-400 font-mono">GHA-112233445-6 • Industrial Area</div>
+            </div>
+          </div>
+          <span class="text-[10px] font-mono bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded">97% Verified</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL: PRO SUBSCRIPTION -->
+  <div id="proModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-surface border border-amber-500/40 rounded-lg max-w-md w-full p-6 space-y-4 text-xs">
+      <div class="flex items-center justify-between border-b border-surface-border pb-3">
+        <div class="flex items-center gap-1.5 text-amber-400 font-bold text-sm">
+          <i data-lucide="zap" class="w-4 h-4"></i> DiasporaGuard PRO Subscription
+        </div>
+        <button onclick="closeModal('proModal')" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <p class="text-slate-300">Upgrade your account for verified badges, priority tenant matches, and 0% artisan commission.</p>
+      
+      <div class="bg-surface-subtle p-3 rounded border border-surface-border space-y-2">
+        <div class="flex items-center justify-between font-mono">
+          <span class="text-slate-400">RECURRING DUES</span>
+          <span class="text-emerald-400 font-bold">180 GHS / month (~$11.60)</span>
+        </div>
+        <ul class="space-y-1.5 text-slate-300">
+          <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i> "PRO SPONSORED" Gold badge on all listings</li>
+          <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i> Top-tier placement in tenant search feeds</li>
+          <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i> Instant WhatsApp Tenant Lead Forwarding</li>
+        </ul>
+      </div>
+
+      <div class="space-y-2">
+        <label class="block text-slate-400 font-mono">SELECT RECURRING WALLET</label>
+        <div class="grid grid-cols-2 gap-2 font-mono">
+          <button type="button" class="p-2 border border-emerald-500 bg-emerald-500/10 rounded text-center text-emerald-400">MTN Mobile Money</button>
+          <button type="button" class="p-2 border border-surface-border rounded text-center text-slate-300">Telecel Cash</button>
+        </div>
+        <input placeholder="Enter 10-digit MoMo number (024/055...)" class="w-full bg-surface-subtle border border-surface-border rounded p-2 text-slate-200">
+      </div>
+
+      <button onclick="activateProSimulation()" class="w-full py-2 rounded bg-amber-500 hover:bg-amber-400 text-black font-bold transition-colors">
+        Authorize Recurring MoMo Debit (180 GHS)
+      </button>
+    </div>
+  </div>
+
+  <!-- APPLICATION JAVASCRIPT CONTROLLER -->
+  <script>
+    const FX_RATES = { GHS: 1.0, GBP: 0.052, USD: 0.065 };
+    let currentCurrency = 'GHS';
+
+    let currentUser = JSON.parse(localStorage.getItem('dg_user')) || {
+      name: 'Felix K.',
+      role: 'LANDLORD',
+      email: 'felix@diasporaguard.com',
+      ghanaCard: 'GHA-789012345-1',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80',
+      trustScore: 98,
+      isPro: true
+    };
+
+    let properties = [
+      {
+        id: 'prop-1',
+        title: 'Executive 2-Bedroom Furnished Flat',
+        type: 'Apartment',
+        location: 'East Legon',
+        gpsCoord: '5°39\'02.1"N 0°09\'14.3"W',
+        ghanaPost: 'GA-183-9021',
+        priceGhs: 6500,
+        cadastral: 'LC/AR/2025/11029',
+        isAvailable: true,
+        isPro: true,
+        image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=600&q=80'
+      },
+      {
+        id: 'prop-2',
+        title: 'Modern Single Self-Contained Studio',
+        type: 'Room',
+        location: 'Airport Hills',
+        gpsCoord: '5°36\'44.8"N 0°08\'51.0"W',
+        ghanaPost: 'GA-049-1182',
+        priceGhs: 2800,
+        cadastral: 'LC/AR/2026/04912',
+        isAvailable: true,
+        isPro: false,
+        image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=600&q=80'
+      },
+      {
+        id: 'prop-3',
+        title: '4-Bedroom Executive Villa with Borehole',
+        type: 'Villa',
+        location: 'Cantonments',
+        gpsCoord: '5°34\'59.2"N 0°10\'32.5"W',
+        ghanaPost: 'GA-301-4491',
+        priceGhs: 18500,
+        cadastral: 'LC/AR/2024/77810',
+        isAvailable: false,
+        isPro: true,
+        image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80'
+      }
+    ];
+
+    let artisans = [
+      {
+        id: 'art-1',
+        name: 'Emmanuel Osei',
+        trade: 'Master Plumber & Pipefitter',
+        location: 'East Legon & Spintex',
+        rateGhs: 120,
+        gpsFix: '5°38\'44.1"N 0°08\'59.2"W',
+        isAvailable: true,
+        isPro: true,
+        avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&q=80',
+        ghanaCard: 'GHA-992100293-2',
+        trustScore: 97
+      },
+      {
+        id: 'art-2',
+        name: 'Isaac Addo',
+        trade: 'Certified HVAC & Inverter Specialist',
+        location: 'Airport Hills & Cantonments',
+        rateGhs: 150,
+        gpsFix: '5°35\'12.8"N 0°10\'44.0"W',
+        isAvailable: true,
+        isPro: false,
+        avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80',
+        ghanaCard: 'GHA-849102933-7',
+        trustScore: 95
+      }
+    ];
+
+    let escrowBookings = [
+      {
+        id: 'ESC-90812',
+        propId: 'prop-1',
+        unitTitle: 'Exec 2-Bed (East Legon)',
+        tenantName: 'Kwame Mensah',
+        tenantIdCard: 'GHA-551234098-9',
+        amountGhs: 6500,
+        quotaGhs: 325,
+        landlordNetGhs: 6175,
+        keysConfirmed: false,
+        status: 'LOCKED_IN_ESCROW'
+      }
+    ];
+
+    // Image Handlers
+    function previewListingImage(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('listingImagePreview').src = e.target.result;
+          document.getElementById('newImageUrl').value = '';
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function previewListingUrl(url) {
+      if (url && url.startsWith('http')) {
+        document.getElementById('listingImagePreview').src = url;
+      }
+    }
+
+    // Exact GPS Grabber
+    function captureLiveGps() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const lat = pos.coords.latitude.toFixed(6);
+            const lng = pos.coords.longitude.toFixed(6);
+            document.getElementById('newGpsLatLong').value = `${lat}°N, ${lng}°W`;
+            if (!document.getElementById('newGhanaPost').value) {
+              document.getElementById('newGhanaPost').value = 'GA-AUTO-' + Math.floor(1000 + Math.random() * 9000);
+            }
+          },
+          () => {
+            // Fallback default coordinates if browser location is denied
+            document.getElementById('newGpsLatLong').value = '5°39\'02.1"N 0°09\'14.3"W';
+            document.getElementById('newGhanaPost').value = 'GA-183-9021';
+          }
+        );
+      } else {
+        document.getElementById('newGpsLatLong').value = '5°39\'02.1"N 0°09\'14.3"W';
+        document.getElementById('newGhanaPost').value = 'GA-183-9021';
+      }
+    }
+
+    // Modal Helpers
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+    function openAddListingModal(defaultType = 'PROPERTY') {
+      document.getElementById('newListingType').value = defaultType;
+      toggleFormFields(defaultType);
+      openModal('addListingModal');
+    }
+    function openProModal() { openModal('proModal'); }
+    function openAuthModal() { openModal('authModal'); }
+
+    function toggleFormFields(type) {
+      const pFields = document.getElementById('propertySpecificFields');
+      const title = document.getElementById('modalTitle');
+      if (type === 'SERVICE') {
+        pFields.classList.add('hidden');
+        title.textContent = 'Register Artisan / Handyman Service';
+      } else {
+        pFields.classList.remove('hidden');
+        title.textContent = 'Create New Property Listing';
+      }
+    }
+
+    function handleCreateListing(e) {
+      e.preventDefault();
+      const type = document.getElementById('newListingType').value;
+      const title = document.getElementById('newTitle').value.trim();
+      const loc = document.getElementById('newLocation').value;
+      const rate = parseFloat(document.getElementById('newRate').value);
+      const img = document.getElementById('listingImagePreview').src;
+
+      if (type === 'PROPERTY') {
+        const cadastral = document.getElementById('newCadastral').value || 'LC/GH/PENDING';
+        const gps = document.getElementById('newGpsLatLong').value || '5°39\'02.1"N 0°09\'14.3"W';
+        const ghanaPost = document.getElementById('newGhanaPost').value || 'GA-AUTO-001';
+
+        properties.unshift({
+          id: `prop-${Date.now()}`,
+          title: title,
+          type: 'Apartment',
+          location: loc,
+          gpsCoord: gps,
+          ghanaPost: ghanaPost,
+          priceGhs: rate,
+          cadastral: cadastral,
+          isAvailable: true,
+          isPro: currentUser.isPro,
+          image: img
+        });
+        renderMarketplace();
+        renderInventory();
+        switchTab('marketplace');
+      } else {
+        artisans.unshift({
+          id: `art-${Date.now()}`,
+          name: title,
+          trade: 'Certified Maintenance Specialist',
+          location: loc,
+          rateGhs: rate,
+          gpsFix: '5°37\'00.0"N 0°10\'00.0"W',
+          isAvailable: true,
+          isPro: currentUser.isPro,
+          avatar: img,
+          ghanaCard: currentUser.ghanaCard,
+          trustScore: 99
+        });
+        renderServices();
+        switchTab('services');
+      }
+
+      closeModal('addListingModal');
+      e.target.reset();
+    }
+
+    function formatMoney(amountGhs) {
+      const converted = amountGhs * FX_RATES[currentCurrency];
+      const symbols = { GHS: 'GH₵', GBP: '£', USD: '$' };
+      return `${symbols[currentCurrency]} ${converted.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+    }
+
+    function renderMarketplace() {
+      const grid = document.getElementById('propertyGrid');
+      const locFilter = document.getElementById('filterLocation').value;
+      const typeFilter = document.getElementById('filterType').value;
+
+      const filtered = properties.filter(p => {
+        const matchesLoc = locFilter === 'ALL' || p.location === locFilter;
+        const matchesType = typeFilter === 'ALL' || p.type === typeFilter;
+        return matchesLoc && matchesType;
+      });
+
+      grid.innerHTML = filtered.map(p => `
+        <div class="bg-surface border border-surface-border rounded-lg overflow-hidden flex flex-col justify-between">
+          <div class="relative">
+            <img src="${p.image}" class="w-full h-44 object-cover">
+            ${p.isPro ? '<span class="absolute top-2 left-2 bg-amber-500 text-black font-mono font-bold text-[10px] px-2 py-0.5 rounded shadow">PRO SPONSORED</span>' : ''}
+            <span class="absolute top-2 right-2 ${p.isAvailable ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'} font-mono font-medium text-[10px] px-2 py-0.5 rounded">
+              ${p.isAvailable ? 'AVAILABLE' : 'RENTED / OCCUPIED'}
+            </span>
+          </div>
+
+          <div class="p-4 space-y-2 flex-1">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-mono text-slate-400 uppercase">${p.location} • ${p.type}</span>
+              <span class="text-[10px] font-mono text-emerald-400">Cadastral: ${p.cadastral}</span>
+            </div>
+            
+            <h3 class="text-sm font-bold text-white leading-snug">${p.title}</h3>
+            
+            <div class="bg-surface-subtle/80 p-2 rounded border border-surface-border space-y-1 font-mono text-[10px]">
+              <div class="text-slate-300 flex items-center gap-1.5">
+                <i data-lucide="map-pin" class="w-3 h-3 text-emerald-400"></i> ${p.gpsCoord}
+              </div>
+              <div class="text-slate-400 flex items-center justify-between">
+                <span>DIGITAL ADDR: <strong class="text-white">${p.ghanaPost}</strong></span>
+                <span class="text-emerald-400 font-semibold">ACT 220 AUDITED</span>
+              </div>
+            </div>
+
+            <div class="text-base font-bold text-emerald-400 font-mono pt-1">
+              ${formatMoney(p.priceGhs)} <span class="text-xs text-slate-400 font-normal">/ month</span>
+            </div>
+          </div>
+
+          <div class="p-4 border-t border-surface-border bg-surface-subtle/40 flex items-center justify-between">
+            <div class="text-[11px] text-slate-400 font-mono">Gov Escrow Protected</div>
+            ${p.isAvailable 
+              ? `<button onclick="initiateBooking('${p.id}')" class="px-3 py-1.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs">
+                   Apply & Book
+                 </button>`
+              : `<span class="text-xs font-mono text-slate-500 italic">No Longer Available</span>`
+            }
+          </div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function renderServices() {
+      const grid = document.getElementById('servicesGrid');
+      grid.innerHTML = artisans.map(a => `
+        <div class="bg-surface border border-surface-border rounded-lg p-5 flex flex-col justify-between space-y-4">
+          <div class="space-y-3">
+            <div class="flex items-center gap-3">
+              <img src="${a.avatar}" class="w-12 h-12 rounded-full object-cover border border-emerald-500/50">
+              <div>
+                <div class="flex items-center gap-1.5">
+                  <h3 class="text-sm font-bold text-white">${a.name}</h3>
+                  ${a.isPro ? '<span class="bg-amber-500/20 text-amber-400 border border-amber-500/40 text-[9px] font-mono px-1 rounded">PRO</span>' : ''}
+                </div>
+                <div class="text-[10px] font-mono text-emerald-400">${a.trade}</div>
+                <div class="text-[10px] text-slate-500 font-mono">ID: ${a.ghanaCard} • ${a.trustScore}% Score</div>
+              </div>
+            </div>
+            
+            <p class="text-xs text-slate-400">Coverage: ${a.location}</p>
+            <div class="bg-surface-subtle p-2 rounded text-[11px] font-mono text-slate-300">
+              GPS FIX: ${a.gpsFix}
+            </div>
+          </div>
+
+          <div class="border-t border-surface-border pt-3 flex items-center justify-between">
+            <div class="font-mono text-emerald-400 font-bold text-sm">
+              ${formatMoney(a.rateGhs)} <span class="text-slate-400 text-xs font-normal">/ hr</span>
+            </div>
+            <button onclick="alert('Technician [${a.name}] dispatched. Inspection fee held in MoMo escrow.')" class="px-3 py-1.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs">
+              Dispatch Callout
+            </button>
+          </div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function renderEscrow() {
+      const tbody = document.getElementById('escrowTableBody');
+      tbody.innerHTML = escrowBookings.map(b => `
+        <tr class="hover:bg-surface-subtle/30 font-mono">
+          <td class="p-3">
+            <div class="text-white font-bold">${b.id}</div>
+            <div class="text-slate-400 text-[11px]">${b.unitTitle}</div>
+          </td>
+          <td class="p-3">
+            <div class="text-slate-200">${b.tenantName}</div>
+            <div class="text-emerald-400 text-[11px]">${b.tenantIdCard} (VERIFIED)</div>
+          </td>
+          <td class="p-3 font-bold text-emerald-400">${formatMoney(b.amountGhs)}</td>
+          <td class="p-3 text-slate-400">${formatMoney(b.quotaGhs)}</td>
+          <td class="p-3 text-white font-bold">${formatMoney(b.landlordNetGhs)}</td>
+          <td class="p-3">
+            <span class="px-2 py-0.5 rounded text-[10px] ${b.keysConfirmed ? 'bg-emerald-950 border border-emerald-500/40 text-emerald-400' : 'bg-amber-950 border border-amber-500/40 text-amber-400'}">
+              ${b.status}
+            </span>
+          </td>
+          <td class="p-3 text-right">
+            ${!b.keysConfirmed ? `
+              <button onclick="confirmKeyHandover('${b.id}')" class="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-sans font-medium">
+                Confirm Keys & Disburse
+              </button>
+            ` : `
+              <span class="text-emerald-400 text-[11px]">Settled to Landlord MoMo</span>
+            `}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderInventory() {
+      const tbody = document.getElementById('inventoryTableBody');
+      tbody.innerHTML = properties.map(p => `
+        <tr class="hover:bg-surface-subtle/30 font-mono">
+          <td class="p-3">
+            <img src="${p.image}" class="w-10 h-10 rounded object-cover border border-surface-border">
+          </td>
+          <td class="p-3 font-medium text-white">
+            <div>${p.title}</div>
+            <div class="text-slate-500 text-[11px]">${p.location} • ${p.type}</div>
+          </td>
+          <td class="p-3 text-slate-300 text-[11px]">
+            <div>${p.gpsCoord}</div>
+            <div class="text-emerald-400 font-bold">${p.ghanaPost}</div>
+          </td>
+          <td class="p-3 font-bold text-emerald-400">${formatMoney(p.priceGhs)}</td>
+          <td class="p-3">
+            <span class="px-2 py-0.5 rounded text-[10px] ${p.isAvailable ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-red-500/10 text-red-400 border border-red-500/30'}">
+              ${p.isAvailable ? 'AVAILABLE' : 'OCCUPIED / LEASED'}
+            </span>
+          </td>
+          <td class="p-3 text-right space-x-2">
+            <button onclick="toggleUnitStatus('${p.id}')" class="text-xs text-cyan-400 hover:underline">
+              [Toggle Availability]
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function setCurrency(curr) {
+      currentCurrency = curr;
+      document.querySelectorAll('#curr-GHS, #curr-GBP, #curr-USD').forEach(b => {
+        b.className = 'px-2 py-0.5 rounded text-slate-400 hover:text-white';
+      });
+      document.getElementById(`curr-${curr}`).className = 'px-2 py-0.5 rounded font-semibold bg-emerald-600 text-white';
+      renderMarketplace();
+      renderServices();
+      renderEscrow();
+      renderInventory();
+    }
+
+    function switchTab(tabId) {
+      ['marketplace', 'services', 'escrow', 'my-listings', 'geofence'].forEach(t => {
+        const view = document.getElementById(`view-${t}`);
+        const btn = document.getElementById(`tabBtn-${t}`);
+        if (view) view.classList.add('hidden');
+        if (btn) {
+          btn.className = 'tab-btn px-3 py-1.5 rounded font-medium text-slate-300 hover:text-white hover:bg-surface-subtle transition-colors';
+        }
+      });
+      document.getElementById(`view-${tabId}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`tabBtn-${tabId}`);
+      if (activeBtn) {
+        activeBtn.className = 'tab-btn px-3 py-1.5 rounded font-medium transition-colors bg-emerald-600 text-white';
+      }
+    }
+
+    function toggleUnitStatus(propId) {
+      const item = properties.find(p => p.id === propId);
+      if (item) {
+        item.isAvailable = !item.isAvailable;
+        renderInventory();
+        renderMarketplace();
+      }
+    }
+
+    function initiateBooking(propId) {
+      const item = properties.find(p => p.id === propId);
+      if (!item) return;
+
+      const quota = item.priceGhs * 0.05;
+      const net = item.priceGhs - quota;
+
+      const newBooking = {
+        id: `ESC-${Math.floor(10000 + Math.random() * 90000)}`,
+        propId: item.id,
+        unitTitle: item.title,
+        tenantName: currentUser.name,
+        tenantIdCard: currentUser.ghanaCard,
+        amountGhs: item.priceGhs,
+        quotaGhs: quota,
+        landlordNetGhs: net,
+        keysConfirmed: false,
+        status: 'LOCKED_IN_ESCROW'
+      };
+
+      escrowBookings.unshift(newBooking);
+      switchTab('escrow');
+      renderEscrow();
+      alert(`Advance rent (${formatMoney(item.priceGhs)}) locked in regulatory escrow under Ghana Card ID [${currentUser.ghanaCard}].`);
+    }
+
+    function confirmKeyHandover(bookingId) {
+      const b = escrowBookings.find(x => x.id === bookingId);
+      if (!b) return;
+
+      b.keysConfirmed = true;
+      b.status = 'DISBURSED_TO_OWNER';
+
+      const prop = properties.find(p => p.id === b.propId);
+      if (prop) {
+        prop.isAvailable = false;
+      }
+
+      renderEscrow();
+      renderMarketplace();
+      renderInventory();
+
+      alert(`Key Handover Confirmed!
+5% Ghana Rent Control Quota (${formatMoney(b.quotaGhs)}) retained.
+Net ${formatMoney(b.landlordNetGhs)} successfully disbursed to Landlord account.
+Property status switched to OCCUPIED.`);
+    }
+
+    function updateDriftSimulation(val) {
+      document.getElementById('driftValueDisplay').textContent = `${val}m`;
+      const dot = document.getElementById('technicianDot');
+      const label = document.getElementById('geofenceDriftLabel');
+      const alertBox = document.getElementById('fraudAlertStatus');
+      const techGps = document.getElementById('techGpsFix');
+
+      const offset = (val / 250) * 35;
+      dot.style.top = `${45 - offset}%`;
+      dot.style.left = `${52 + offset}%`;
+
+      if (val > 100) {
+        label.textContent = `DRIFT: ${val} METERS (SUSPECT - EXCEEDS 100M)`;
+        label.className = 'text-red-400 font-semibold font-mono';
+        dot.className = 'absolute w-3 h-3 rounded-full bg-red-500 ring-4 ring-red-500/30 transition-all duration-300';
+        techGps.textContent = '5°39\'08.9"N 0°09\'21.4"W (OFF-PREMISES)';
+        techGps.className = 'text-red-400 font-semibold';
+        alertBox.className = 'p-3 rounded border border-red-500/40 bg-red-950/20 text-red-400';
+        alertBox.innerHTML = `
+          <div class="font-bold flex items-center gap-1.5"><i data-lucide="alert-triangle" class="w-4 h-4"></i> DRIFT VIOLATION DETECTED</div>
+          <div class="text-[11px] text-slate-400 mt-1">Contractor is ${val}m away from East Legon cadastral root. Invoicing locked to prevent fraud.</div>
+        `;
+      } else {
+        label.textContent = `DRIFT: ${val} METERS (IN BOUNDS)`;
+        label.className = 'text-emerald-400 font-semibold font-mono';
+        dot.className = 'absolute w-3 h-3 rounded-full bg-cyan-400 ring-4 ring-cyan-400/30 transition-all duration-300';
+        techGps.textContent = '5°39\'02.4"N 0°09\'14.1"W';
+        techGps.className = 'text-cyan-400 font-semibold';
+        alertBox.className = 'p-3 rounded border border-emerald-500/30 bg-emerald-950/20 text-emerald-400';
+        alertBox.innerHTML = `
+          <div class="font-bold flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-4 h-4"></i> VERIFIED: ON PREMISES</div>
+          <div class="text-[11px] text-slate-400 mt-1">Technician within 100m geofence radius. Repair photo invoice submissions unlocked.</div>
+        `;
+      }
+      lucide.createIcons();
+    }
+
+    function switchAuthTab(tab) {
+      ['login', 'register', 'switcher'].forEach(t => {
+        document.getElementById(`authPane-${t}`).classList.add('hidden');
+        document.getElementById(`authTab-${t}`).className = 'px-4 py-2 border-b-2 border-transparent text-slate-400 hover:text-white';
+      });
+      document.getElementById(`authPane-${tab}`).classList.remove('hidden');
+      document.getElementById(`authTab-${tab}`).className = 'px-4 py-2 border-b-2 border-emerald-500 text-emerald-400 font-bold';
+    }
+
+    function previewAvatar(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('avatarPreview').src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    async function handleRegistrationSubmit(e) {
+      e.preventDefault();
+      
+      const fullName = document.getElementById('regFullName').value.trim();
+      const role = document.getElementById('regRole').value;
+      const email = document.getElementById('regEmail').value.trim();
+      const ghanaCard = document.getElementById('regGhanaCard').value.trim();
+      const avatarSrc = document.getElementById('avatarPreview').src;
+
+      const logList = document.getElementById('osintLogList');
+      const telemetryBox = document.getElementById('osintTelemetryBox');
+      const percentLabel = document.getElementById('osintPercent');
+      const submitBtn = document.getElementById('btnVerifyAndRegister');
+
+      telemetryBox.classList.remove('hidden');
+      submitBtn.disabled = true;
+      submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      logList.innerHTML = '';
+
+      const steps = [
+        { text: 'Connecting to Ghana National Identification Authority (NIA) IVS...', delay: 350 },
+        { text: `Querying Ghana Card [${ghanaCard}] checksum against citizen register...`, delay: 500 },
+        { text: 'Biometric facial mesh match: 99.4% CONFIDENCE.', delay: 400 },
+        { text: 'Generating Act 843 cryptographic hash (SHA-256) of ID credentials...', delay: 350 },
+        { text: 'Scraping LinkedIn API & professional title verification...', delay: 450 },
+        { text: 'MNO Subscriber Registry: Confirmed MTN/Telecel SIM matches applicant name.', delay: 450 }
+      ];
+
+      for (let i = 0; i < steps.length; i++) {
+        await new Promise(r => setTimeout(r, steps[i].delay));
+        const item = document.createElement('div');
+        item.className = 'flex items-center gap-1.5 text-emerald-400';
+        item.innerHTML = `<span class="text-slate-500">•</span> ${steps[i].text}`;
+        logList.appendChild(item);
+        percentLabel.textContent = `${Math.round(((i + 1) / steps.length) * 100)}%`;
+      }
+
+      currentUser = {
+        name: fullName,
+        role: role,
+        email: email,
+        ghanaCard: ghanaCard,
+        avatar: avatarSrc,
+        trustScore: 98,
+        isPro: false
+      };
+
+      localStorage.setItem('dg_user', JSON.stringify(currentUser));
+      updateAuthPill();
+      
+      setTimeout(() => {
+        closeModal('authModal');
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        telemetryBox.classList.add('hidden');
+        alert(`Welcome, ${fullName}! Your Ghana Card and cross-platform identity have been verified.`);
+      }, 700);
+    }
+
+    function handleLoginSubmit(e) {
+      e.preventDefault();
+      const identifier = document.getElementById('loginIdentifier').value.trim();
+      currentUser.name = identifier.includes('@') ? identifier.split('@')[0] : 'Kwame Mensah';
+      localStorage.setItem('dg_user', JSON.stringify(currentUser));
+      updateAuthPill();
+      closeModal('authModal');
+      alert(`Authenticated successfully as ${currentUser.name}.`);
+    }
+
+    function switchRole(role) {
+      if (role === 'LANDLORD') {
+        currentUser = {
+          name: 'Felix K.',
+          role: 'LANDLORD',
+          email: 'felix@diasporaguard.com',
+          ghanaCard: 'GHA-789012345-1',
+          avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80',
+          trustScore: 98,
+          isPro: true
+        };
+      } else if (role === 'TENANT') {
+        currentUser = {
+          name: 'Kwame Mensah',
+          role: 'TENANT',
+          email: 'kwame@gmail.com',
+          ghanaCard: 'GHA-551234098-9',
+          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+          trustScore: 94,
+          isPro: false
+        };
+      } else {
+        currentUser = {
+          name: 'Kofi Tech',
+          role: 'ARTISAN',
+          email: 'kofitech@gmail.com',
+          ghanaCard: 'GHA-112233445-6',
+          avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80',
+          trustScore: 97,
+          isPro: true
+        };
+      }
+      localStorage.setItem('dg_user', JSON.stringify(currentUser));
+      updateAuthPill();
+      closeModal('authModal');
+    }
+
+    function updateAuthPill() {
+      const pill = document.getElementById('authStatusPill');
+      pill.innerHTML = `
+        <div class="relative w-6 h-6 rounded-full overflow-hidden border border-emerald-500/60 bg-surface">
+          <img src="${currentUser.avatar}" class="w-full h-full object-cover">
+        </div>
+        <div class="text-left">
+          <div class="text-slate-200 font-mono text-[11px] font-semibold leading-tight flex items-center gap-1">
+            ${currentUser.name}
+            ${currentUser.isPro ? '<span class="text-[9px] bg-amber-500/20 text-amber-400 px-1 rounded font-bold">PRO</span>' : ''}
+          </div>
+          <div class="text-[9px] text-emerald-400 font-mono leading-none">${currentUser.role} • ${currentUser.trustScore}% TRUST</div>
+        </div>
+      `;
+    }
+
+    function activateProSimulation() {
+      currentUser.isPro = true;
+      localStorage.setItem('dg_user', JSON.stringify(currentUser));
+      closeModal('proModal');
+      updateAuthPill();
+      alert('MoMo prompt accepted: 180 GHS charged. DiasporaGuard PRO features are now active!');
+      renderMarketplace();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      updateAuthPill();
+      renderMarketplace();
+      renderServices();
+      renderEscrow();
+      renderInventory();
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

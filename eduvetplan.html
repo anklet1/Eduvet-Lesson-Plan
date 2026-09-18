@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eduvet School Hub — Robust GES / NaCCA & WAEC/BECE Lesson Engine</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- PDF.js CDN for in-browser PDF Scheme text parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <!-- Firebase Compat SDKs (Loaded first in head) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gesNavy: '#0F2942',
+                        gesBlue: '#1A73E8',
+                        gesGold: '#D97706',
+                        gesGreen: '#059669'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Print-Only Styling Rules to isolate the Inspection Report cleanly into PDF -->
+    <style>
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printable-report, #printable-report * {
+                visibility: visible;
+            }
+            #printable-report {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 20px;
+                background: white !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col overflow-x-hidden" x-data="schoolApp()">
+
+    <!-- ==================== SCHOOL GATEWAY / LOGIN & REGISTRATION OVERLAY ==================== -->
+    <div x-show="!authenticatedSchoolId" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8 space-y-6 border border-slate-200">
+            
+            <!-- Branded Logo Header -->
+            <div class="flex flex-col items-center text-center">
+                <div class="flex items-center space-x-3 mb-2">
+                    <svg class="w-12 h-12" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 25C10 25 25 35 45 28V75C25 82 10 70 10 70V25Z" fill="#2563EB"/>
+                        <path d="M90 25C90 25 75 35 55 28V75C75 82 90 70 90 70V25Z" fill="#0D9488"/>
+                        <path d="M28 50L44 65L74 32" stroke="#F97316" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <div class="text-left">
+                        <div class="text-2xl font-black tracking-tight text-slate-900 leading-none">
+                            edu<span class="text-teal-600">vet</span>
+                        </div>
+                        <div class="text-[10px] font-bold tracking-[0.25em] text-slate-500 uppercase mt-1">
+                            School Hub
+                        </div>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-500 mt-1">Multi-Tenant Institutional Lesson Plan Portal</p>
+            </div>
+
+            <!-- Tabs Selection -->
+            <div class="flex rounded-lg bg-slate-100 p-1 text-xs font-semibold">
+                <button @click="gatewayTab = 'login'" :class="gatewayTab === 'login' ? 'bg-white text-indigo-900 shadow-sm' : 'text-slate-600'" class="flex-1 py-2 rounded-md transition">School Login</button>
+                <button @click="gatewayTab = 'register'" :class="gatewayTab === 'register' ? 'bg-white text-indigo-900 shadow-sm' : 'text-slate-600'" class="flex-1 py-2 rounded-md transition">Register New School</button>
+            </div>
+
+            <!-- School Login Form -->
+            <form x-show="gatewayTab === 'login'" @submit.prevent="loginSchool()" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Enter School ID (e.g. ATAK-983)</label>
+                    <input type="text" x-model="loginInputId" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm uppercase font-mono tracking-wide" placeholder="ATAK-983">
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg text-sm transition shadow-sm">Access School Portal</button>
+            </form>
+
+            <!-- School Registration Form -->
+            <form x-show="gatewayTab === 'register'" @submit.prevent="registerSchool()" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Official School Name</label>
+                    <input type="text" x-model="regForm.name" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="Atakora D/A Junior High">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">District / Region Location</label>
+                    <input type="text" x-model="regForm.location" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="Kwahu Afram Plains North">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Headteacher / Administrator Name</label>
+                    <input type="text" x-model="regForm.headName" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="Mr. John Doe">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Headteacher Contact</label>
+                    <input type="text" x-model="regForm.headContact" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="054xxxxxxx">
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg text-sm transition shadow-sm mt-2">Generate School ID & Register</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Header / Active School Dashboard Bar -->
+    <header class="bg-indigo-900 text-white shadow-md no-print">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-3">
+            
+            <div class="flex items-center space-x-3 text-center sm:text-left">
+                <div class="w-9 h-9 bg-white rounded-lg flex items-center justify-center shadow-sm p-1">
+                    <svg class="w-full h-full" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 25C10 25 25 35 45 28V75C25 82 10 70 10 70V25Z" fill="#2563EB"/>
+                        <path d="M90 25C90 25 75 35 55 28V75C75 82 90 70 90 70V25Z" fill="#0D9488"/>
+                        <path d="M28 50L44 65L74 32" stroke="#F97316" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="text-base font-black tracking-tight leading-none text-white">
+                        edu<span class="text-teal-400">vet</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-[10px] text-indigo-200 mt-0.5">
+                        <span class="font-bold text-white uppercase font-mono" x-text="activeSchoolName + ' (' + authenticatedSchoolId + ')'"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-center gap-2 text-sm w-full sm:w-auto">
+                <!-- Teacher Profile Selector with Staff ID Security Guard -->
+                <div x-show="portalMode === 'teacher'" class="flex items-center gap-1 w-full sm:w-auto justify-center">
+                    <label class="text-xs text-indigo-200 hidden md:inline">Profile:</label>
+                    <select x-model="selectedTeacherId" @change="verifyTeacherSession($event)" class="bg-indigo-800 text-white border border-indigo-600 rounded-lg px-2 py-1.5 text-xs focus:outline-none w-full sm:w-48">
+                        <option value="">-- Select Your Name --</option>
+                        <template x-for="t in sortedTeachers" :key="t.id">
+                            <option :value="t.id" x-text="t.name"></option>
+                        </template>
+                    </select>
+                </div>
+
+                <button x-show="portalMode === 'reviewer'" @click="portalMode = 'teacher'" class="bg-indigo-600 hover:bg-indigo-500 px-3 py-1.5 rounded text-xs font-medium transition">Exit to Teacher Portal</button>
+                <button @click="showPinModal = true" class="text-indigo-300 hover:text-white text-xs font-mono transition" title="Reviewer Access">🔒 Reviewer Login</button>
+                <button @click="logoutSchool()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded text-xs font-semibold transition shadow-sm flex items-center gap-1">🚪 Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Secure PIN Modal Overlay -->
+    <div x-show="showPinModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print" style="display: none;">
+        <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 space-y-4 border border-slate-200" @click.away="showPinModal = false">
+            <div class="text-center">
+                <div class="text-3xl mb-1">🔐</div>
+                <h3 class="text-base font-bold text-indigo-900">Reviewer Authentication</h3>
+                <p class="text-xs text-slate-500 mt-1" x-text="'Login for ' + activeSchoolName"></p>
+            </div>
+            
+            <form @submit.prevent="verifyPin()" class="space-y-3">
+                <div>
+                    <input type="password" x-model="enteredPin" placeholder="Enter PIN" autofocus class="w-full text-center tracking-widest text-lg rounded-lg border-slate-300 border px-3 py-2 focus:outline-none focus:border-indigo-600" maxlength="8" required>
+                </div>
+                <div class="flex gap-2 pt-1">
+                    <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium py-2.5 rounded-lg transition">Login</button>
+                    <button type="button" @click="showPinModal = false; enteredPin = ''" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium py-2.5 rounded-lg transition">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8 flex-grow w-full space-y-6" x-show="authenticatedSchoolId">
+
+        <!-- ==================== UNIVERSAL NOTICE BOARD ==================== -->
+        <template x-if="schoolNotification">
+            <div class="bg-indigo-50 border-l-4 border-indigo-600 p-4 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 no-print">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">📢</span>
+                    <div>
+                        <h3 class="text-sm font-bold text-indigo-900">School Announcement & Notice Board</h3>
+                        <p class="text-xs text-indigo-700 font-medium" x-text="schoolNotification"></p>
+                    </div>
+                </div>
+                <button x-show="portalMode === 'reviewer'" @click="promptUpdateNotification()" class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded font-medium transition shrink-0">Edit Notice</button>
+            </div>
+        </template>
+
+        <!-- ==================== PORTAL 1: TEACHER WORKSPACE ==================== -->
+        <div class="space-y-6" x-show="portalMode === 'teacher'">
+            
+            <!-- Personalized Teacher Lagging Alert Banner -->
+            <template x-if="activeTeacher && isTeacherLagging(activeTeacher.id)">
+                <div class="bg-rose-50 border-l-4 border-rose-500 p-4 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 no-print">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-2xl">🚨</span>
+                        <div>
+                            <h3 class="text-sm font-bold text-rose-900">Compliance Warning: Missing Weekly Lesson Plan</h3>
+                            <p class="text-xs text-rose-700">Staff ID: <span class="font-mono font-bold" x-text="activeTeacher.id"></span> | Contact: <span x-text="activeTeacher.contact"></span>. Please submit your required lesson plan immediately for <span x-text="activeSchoolName"></span>[cite: 5].</p>
+                        </div>
+                    </div>
+                    <span class="bg-rose-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">Action Required</span>
+                </div>
+            </template>
+
+            <!-- Teacher Portal Mode Sub-Switcher Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 no-print">
+                <div @click="teacherSubTab = 'upload'" class="cursor-pointer bg-white p-5 rounded-2xl border transition shadow-sm hover:shadow-md flex items-center space-x-4" :class="teacherSubTab === 'upload' ? 'border-indigo-600 ring-2 ring-indigo-600/20 bg-indigo-50/20' : 'border-slate-200'">
+                    <div class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl font-bold">
+                        <i class="fa fa-folder-open"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-indigo-950">Upload & Submission History</h3>
+                        <p class="text-xs text-slate-500">Manage, update, and track status of weekly lesson notes.</p>
+                    </div>
+                </div>
+                <div @click="teacherSubTab = 'engine'" class="cursor-pointer bg-white p-5 rounded-2xl border transition shadow-sm hover:shadow-md flex items-center space-x-4" :class="teacherSubTab === 'engine' ? 'border-indigo-600 ring-2 ring-indigo-600/20 bg-indigo-50/20' : 'border-slate-200'">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl font-bold">
+                        <i class="fa fa-wand-magic-sparkles"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-indigo-950">Robust NaCCA & BECE Lesson Engine</h3>
+                        <p class="text-xs text-slate-500">Upload scheme, auto-align Strands/Sub-Strands & WAEC/BECE focus.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUB-TAB 1: ORIGINAL FILE UPLOAD & HISTORY WORKSPACE -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8" x-show="teacherSubTab === 'upload'">
+                <!-- Left Column: Metrics & Upload Form -->
+                <div class="space-y-6 lg:col-span-1">
+                    <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-slate-200">
+                        <h2 class="text-base font-bold text-indigo-900 mb-3" x-text="activeSchoolName + ' - Metrics'"></h2>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between bg-slate-50 p-2 rounded">
+                                <span class="text-slate-600">Total Submissions:</span>
+                                <span class="font-bold text-indigo-900" x-text="teacherFilteredLessons.length"></span>
+                            </div>
+                            <div class="flex justify-between bg-slate-50 p-2 rounded">
+                                <span class="text-slate-600">Approved Plans:</span>
+                                <span class="font-bold text-emerald-600" x-text="teacherFilteredLessons.filter(l => l.status === 'Approved').length"></span>
+                            </div>
+                            <div class="flex justify-between bg-slate-50 p-2 rounded">
+                                <span class="text-slate-600">Pending / Revisions:</span>
+                                <span class="font-bold text-amber-600" x-text="teacherFilteredLessons.filter(l => l.status !== 'Approved').length"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-slate-200">
+                        <h2 class="text-base sm:text-lg font-semibold mb-1 text-indigo-900" x-text="editingId ? 'Update Lesson Plan' : 'Submit Prepared Plan'"></h2>
+                        <p class="text-xs text-slate-500 mb-4" x-text="'Staff ID: ' + (activeTeacher ? activeTeacher.id : '')"></p>
+                        
+                        <form @submit.prevent="submitLessonFile" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Subject</label>
+                                <select x-model="form.subject" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm">
+                                    <option value="">Select subject...</option>
+                                    <template x-for="subj in allAvailableSubjects" :key="subj">
+                                        <option :value="subj" x-text="subj"></option>
+                                    </template>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Class Level</label>
+                                <input type="text" x-model="form.classLevel" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="e.g. Basic 4 / JHS 2">
+                            </div>
+
+                            <div class="grid grid-cols-3 gap-2">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-700 mb-1">Term</label>
+                                    <select x-model="form.term" required class="w-full rounded-lg border-slate-300 border px-2 py-2 text-xs">
+                                        <option value="">Select term...</option>
+                                        <option value="Term 1">Term 1</option>
+                                        <option value="Term 2">Term 2</option>
+                                        <option value="Term 3">Term 3</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-700 mb-1">Week</label>
+                                    <select x-model="form.week" required class="w-full rounded-lg border-slate-300 border px-2 py-2 text-xs">
+                                        <option value="">Select week...</option>
+                                        <template x-for="w in 15" :key="w">
+                                            <option :value="'Week ' + w" x-text="'Week ' + w"></option>
+                                        </template>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-700 mb-1">Year</label>
+                                    <select x-model="form.year" required class="w-full rounded-lg border-slate-300 border px-2 py-2 text-xs">
+                                        <option value="2026/2027">2026/2027</option>
+                                        <option value="2027/2028">2027/2028</option>
+                                        <option value="2028/2029">2028/2029</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Upload Document (Word / PDF)</label>
+                                <input type="file" @change="handleFileUpload($event)" accept=".pdf,.doc,.docx" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700">
+                                <span class="text-xs text-emerald-600 mt-1 block font-medium break-all" x-show="form.fileName" x-text="'Attached: ' + form.fileName"></span>
+                            </div>
+
+                            <div class="flex space-x-2 pt-2">
+                                <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg text-sm transition" x-text="editingId ? 'Update' : 'Submit'"></button>
+                                <button type="button" @click="resetForm()" x-show="editingId" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium py-2 px-4 rounded-lg text-sm">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Right Column: Submission History -->
+                <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-2 flex flex-col">
+                    <h2 class="text-lg font-semibold text-indigo-900 mb-4">My Submitted Lesson Plans</h2>
+
+                    <div class="space-y-4 flex-grow overflow-y-auto max-h-[600px]">
+                        <template x-for="lesson in teacherFilteredLessons" :key="lesson.id">
+                            <div class="border border-slate-200 rounded-xl p-3 sm:p-4 bg-white flex flex-col justify-between hover:shadow-sm transition">
+                                <div>
+                                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
+                                        <div class="flex flex-wrap items-center gap-1.5">
+                                            <span class="bg-indigo-100 text-indigo-800 text-[11px] font-semibold px-2 py-0.5 rounded" x-text="lesson.subject"></span>
+                                            <span class="bg-slate-100 text-slate-700 text-[11px] px-2 py-0.5 rounded" x-text="lesson.classLevel"></span>
+                                            <span class="bg-indigo-50 text-indigo-700 text-[11px] font-medium px-2 py-0.5 rounded" x-text="lesson.term + ' | ' + lesson.week + ' (' + lesson.year + ')'"></span>
+                                        </div>
+                                        <span class="text-xs font-bold px-2.5 py-0.5 rounded-full" 
+                                              :class="{
+                                                  'bg-amber-100 text-amber-800': lesson.status === 'Submitted',
+                                                  'bg-emerald-100 text-emerald-800': lesson.status === 'Approved',
+                                                  'bg-rose-100 text-rose-800': lesson.status === 'Rejected' || lesson.status === 'Changes Requested'
+                                              }" 
+                                              x-text="lesson.status">
+                                        </span>
+                                    </div>
+
+                                    <div class="text-xs my-2 bg-slate-50 p-2.5 rounded border border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                                        <a :href="lesson.fileData" :download="lesson.fileName" class="text-indigo-600 hover:underline font-semibold flex items-center gap-1 break-all">
+                                            📎 <span x-text="lesson.fileName"></span>
+                                        </a>
+                                        <span class="text-slate-400 text-[10px]" x-text="'Submitted: ' + lesson.timestamp"></span>
+                                    </div>
+
+                                    <div x-show="lesson.feedback" class="bg-rose-50 border border-rose-200 p-2 rounded text-xs text-rose-900 mb-2">
+                                        <strong>Reviewer Feedback:</strong> <span x-text="lesson.feedback"></span>
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-end space-x-3 border-t border-slate-100 pt-2 text-xs">
+                                    <button @click="editSubmission(lesson)" class="text-indigo-600 hover:text-indigo-800 font-medium" x-show="lesson.status !== 'Approved'">Update File</button>
+                                    <button @click="deleteLesson(lesson.id)" class="text-rose-600 hover:text-rose-800 font-medium">Delete</button>
+                                </div>
+                            </div>
+                        </template>
+
+                        <div x-show="teacherFilteredLessons.length === 0" class="text-center py-12 text-slate-400 text-sm">
+                            <p>No lesson submissions found for this school partition.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUB-TAB 2: EMBEDDED ROBUST NaCCA & BECE ENGINE -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-6" x-show="teacherSubTab === 'engine'">
+                
+                <!-- Engine Header Cards & Setup -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-slate-50 p-5 rounded-2xl border border-slate-200">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Class Level (KG1 - SHS 3)</label>
+                        <select id="engineClassSelect" class="w-full text-xs border p-2 rounded bg-white font-medium" onchange="updateEngineSubjects()">
+                            <optgroup label="Kindergarten">
+                                <option value="KG1">Kindergarten 1 (KG1)</option>
+                                <option value="KG2">Kindergarten 2 (KG2)</option>
+                            </optgroup>
+                            <optgroup label="Lower Primary">
+                                <option value="Basic 1">Basic 1 (Primary 1)</option>
+                                <option value="Basic 2">Basic 2 (Primary 2)</option>
+                                <option value="Basic 3">Basic 3 (Primary 3)</option>
+                            </optgroup>
+                            <optgroup label="Upper Primary">
+                                <option value="Basic 4">Basic 4 (Primary 4)</option>
+                                <option value="Basic 5">Basic 5 (Primary 5)</option>
+                                <option value="Basic 6">Basic 6 (Primary 6)</option>
+                            </optgroup>
+                            <optgroup label="Junior High School (JHS - BECE Focus)">
+                                <option value="Basic 7" selected>Basic 7 (JHS 1)</option>
+                                <option value="Basic 8">Basic 8 (JHS 2)</option>
+                                <option value="Basic 9">Basic 9 (JHS 3 - BECE)</option>
+                            </optgroup>
+                            <optgroup label="Senior High School (SHS - WASSCE Focus)">
+                                <option value="SHS 1">SHS Form 1</option>
+                                <option value="SHS 2">SHS Form 2</option>
+                                <option value="SHS 3">SHS Form 3</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Subject (NaCCA Standard)</label>
+                        <select id="engineSubjectSelect" class="w-full text-xs border p-2 rounded bg-white font-medium">
+                            <!-- Populated dynamically via updateEngineSubjects() -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Upload Termly Scheme (PDF/TXT)</label>
+                        <input type="file" id="engineSchemeFileInput" accept=".pdf,.txt" class="w-full text-xs text-slate-500 file:mr-1 file:py-1 file:px-2 file:rounded file:border-0 file:bg-indigo-50 file:text-indigo-700" onchange="engineHandleSchemeUpload(event)">
+                        <p id="engineUploadStatus" class="text-[10px] text-slate-500 mt-0.5">Upload scheme to auto-extract Strands/Sub-Strands.</p>
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="engineGenerateCustomScheme()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs py-2 px-3 rounded-xl shadow-sm transition flex items-center justify-center gap-1.5">
+                            <i class="fa fa-wand-magic-sparkles"></i> 1. Generate Weekly Scheme
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Scheme Table Preview with In-App Editing -->
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-bold text-indigo-950">📋 Generated Scheme of Learning (Aligned with NaCCA Strands & WAEC/BECE Standards)</h3>
+                        <button onclick="engineExportSchemeWord()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs px-3 py-1.5 rounded font-semibold transition">Download Scheme (.doc)</button>
+                    </div>
+                    <div class="overflow-x-auto border border-slate-200 rounded-xl max-h-[350px]">
+                        <table class="w-full text-left text-xs border-collapse" id="engineSchemeTable">
+                            <thead class="bg-slate-100 sticky top-0 border-b">
+                                <tr>
+                                    <th class="p-2.5 border-r font-bold w-12 text-center">Wk</th>
+                                    <th class="p-2.5 border-r font-bold w-24">Week Ending</th>
+                                    <th class="p-2.5 border-r font-bold w-32">NaCCA Strand</th>
+                                    <th class="p-2.5 border-r font-bold">Sub Strand & Content Standard</th>
+                                    <th class="p-2.5 border-r font-bold">Indicators & BECE Focus</th>
+                                    <th class="p-2.5 font-bold w-40">TLM Resources</th>
+                                </tr>
+                            </thead>
+                            <tbody id="engineSchemeTableBody">
+                                <tr><td colspan="6" class="p-8 text-center text-slate-400">Select class & subject, upload your termly scheme, and click "Generate Weekly Scheme".</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 3-Phase Lesson Notes Engine Actions (Card UI with Explicit Generate Button) -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-slate-200">
+                    <div onclick="engineGenerateLessons()" class="cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white p-4 rounded-2xl transition shadow-md flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center font-bold text-lg">
+                            <i class="fa fa-book-open"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-black tracking-wide uppercase">2. Build Lesson Plans</h4>
+                            <p class="text-[11px] text-emerald-100">Click to Generate 3-Phase Notes</p>
+                        </div>
+                    </div>
+                    <div onclick="engineExportLessonsWord()" class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-2xl transition shadow-md flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center font-bold text-lg">
+                            <i class="fa fa-file-word"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-black tracking-wide uppercase">3. Download Lessons</h4>
+                            <p class="text-[11px] text-blue-100">Export Word Document (.doc)</p>
+                        </div>
+                    </div>
+                    <div onclick="engineSubmitToMainPortal()" class="cursor-pointer bg-indigo-900 hover:bg-indigo-950 text-white p-4 rounded-2xl transition shadow-md flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center font-bold text-lg">
+                            <i class="fa fa-paper-plane"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-black tracking-wide uppercase">4. Submit to Queue</h4>
+                            <p class="text-[11px] text-indigo-200">Send notes to vetting portal</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Generated Lessons Container Preview -->
+                <div id="engineLessonsContainer" class="space-y-4 max-h-[450px] overflow-y-auto pr-1">
+                    <p class="text-center text-slate-400 py-6 text-xs">Generated 3-phase lesson notes preview will appear here once you click "Build Lesson Plans".</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ==================== PORTAL 2: REVIEWER & INSPECTION DASHBOARD ==================== -->
+        <div class="space-y-6" x-show="portalMode === 'reviewer'">
+            
+            <!-- Management Bar -->
+            <div class="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 gap-3 no-print">
+                <div>
+                    <h2 class="text-base font-bold text-indigo-900" x-text="activeSchoolName + ' - Inspection Dashboard'"></h2>
+                    <p class="text-xs text-slate-500">Active Tenant Partition</p>
+                </div>
+                <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                    <button @click="promptUpdateSchoolInfo()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-2 rounded font-medium transition">⚙️ Edit School & Head Info</button>
+                    <button @click="showOnboarding = !showOnboarding" class="bg-slate-800 hover:bg-slate-900 text-white text-xs px-3 py-2 rounded font-medium transition" x-text="showOnboarding ? 'Close Directory' : 'Manage Teachers'"></button>
+                </div>
+            </div>
+
+            <!-- Onboarding Directory Drawer -->
+            <section x-show="showOnboarding" class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-slate-200 overflow-x-hidden no-print">
+                <h3 class="text-sm font-bold text-indigo-900 mb-1" x-text="editingTeacherId ? 'Edit Teacher Record' : 'Teacher Onboarding Directory'"></h3>
+                <form @submit.prevent="saveTeacherRecord" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-4 bg-slate-50 p-3 sm:p-4 rounded-lg border border-slate-200">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700 mb-1">Full Name</label>
+                        <input type="text" x-model="teacherForm.name" required class="w-full rounded border-slate-300 border px-3 py-1.5 text-sm" placeholder="Felix Fleku">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700 mb-1">Unique Staff ID (PIN)</label>
+                        <input type="text" x-model="teacherForm.id" required class="w-full rounded border-slate-300 border px-3 py-1.5 text-sm uppercase" placeholder="GES-0543" :disabled="editingTeacherId">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700 mb-1">Phone Contact</label>
+                        <input type="text" x-model="teacherForm.contact" required class="w-full rounded border-slate-300 border px-3 py-1.5 text-sm" placeholder="0543521863">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700 mb-1">Assigned Subjects (comma sep)</label>
+                        <input type="text" x-model="teacherForm.subjects" required class="w-full rounded border-slate-300 border px-3 py-1.5 text-sm" placeholder="Computing, Mathematics">
+                    </div>
+                    <div class="flex items-end gap-2 sm:col-span-2 lg:col-span-1">
+                        <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-1.5 px-3 rounded" x-text="editingTeacherId ? 'Update' : 'Save'"></button>
+                        <button type="button" @click="resetTeacherForm()" x-show="editingTeacherId" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm py-1.5 px-3 rounded">Cancel</button>
+                    </div>
+                </form>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm border-collapse min-w-[500px]">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 text-xs uppercase">
+                                <th class="p-3">Staff ID (Code)</th>
+                                <th class="p-3">Name</th>
+                                <th class="p-3">Contact</th>
+                                <th class="p-3">Subjects</th>
+                                <th class="p-3 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200">
+                            <template x-for="t in sortedTeachers" :key="t.id">
+                                <tr>
+                                    <td class="p-3 font-mono font-semibold text-indigo-700" x-text="t.id"></td>
+                                    <td class="p-3 font-medium" x-text="t.name"></td>
+                                    <td class="p-3 text-slate-600" x-text="t.contact"></td>
+                                    <td class="p-3 text-slate-600 text-xs" x-text="t.subjects"></td>
+                                    <td class="p-3 text-right space-x-2">
+                                        <button @click="editTeacher(t)" class="text-indigo-600 hover:text-indigo-800 text-xs font-medium">Edit</button>
+                                        <button @click="deleteTeacher(t.id)" class="text-rose-600 hover:text-rose-800 text-xs font-medium">Remove</button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Reviewer Navigation Sub-Tabs -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6">
+                <div class="flex flex-col lg:flex-row justify-between items-center mb-6 gap-4 border-b border-slate-100 pb-4 no-print">
+                    <div class="flex flex-wrap gap-1.5 w-full lg:w-auto">
+                        <button @click="adminSubTab = 'queue'" :class="adminSubTab === 'queue' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700'" class="flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-lg text-xs font-semibold transition">Vetting Queue</button>
+                        <button @click="adminSubTab = 'history'" :class="adminSubTab === 'history' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700'" class="flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-lg text-xs font-semibold transition">Teachers History</button>
+                        <button @click="adminSubTab = 'archive'" :class="adminSubTab === 'archive' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700'" class="flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-lg text-xs font-semibold transition">Archive</button>
+                        <button @click="adminSubTab = 'report'" :class="adminSubTab === 'report' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700'" class="flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-lg text-xs font-semibold transition">📊 Inspection Report</button>
+                    </div>
+
+                    <!-- Filter controls -->
+                    <div class="flex items-center gap-2 w-full lg:w-auto justify-end">
+                        <select x-show="adminSubTab === 'queue' || adminSubTab === 'history'" x-model="reviewerTermFilter" class="rounded-lg border-slate-300 border px-3 py-1.5 text-xs bg-white text-slate-700">
+                            <option value="">Filter by Term (All)</option>
+                            <option value="Term 1">Term 1</option>
+                            <option value="Term 2">Term 2</option>
+                            <option value="Term 3">Term 3</option>
+                        </select>
+                        <select x-show="adminSubTab === 'queue' || adminSubTab === 'history'" x-model="reviewerWeekFilter" class="rounded-lg border-slate-300 border px-3 py-1.5 text-xs bg-white text-slate-700">
+                            <option value="">Filter by Week (All)</option>
+                            <template x-for="w in 15" :key="w">
+                                <option :value="'Week ' + w" x-text="'Week ' + w"></option>
+                            </template>
+                        </select>
+                        <input x-show="adminSubTab !== 'report'" type="text" x-model="adminSearchQuery" placeholder="Search teacher or subject..." class="rounded-lg border-slate-300 border px-3 py-1.5 text-sm w-full lg:w-48">
+                    </div>
+                </div>
+
+                <!-- Queue Tab -->
+                <div x-show="adminSubTab === 'queue'" class="space-y-4 max-h-[550px] overflow-y-auto no-print">
+                    <template x-for="lesson in adminFilteredActiveLessons" :key="lesson.id">
+                        <div class="border border-slate-200 rounded-xl p-3 sm:p-4 bg-slate-50/50 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                            <div class="space-y-1.5 flex-grow w-full">
+                                <div class="flex flex-wrap items-center gap-1.5">
+                                    <span class="bg-indigo-100 text-indigo-800 text-[11px] font-semibold px-2 py-0.5 rounded" x-text="lesson.subject"></span>
+                                    <span class="bg-slate-200 text-slate-700 text-[11px] px-2 py-0.5 rounded" x-text="lesson.classLevel"></span>
+                                    <span class="bg-indigo-50 text-indigo-700 text-[11px] font-medium px-2 py-0.5 rounded" x-text="lesson.term + ' | ' + lesson.week + ' (' + lesson.year + ')'"></span>
+                                    <span class="text-[11px] font-semibold text-indigo-900 bg-white px-2 py-0.5 rounded border border-slate-200 font-mono" x-text="'ID: ' + lesson.teacherId + ' | ' + lesson.teacherName"></span>
+                                    <span class="text-[11px] font-bold px-2 py-0.5 rounded-full" 
+                                          :class="{
+                                              'bg-amber-100 text-amber-800': lesson.status === 'Submitted',
+                                              'bg-emerald-100 text-emerald-800': lesson.status === 'Approved',
+                                              'bg-rose-100 text-rose-800': lesson.status === 'Rejected' || lesson.status === 'Changes Requested'
+                                          }" 
+                                          x-text="lesson.status">
+                                    </span>
+                                </div>
+                                <div class="text-xs pt-1">
+                                    <a :href="lesson.fileData" :download="lesson.fileName" class="text-indigo-600 hover:underline font-semibold inline-flex items-center gap-1 bg-white p-2 rounded border border-indigo-100 break-all">
+                                        📥 Download Document: <span x-text="lesson.fileName"></span>
+                                    </a>
+                                </div>
+                                <div x-show="lesson.feedback" class="text-xs text-rose-700 bg-rose-50 p-2 rounded border border-rose-100 mt-1">
+                                    <strong>Feedback:</strong> <span x-text="lesson.feedback"></span>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-end"
+                                 :class="lesson.status === 'Approved' ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''"
+                                 :title="lesson.status === 'Approved' ? 'Approved plans cannot be modified.' : ''">
+                                <button @click="reviewAction(lesson, 'Approved')" class="flex-1 lg:flex-initial bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded font-medium transition">Approve</button>
+                                <button @click="reviewAction(lesson, 'Changes Requested')" class="flex-1 lg:flex-initial bg-amber-600 hover:bg-amber-700 text-white text-xs px-3 py-1.5 rounded font-medium transition">Revisions</button>
+                                <button @click="reviewAction(lesson, 'Rejected')" class="flex-1 lg:flex-initial bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded font-medium transition">Reject</button>
+                            </div>
+                        </div>
+                    </template>
+                    <div x-show="adminFilteredActiveLessons.length === 0" class="text-center py-8 text-slate-400 text-sm">No submissions in queue matching filter.</div>
+                </div>
+
+                <!-- History Tab (Grouped & Sorted) -->
+                <div x-show="adminSubTab === 'history'" class="space-y-4 max-h-[550px] overflow-x-auto no-print">
+                    <div class="text-xs text-slate-500 mb-2 font-medium">📋 Submissions grouped by Teacher Name, ID, Subject, and Week Number:</div>
+                    <table class="w-full text-left text-sm border-collapse min-w-[650px]">
+                       <thead>
+                           <tr class="bg-slate-100 text-slate-700 text-xs uppercase">
+                               <th class="p-3">Staff ID & Name</th>
+                               <th class="p-3">Contact</th>
+                               <th class="p-3">Subject & Class</th>
+                               <th class="p-3">Term & Week</th>
+                               <th class="p-3">Status</th>
+                               <th class="p-3">File</th>
+                               <th class="p-3 text-right">Action</th>
+                           </tr>
+                       </thead>
+                       <tbody class="divide-y divide-slate-200">
+                           <template x-for="lesson in adminFilteredAllLessons" :key="lesson.id">
+                               <tr>
+                                   <td class="p-3"><div class="text-xs font-mono font-bold text-indigo-700" x-text="lesson.teacherId"></div><div class="font-medium text-slate-900 text-xs" x-text="lesson.teacherName"></div></td>
+                                   <td class="p-3 text-slate-600 text-xs" x-text="lesson.teacherContact"></td>
+                                   <td class="p-3 text-xs"><span class="font-semibold" x-text="lesson.subject"></span> (<span x-text="lesson.classLevel"></span>)</td>
+                                   <td class="p-3 text-xs text-slate-600 font-semibold text-indigo-700" x-text="lesson.term + ' | ' + lesson.week + ' (' + lesson.year + ')'"></td>
+                                   <td class="p-3"><span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="{'bg-amber-100 text-amber-800': lesson.status === 'Submitted', 'bg-emerald-100 text-emerald-800': lesson.status === 'Approved', 'bg-rose-100 text-rose-800': lesson.status === 'Rejected' || lesson.status === 'Changes Requested'}" x-text="lesson.status"></span></td>
+                                   <td class="p-3"><a :href="lesson.fileData" :download="lesson.fileName" class="text-indigo-600 text-xs hover:underline font-medium break-all">📥 <span x-text="lesson.fileName"></span></a></td>
+                                   <td class="p-3 text-right"><button @click="deleteLesson(lesson.id)" class="text-rose-600 hover:text-rose-800 text-xs font-medium">Delete</button></td>
+                               </tr>
+                           </template>
+                       </tbody>
+                    </table>
+                </div>
+
+                <!-- Archive Tab -->
+                <div x-show="adminSubTab === 'archive'" class="space-y-4 max-h-[550px] overflow-y-auto no-print">
+                    <template x-for="lesson in archivedLessons" :key="lesson.id">
+                        <div class="border border-slate-200 rounded-xl p-3 bg-slate-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs">
+                            <div>
+                                <span class="font-bold font-mono text-indigo-900" x-text="lesson.teacherId + ' — ' + lesson.teacherName"></span> — <span x-text="lesson.subject + ' | ' + lesson.term + ' - ' + lesson.week + ' ' + lesson.year"></span>
+                                <a :href="lesson.fileData" :download="lesson.fileName" class="text-indigo-600 font-semibold ml-0 sm:ml-2 underline block sm:inline break-all">📎 <span x-text="lesson.fileName"></span></a>
+                            </div>
+                            <button @click="restoreFromArchive(lesson.id)" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded font-medium shrink-0">Restore</button>
+                        </div>
+                    </template>
+                    <div x-show="archivedLessons.length === 0" class="text-center py-8 text-slate-400 text-sm">No archived records.</div>
+                </div>
+
+                <!-- ==================== PRINTABLE INSPECTION REPORT & RECORDS TAB ==================== -->
+                <div x-show="adminSubTab === 'report'" id="printable-report" class="space-y-6">
+                    
+                    <!-- Inspection Report starts directly with School Name as Heading 1 -->
+                    <div class="space-y-3 border-b border-slate-200 pb-4">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                            <h1 class="text-2xl sm:text-3xl font-black text-indigo-900 tracking-tight" x-text="activeSchoolName"></h1>
+                            <button @click="window.print()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs px-3 py-2 rounded font-medium transition shadow-sm no-print">🖨️ Print / Export Report</button>
+                        </div>
+                        <div class="text-xs text-slate-600 font-medium space-x-2">
+                            <span x-text="'Headteacher / Admin: ' + (activeHeadName || 'Not Set')"></span>
+                            <span>|</span>
+                            <span x-text="'Contact: ' + (activeHeadContact || 'Not Set')"></span>
+                            <span>|</span>
+                            <span x-text="'Date Generated: ' + new Date().toLocaleDateString()"></span>
+                        </div>
+                    </div>
+
+                    <!-- Official Summary & Audit Report Content -->
+                    <div class="space-y-4">
+                        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wider border-l-4 border-indigo-600 pl-2">Official Institutional Summary & Audit Report</h2>
+
+                        <!-- Summary Statistics Cards -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-xl">
+                                <span class="text-xs text-indigo-600 font-semibold uppercase">Total Staff Onboarded</span>
+                                <h4 class="text-2xl font-extrabold text-indigo-900 mt-1" x-text="sortedTeachers.length"></h4>
+                            </div>
+                            <div class="bg-emerald-50 border border-emerald-100 p-4 rounded-xl">
+                                <span class="text-xs text-emerald-600 font-semibold uppercase">Total Submissions</span>
+                                <h4 class="text-2xl font-extrabold text-emerald-900 mt-1" x-text="activeLessons.length"></h4>
+                            </div>
+                            <div class="bg-amber-50 border border-amber-100 p-4 rounded-xl">
+                                <span class="text-xs text-amber-600 font-semibold uppercase">Approved Plans</span>
+                                <h4 class="text-2xl font-extrabold text-amber-900 mt-1" x-text="lessons.filter(l => l.status === 'Approved').length"></h4>
+                            </div>
+                            <div class="bg-rose-50 border border-rose-100 p-4 rounded-xl">
+                                <span class="text-xs text-rose-600 font-semibold uppercase">Pending / Laggards</span>
+                                <h4 class="text-2xl font-extrabold text-rose-900 mt-1" x-text="laggingTeachers.length"></h4>
+                            </div>
+                        </div>
+
+                        <!-- Enhanced Teacher Record Breakdown Table -->
+                        <div class="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 space-y-4 shadow-sm">
+                            <h4 class="text-sm font-bold text-indigo-900">📋 Staff Compliance & Submission Audit Breakdown</h4>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm border-collapse min-w-[500px]">
+                                    <thead>
+                                        <tr class="bg-slate-100 text-slate-700 text-xs uppercase">
+                                            <th class="p-3">Teacher Name</th>
+                                            <th class="p-3">Contact</th>
+                                            <th class="p-3 text-center">Total Uploads</th>
+                                            <th class="p-3 text-center">Approved</th>
+                                            <th class="p-3 text-right">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-200">
+                                        <template x-for="t in sortedTeachers" :key="t.id">
+                                            <tr>
+                                                <td class="p-3 font-medium" x-text="t.name"></td>
+                                                <td class="p-3 text-slate-600 text-xs" x-text="t.contact"></td>
+                                                <td class="p-3 text-center font-bold" x-text="getTeacherSubmissionCount(t.id)"></td>
+                                                <td class="p-3 text-center text-emerald-600 font-bold" x-text="activeLessons.filter(l => l.teacherId === t.id && l.status === 'Approved').length"></td>
+                                                <td class="p-3 text-right">
+                                                    <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full"
+                                                          :class="getTeacherSubmissionCount(t.id) > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'"
+                                                          x-text="getTeacherSubmissionCount(t.id) > 0 ? '🟢 Compliant' : '🔴 Flagged (Laggard)'">
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Bar Graph Trend Visualizer -->
+                        <div class="bg-slate-50 p-4 sm:p-6 rounded-xl border border-slate-200 space-y-4">
+                            <h4 class="text-sm font-bold text-indigo-900">📈 Teacher Submission Progress & Trend Graph</h4>
+                            <div class="space-y-3">
+                                <template x-for="t in sortedTeachers" :key="t.id">
+                                    <div class="bg-white p-3 rounded-lg border border-slate-200 space-y-1 shadow-sm">
+                                        <div class="flex justify-between text-xs font-semibold">
+                                            <span class="font-medium text-indigo-900" x-text="t.name"></span>
+                                            <span :class="getTeacherSubmissionCount(t.id) > 0 ? 'text-emerald-600 font-bold' : 'text-slate-400 font-bold'" 
+                                                  x-text="getTeacherSubmissionCount(t.id) > 0 ? getTeacherSubmissionCount(t.id) + ' Plan(s) Submitted (100%)' : '0 Plans (Pending)'"></span>
+                                        </div>
+                                        <!-- Progress Bar -->
+                                        <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden flex border border-slate-200">
+                                            <div class="h-3 transition-all duration-500 rounded-full"
+                                                 :class="getTeacherSubmissionCount(t.id) > 0 ? 'bg-emerald-500' : 'bg-slate-300 w-[5%]' "
+                                                 :style="'width: ' + (getTeacherSubmissionCount(t.id) > 0 ? '100%': '5%')">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                                <div x-show="sortedTeachers.length === 0" class="text-center py-6 text-slate-400 text-xs">
+                                    No teachers registered in this school.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sign-off & Metadata Fields for Headteacher and Academics -->
+                        <div class="grid grid-cols-2 gap-8 pt-8 mt-8 border-t border-slate-200 text-xs">
+                            <div class="space-y-6">
+                                <p class="font-bold text-slate-700">Headteacher / Administrator Signature:</p>
+                                <div class="border-b border-slate-400 pb-1 font-semibold text-indigo-900" x-text="activeHeadName || '__________________________'"></div>
+                                <p class="text-slate-500">Date: ............................................</p>
+                            </div>
+                            <div class="space-y-6">
+                                <p class="font-bold text-slate-700">Academic Department Review Sign-off:</p>
+                                <div class="border-b border-slate-400 pb-1 font-semibold text-indigo-900">Academic Coordinator</div>
+                                <p class="text-slate-500">Date: ............................................</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer generated by Edubyte Africa Inc. -->
+    <footer class="bg-white border-t border-slate-200 py-4 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 font-medium space-y-1">
+            <p>© 2026 Edubyte Africa Inc. All rights reserved.</p>
+            <p class="text-slate-400">Eduvet School Hub — Powered by Edubyte Africa Inc. | Contact: +233 543 521 863</p>
+        </div>
+    </footer>
+
+    <!-- App Script Logic -->
+    <script>
+        // ==========================================
+        // GES / NACCA LEVEL-BASED SUBJECT MAPS
+        // ==========================================
+        const gesCurriculumMap = {
+            "KG1": ["Language and Literacy", "Numeracy", "Creative Arts", "Our World Our People", "Physical Education"],
+            "KG2": ["Language and Literacy", "Numeracy", "Creative Arts", "Our World Our People", "Physical Education"],
+            "Basic 1": ["English Language", "Mathematics", "Natural Science", "Our World Our People", "Ghanaian Language", "Religious and Moral Education (RME)", "Creative Arts", "Physical Education"],
+            "Basic 2": ["English Language", "Mathematics", "Natural Science", "Our World Our People", "Ghanaian Language", "Religious and Moral Education (RME)", "Creative Arts", "Physical Education"],
+            "Basic 3": ["English Language", "Mathematics", "Natural Science", "Our World Our People", "Ghanaian Language", "Religious and Moral Education (RME)", "Creative Arts", "Physical Education"],
+            "Basic 4": ["English Language", "Mathematics", "Natural Science", "Our World Our People", "Ghanaian Language", "Religious and Moral Education (RME)", "Creative Arts", "History of Ghana", "Physical Education"],
+            "Basic 5": ["English Language", "Mathematics", "Natural Science", "Our World Our People", "Ghanaian Language", "Religious and Moral Education (RME)", "Creative Arts", "History of Ghana", "Physical Education"],
+            "Basic 6": ["English Language", "Mathematics", "Natural Science", "Our World Our People", "Ghanaian Language", "Religious and Moral Education (RME)", "Creative Arts", "History of Ghana", "Physical Education"],
+            "Basic 7": ["English Language", "Mathematics", "Integrated Science", "Social Studies", "Computing / ICT", "Career Technology", "Creative Arts and Design", "Religious and Moral Education (RME)", "Ghanaian Language", "French", "Physical Education and Health", "History of Ghana"],
+            "Basic 8": ["English Language", "Mathematics", "Integrated Science", "Social Studies", "Computing / ICT", "Career Technology", "Creative Arts and Design", "Religious and Moral Education (RME)", "Ghanaian Language", "French", "Physical Education and Health", "History of Ghana"],
+            "Basic 9": ["English Language", "Mathematics", "Integrated Science", "Social Studies", "Computing / ICT", "Career Technology", "Creative Arts and Design", "Religious and Moral Education (RME)", "Ghanaian Language", "French", "Physical Education and Health", "History of Ghana"],
+            "SHS 1": ["English Language", "Core Mathematics", "Integrated Science", "Social Studies", "Elective Mathematics", "Physics", "Chemistry", "Biology", "Financial Accounting", "Costing", "Business Management", "Economics", "Geography", "History", "General Knowledge in Art", "Food and Nutrition", "Management in Living"],
+            "SHS 2": ["English Language", "Core Mathematics", "Integrated Science", "Social Studies", "Elective Mathematics", "Physics", "Chemistry", "Biology", "Financial Accounting", "Costing", "Business Management", "Economics", "Geography", "History", "General Knowledge in Art", "Food and Nutrition", "Management in Living"],
+            "SHS 3": ["English Language", "Core Mathematics", "Integrated Science", "Social Studies", "Elective Mathematics", "Physics", "Chemistry", "Biology", "Financial Accounting", "Costing", "Business Management", "Economics", "Geography", "History", "General Knowledge in Art", "Food and Nutrition", "Management in Living"]
+        };
+
+        function updateEngineSubjects() {
+            const classSelect = document.getElementById('engineClassSelect');
+            const subjectSelect = document.getElementById('engineSubjectSelect');
+            if (!classSelect || !subjectSelect) return;
+
+            const selectedClass = classSelect.value;
+            const subjects = gesCurriculumMap[selectedClass] || ["English Language", "Mathematics"];
+
+            subjectSelect.innerHTML = '';
+            subjects.forEach(subj => {
+                const opt = document.createElement('option');
+                opt.value = subj;
+                opt.textContent = subj;
+                subjectSelect.appendChild(opt);
+            });
+        }
+
+        // ==========================================
+        // FIREBASE CONFIGURATION & INITIALIZATION
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyBu0Kgn8luqI6ma9rkZ90F6Gy3sath64Jk",
+            authDomain: "eduvet-397d4.firebaseapp.com",
+            projectId: "eduvet-397d4",
+            storageBucket: "eduvet-397d4.firebasestorage.app",
+            messagingSenderId: "956448442609",
+            appId: "1:956448442609:web:7e625c7d3e5091c15c8150",
+            measurementId: "G-90YYJC66X3"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+
+        function schoolApp() {
+            return {
+                portalMode: 'teacher',
+                teacherSubTab: 'upload',
+                showOnboarding: false,
+                adminSubTab: 'queue',
+                showPinModal: false,
+                enteredPin: '',
+
+                gatewayTab: 'login',
+                loginInputId: '',
+                authenticatedSchoolId: '',
+                activeSchoolName: '',
+                activeHeadName: '',
+                activeHeadContact: '',
+                schoolNotification: '',
+                
+                regForm: { name: '', location: '', headName: '', headContact: '' },
+                selectedTeacherId: '',
+
+                teachers: [],
+                lessons: [],
+                
+                allAvailableSubjects: [
+                    'Career Technology',
+                    'Computing / ICT',
+                    'Mathematics',
+                    'Integrated Science',
+                    'Social Studies',
+                    'English Language',
+                    'Religious and Moral Education (RME)',
+                    'Creative Arts and Design',
+                    'French',
+                    'Our World Our People (OWOP)'
+                ],
+
+                adminSearchQuery: '',
+                reviewerTermFilter: '',
+                reviewerWeekFilter: '',
+                editingId: null,
+                editingTeacherId: null,
+
+                teacherForm: { name: '', id: '', contact: '', subjects: '' },
+
+                form: {
+                    subject: '',
+                    classLevel: '',
+                    term: '',
+                    week: '',
+                    year: '2026/2027',
+                    fileName: '',
+                    fileData: '',
+                    status: 'Submitted',
+                    feedback: ''
+                },
+
+                // Engine state variables
+                engineScheme: null,
+                engineLessons: null,
+                parsedSchemeTopics: null,
+
+                init() {
+                    setTimeout(() => updateEngineSubjects(), 200);
+                },
+
+                getCurrentSystemWeekNumber() {
+                    const termStart = new Date('2026-09-07');
+                    const now = new Date();
+                    const diffTime = now - termStart;
+                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                    let currentWeek = Math.floor(diffDays / 7) + 1;
+                    if (currentWeek < 1) currentWeek = 1;
+                    if (currentWeek > 15) currentWeek = 15;
+                    return currentWeek;
+                },
+
+                registerSchool() {
+                    const cleanName = this.regForm.name.trim();
+                    if (!cleanName) return;
+
+                    const prefix = cleanName.substring(0, 4).toUpperCase().replace(/[^A-Z]/g, 'SCH');
+                    const randomNum = Math.floor(100 + Math.random() * 900);
+                    const generatedId = `${prefix}-${randomNum}`;
+
+                    const schoolRecord = {
+                        id: generatedId,
+                        name: cleanName,
+                        location: this.regForm.location,
+                        headName: this.regForm.headName,
+                        headContact: this.regForm.headContact,
+                        notification: 'Welcome to the school portal! Please submit your weekly lesson plans on time.',
+                        createdAt: Date.now()
+                    };
+
+                    db.collection('registered_schools').doc(generatedId).set(schoolRecord)
+                      .then(() => {
+                          alert(`School Registered Successfully!\n\nYour Unique School ID is: ${generatedId}\n\nPlease copy this code and use it to log into your school portal.`);
+                          this.regForm = { name: '', location: '', headName: '', headContact: '' };
+                          this.gatewayTab = 'login';
+                          this.loginInputId = generatedId;
+                      })
+                      .catch(err => alert('Error registering school: ' + err.message));
+                },
+
+                loginSchool() {
+                    const inputId = this.loginInputId.trim().toUpperCase();
+                    if (!inputId) return;
+
+                    db.collection('registered_schools').doc(inputId).get()
+                      .then((doc) => {
+                          if (doc.exists) {
+                              const data = doc.data();
+                              this.authenticatedSchoolId = data.id;
+                              this.activeSchoolName = data.name;
+                              this.activeHeadName = data.headName || '';
+                              this.activeHeadContact = data.headContact || '';
+                              this.schoolNotification = data.notification || '';
+                              this.loadSchoolData();
+                          } else {
+                              alert('School ID not found! Please check your ID or register your school.');
+                          }
+                      })
+                      .catch(err => alert('Login error: ' + err.message));
+                },
+
+                logoutSchool() {
+                    if (confirm('Exit current school portal session?')) {
+                        this.authenticatedSchoolId = '';
+                        this.activeSchoolName = '';
+                        this.activeHeadName = '';
+                        this.activeHeadContact = '';
+                        this.schoolNotification = '';
+                        this.loginInputId = '';
+                        this.selectedTeacherId = '';
+                        this.teachers = [];
+                        this.lessons = [];
+                    }
+                },
+
+                loadSchoolData() {
+                    db.collection('registered_schools').doc(this.authenticatedSchoolId).onSnapshot((doc) => {
+                        if (doc.exists) {
+                            const data = doc.data();
+                            if (data.name) this.activeSchoolName = data.name;
+                            if (data.headName) this.activeHeadName = data.headName;
+                            if (data.headContact) this.activeHeadContact = data.headContact;
+                            if (data.notification) this.schoolNotification = data.notification;
+                        }
+                    });
+
+                    db.collection('teachers').where('schoolId', '==', this.authenticatedSchoolId).onSnapshot((snapshot) => {
+                        this.teachers = snapshot.docs.map(doc => ({ ...doc.data() }));
+                    });
+
+                    db.collection('lessons').where('schoolId', '==', this.authenticatedSchoolId).onSnapshot((snapshot) => {
+                        this.lessons = snapshot.docs.map(doc => ({ ...doc.data() }));
+                    });
+                },
+
+                promptUpdateSchoolInfo() {
+                    const newName = prompt('Update Official School Name:', this.activeSchoolName);
+                    if (newName === null) return;
+                    const newHeadName = prompt('Update Headteacher Name:', this.activeHeadName);
+                    if (newHeadName === null) return;
+                    const newHeadContact = prompt('Update Headteacher Contact:', this.activeHeadContact);
+                    if (newHeadContact === null) return;
+
+                    db.collection('registered_schools').doc(this.authenticatedSchoolId).update({
+                        name: newName.trim(),
+                        headName: newHeadName.trim(),
+                        headContact: newHeadContact.trim()
+                    }).then(() => {
+                        this.activeSchoolName = newName.trim();
+                        this.activeHeadName = newHeadName.trim();
+                        this.activeHeadContact = newHeadContact.trim();
+                        alert('School & Headteacher details updated successfully!');
+                    }).catch(err => alert('Error updating details: ' + err.message));
+                },
+
+                promptUpdateNotification() {
+                    const newNotice = prompt('Enter a notification message to broadcast to all teachers in this school:', this.schoolNotification);
+                    if (newNotice !== null) {
+                        this.updateNotification(newNotice);
+                    }
+                },
+
+                updateNotification(message) {
+                    db.collection('registered_schools').doc(this.authenticatedSchoolId).update({
+                        notification: message
+                    }).then(() => {
+                        this.schoolNotification = message;
+                        alert('Notification broadcasted successfully to all teachers!');
+                    }).catch(err => alert('Error updating notice: ' + err.message));
+                },
+
+                verifyTeacherSession(event) {
+                    const chosenId = event.target.value;
+                    if (!chosenId) {
+                        this.selectedTeacherId = '';
+                        return;
+                    }
+
+                    const targetTeacher = this.teachers.find(t => t.id === chosenId);
+                    if (!targetTeacher) return;
+
+                    const enteredStaffId = prompt(`Enter Staff ID for ${targetTeacher.name}:`);
+                    
+                    if (enteredStaffId && enteredStaffId.trim().toUpperCase() === targetTeacher.id) {
+                        this.selectedTeacherId = targetTeacher.id;
+                        alert(`Welcome, ${targetTeacher.name}! Workspace unlocked.`);
+                    } else {
+                        alert('Incorrect Staff ID! Access denied.');
+                        this.selectedTeacherId = '';
+                        event.target.value = '';
+                    }
+                },
+
+                verifyPin() {
+                    if (this.enteredPin === '0543') {
+                        this.portalMode = 'reviewer';
+                        this.showPinModal = false;
+                        this.enteredPin = '';
+                    } else {
+                        alert('Incorrect Security PIN!');
+                        this.enteredPin = '';
+                    }
+                },
+
+                get sortedTeachers() {
+                    return [...this.teachers].sort((a, b) => a.name.localeCompare(b.name));
+                },
+
+                get activeTeacher() {
+                    return this.teachers.find(t => t.id === this.selectedTeacherId);
+                },
+
+                getTeacherSubmissionCount(teacherId) {
+                    return this.activeLessons.filter(l => l.teacherId === teacherId).length;
+                },
+
+                isTeacherLagging(teacherId) {
+                    const hasSubmitted = this.activeLessons.some(l => l.teacherId === teacherId);
+                    return !hasSubmitted;
+                },
+
+                handleFileUpload(event) {
+                    const file = event.target.files[0];
+                    if (!file) return;
+                    this.form.fileName = file.name;
+                    const reader = new FileReader();
+                    reader.onload = (e) => { this.form.fileData = e.target.result; };
+                    reader.readAsDataURL(file);
+                },
+
+                saveTeacherRecord() {
+                    const id = this.teacherForm.id.trim().toUpperCase();
+                    const teacherData = { ...this.teacherForm, id, schoolId: this.authenticatedSchoolId };
+                    
+                    db.collection('teachers').doc(id).set(teacherData)
+                      .then(() => {
+                          alert('Teacher saved to ' + this.activeSchoolName + ' partition successfully!');
+                          this.resetTeacherForm();
+                      })
+                      .catch(err => alert('Error saving teacher: ' + err.message));
+                },
+
+                editTeacher(teacher) {
+                    this.editingTeacherId = teacher.id;
+                    this.teacherForm = { ...teacher };
+                },
+
+                resetTeacherForm() {
+                    this.editingTeacherId = null;
+                    this.teacherForm = { name: '', id: '', contact: '', subjects: '' };
+                },
+
+                deleteTeacher(id) {
+                    if (confirm('Remove this teacher from this school partition?')) {
+                        db.collection('teachers').doc(id).delete()
+                          .catch(err => alert('Error deleting: ' + err.message));
+                    }
+                },
+
+                submitLessonFile() {
+                    const t = this.activeTeacher;
+                    if (!t) return;
+
+                    const selectedWeekNum = parseInt(this.form.week.replace('Week ', '')) || 1;
+                    const currentSystemWeek = this.getCurrentSystemWeekNumber();
+                    const now = new Date();
+                    const dayOfWeek = now.getDay();
+
+                    if (selectedWeekNum > currentSystemWeek) {
+                        alert(`❌ Restriction Notice:\nYou cannot submit lesson plans for future weeks (Week ${selectedWeekNum}). Current active week is Week ${currentSystemWeek}.`);
+                        return;
+                    }
+
+                    if (selectedWeekNum === currentSystemWeek + 1 && dayOfWeek < 5 && dayOfWeek !== 0) {
+                        alert(`⏳ Submission Window Locked:\nYou cannot submit lessons for Week ${selectedWeekNum} until Friday of the current week (Week ${currentSystemWeek}).`);
+                        return;
+                    }
+
+                    if (!this.form.fileName && !this.editingId) {
+                        alert('Please attach your Word or PDF lesson plan document.');
+                        return;
+                    }
+
+                    const lessonId = this.editingId ? this.editingId : Date.now().toString();
+                    const lessonData = {
+                        ...this.form,
+                        id: lessonId,
+                        rawDate: Date.now(),
+                        schoolId: this.authenticatedSchoolId,
+                        teacherId: t.id,
+                        teacherName: t.name,
+                        teacherContact: t.contact,
+                        timestamp: new Date().toLocaleDateString(),
+                        isArchived: false,
+                        feedback: this.editingId ? (this.lessons.find(l => l.id === this.editingId)?.feedback || '') : ''
+                    };
+
+                    db.collection('lessons').doc(lessonId).set(lessonData)
+                      .then(() => {
+                          alert('Lesson plan submitted successfully to ' + this.activeSchoolName + '!');
+                          this.resetForm();
+                      })
+                      .catch(err => alert('Error submitting: ' + err.message));
+                },
+
+                editSubmission(lesson) {
+                    this.editingId = lesson.id;
+                    this.form = { ...lesson };
+                },
+
+                deleteLesson(id) {
+                    if (confirm('Delete this record?')) {
+                        db.collection('lessons').doc(id).delete()
+                          .catch(err => alert('Error deleting: ' + err.message));
+                    }
+                },
+
+                reviewAction(lesson, newStatus) {
+                    const comment = prompt(`Enter review comments / feedback for ${lesson.teacherName}:`, lesson.feedback || '');
+                    if (comment !== null) {
+                        db.collection('lessons').doc(lesson.id).update({
+                            status: newStatus,
+                            feedback: comment
+                        }).catch(err => alert('Error updating review: ' + err.message));
+                    }
+                },
+
+                restoreFromArchive(id) {
+                    db.collection('lessons').doc(id).update({ isArchived: false })
+                      .then(() => alert('Restored from archive!'))
+                      .catch(err => alert('Error: ' + err.message));
+                },
+
+                resetForm() {
+                    this.editingId = null;
+                    this.form = { subject: '', classLevel: '', term: '', week: '', year: '2026/2027', fileName: '', fileData: '', status: 'Submitted', feedback: '' };
+                },
+
+                get activeLessons() { return this.lessons.filter(l => !l.isArchived); },
+                get archivedLessons() { return this.lessons.filter(l => l.isArchived); },
+                get teacherFilteredLessons() { return this.lessons.filter(l => l.teacherId === this.selectedTeacherId); },
+                
+                get adminFilteredActiveLessons() {
+                    let items = [...this.activeLessons];
+                    
+                    if (this.reviewerTermFilter) {
+                        items = items.filter(l => l.term === this.reviewerTermFilter);
+                    }
+                    if (this.reviewerWeekFilter) {
+                        items = items.filter(l => l.week === this.reviewerWeekFilter);
+                    }
+
+                    const q = this.adminSearchQuery.toLowerCase();
+                    if (q) {
+                        items = items.filter(l => l.teacherName.toLowerCase().includes(q) || l.subject.toLowerCase().includes(q) || l.teacherId.toLowerCase().includes(q));
+                    }
+
+                    return items.sort((a, b) => {
+                        const nameComp = a.teacherName.localeCompare(b.teacherName);
+                        if (nameComp !== 0) return nameComp;
+
+                        const idComp = a.teacherId.localeCompare(b.teacherId);
+                        if (idComp !== 0) return idComp;
+
+                        const subjComp = a.subject.localeCompare(b.subject);
+                        if (subjComp !== 0) return subjComp;
+
+                        const weekA = parseInt(a.week.replace('Week ', '')) || 0;
+                        const weekB = parseInt(b.week.replace('Week ', '')) || 0;
+                        return weekA - weekB;
+                    });
+                },
+                
+                get adminFilteredAllLessons() {
+                    let items = [...this.lessons];
+
+                    if (this.reviewerTermFilter) {
+                        items = items.filter(l => l.term === this.reviewerTermFilter);
+                    }
+                    if (this.reviewerWeekFilter) {
+                        items = items.filter(l => l.week === this.reviewerWeekFilter);
+                    }
+
+                    const q = this.adminSearchQuery.toLowerCase();
+                    if (q) {
+                        items = items.filter(l => l.teacherName.toLowerCase().includes(q) || l.subject.toLowerCase().includes(q) || l.teacherId.toLowerCase().includes(q));
+                    }
+
+                    return items.sort((a, b) => {
+                        const nameComp = a.teacherName.localeCompare(b.teacherName);
+                        if (nameComp !== 0) return nameComp;
+
+                        const idComp = a.teacherId.localeCompare(b.teacherId);
+                        if (idComp !== 0) return idComp;
+
+                        const subjComp = a.subject.localeCompare(b.subject);
+                        if (subjComp !== 0) return subjComp;
+
+                        const weekA = parseInt(a.week.replace('Week ', '')) || 0;
+                        const weekB = parseInt(b.week.replace('Week ', '')) || 0;
+                        return weekA - weekB;
+                    });
+                },
+
+                get laggingTeachers() {
+                    const submittedIds = new Set(this.activeLessons.map(l => l.teacherId));
+                    return this.sortedTeachers.filter(t => !submittedIds.has(t.id));
+                },
+
+                triggerLaggingAlerts() {
+                    if (this.laggingTeachers.length === 0) { 
+                        alert('All onboarded teachers in ' + this.activeSchoolName + ' are compliant!'); 
+                        return; 
+                    }
+                    alert('🚨 LAGGING TEACHERS FLAGGED (' + this.activeSchoolName + '):\n\n' + this.laggingTeachers.map(t => `${t.id} - ${t.name} (${t.contact})`).join('\n'));
+                },
+
+                exportData() {
+                    const backup = { schoolId: this.authenticatedSchoolId, schoolName: this.activeSchoolName, teachers: this.teachers, lessons: this.lessons };
+                    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = `${this.authenticatedSchoolId}_backup_${new Date().toISOString().split('T')[0]}.json`;
+                    a.click();
+                }
+            }
+        }
+
+        // --- ROBUST NaCCA SCHEME PARSER & WEEKLY ENGINE ---
+        async function engineHandleSchemeUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const statusEl = document.getElementById('engineUploadStatus');
+            statusEl.innerHTML = `<span class="text-indigo-600 font-bold"><i class="fa fa-spinner fa-spin mr-1"></i> Parsing "${file.name}"...</span>`;
+
+            if (file.name.endsWith('.pdf')) {
+                const fileReader = new FileReader();
+                fileReader.onload = async function() {
+                    try {
+                        const typedarray = new Uint8Array(this.result);
+                        const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                        let fullText = '';
+                        for (let i = 1; i <= pdf.numPages; i++) {
+                            const page = await pdf.getPage(i);
+                            const textContent = await page.getTextContent();
+                            fullText += textContent.items.map(item => item.str).join(' ') + '\n';
+                        }
+                        engineParseSchemeText(fullText, file.name);
+                    } catch (e) {
+                        statusEl.innerHTML = `<span class="text-rose-600">Error reading PDF: ${e.message}</span>`;
+                    }
+                };
+                fileReader.readAsArrayBuffer(file);
+            } else {
+                const textReader = new FileReader();
+                textReader.onload = function(e) {
+                    engineParseSchemeText(e.target.result, file.name);
+                };
+                textReader.readAsText(file);
+            }
+        }
+
+        function engineParseSchemeText(rawText, fileName) {
+            const statusEl = document.getElementById('engineUploadStatus');
+            statusEl.innerHTML = `<span class="text-emerald-700 font-bold"><i class="fa fa-circle-check mr-1"></i> Extracted NaCCA Strands from "${fileName}"!</span>`;
+
+            const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 5);
+            const extracted = [];
+            let currentStrand = "NaCCA Core Strand";
+
+            for (let line of lines) {
+                if (/STRAND|UNIT|CHAPTER|MODULE|THEME/i.test(line)) {
+                    currentStrand = line;
+                } else if (line.length > 6) {
+                    extracted.push({
+                        strand: currentStrand,
+                        sub_strand: line.slice(0, 70),
+                        content_standard: "Demonstrate NaCCA standard competency in " + line.slice(0, 30),
+                        indicators: "Execute practical indicators & BECE past question drills",
+                        resources: "Standard GES textbooks, calculator, interactive tools"
+                    });
+                }
+            }
+
+            const app = Alpine.$data(document.body);
+            app.parsedSchemeTopics = extracted.length > 0 ? extracted : null;
+        }
+
+        function engineGenerateCustomScheme() {
+            const app = Alpine.$data(document.body);
+            const subject = document.getElementById('engineSubjectSelect').value;
+            const grade = document.getElementById('engineClassSelect').value;
+            const totalWeeks = 15;
+
+            const fridays = ['11-09-2026', '18-09-2026', '25-09-2026', '02-10-2026', '09-10-2026', '16-10-2026', '23-10-2026', '30-10-2026', '06-11-2026', '13-11-2026', '20-11-2026', '27-11-2026', '04-12-2026', '11-12-2026', '18-12-2026'];
+            
+            // Strictly fetch specific class/subject topics from uploaded file or generate based on selected subject ONLY
+            let topics = app.parsedSchemeTopics;
+            if (!topics || topics.length === 0) {
+                // Generate intelligent subject-specific curriculum topics without mixing subjects
+                if (subject.includes("Mathematics")) {
+                    topics = [
+                        { strand: "Strand 1: Number", sub_strand: "Number Operations & Real Numbers", content_standard: "Demonstrate understanding of number systems", indicators: "Perform operations accurately (BECE Focus)", resources: "Base ten blocks, charts" },
+                        { strand: "Strand 2: Algebra", sub_strand: "Algebraic Expressions & Equations", content_standard: "Translate word problems into algebraic expressions", indicators: "Solve linear equations", resources: "Graph sheets, algebra tiles" },
+                        { strand: "Strand 3: Geometry", sub_strand: "Shapes, Angles & Measurement", content_standard: "Demonstrate understanding of geometric properties", indicators: "Calculate angles and perimeters", resources: "Protractor, ruler, compass" },
+                        { strand: "Strand 4: Statistics", sub_strand: "Data Collection and Probability", content_standard: "Collect, organize, and interpret data", indicators: "Represent data on bar charts and pie charts", resources: "Graph boards, markers" }
+                    ];
+                } else if (subject.includes("Science")) {
+                    topics = [
+                        { strand: "Strand 1: Diversity of Matter", sub_strand: "Living and Non-Living Things", content_standard: "Classify matter into various categories", indicators: "Identify properties of materials", resources: "Beakers, specimens, magnets" },
+                        { strand: "Strand 2: Cycles", sub_strand: "Earth Science and Life Cycles", content_standard: "Understand natural cycles in the environment", indicators: "Describe water cycle and plant reproduction", resources: "Charts, potted plants" },
+                        { strand: "Strand 3: Systems", sub_strand: "The Human Body and Ecosystems", content_standard: "Analyze biological and physical systems", indicators: "Trace digestive and respiratory systems", resources: "Anatomical charts" }
+                    ];
+                } else {
+                    topics = [
+                        { strand: `Strand 1: Fundamentals`, sub_strand: `Introduction to ${subject}`, content_standard: `Demonstrate mastery of core ${subject} concepts`, indicators: `Execute practical indicators for ${subject}`, resources: `GES approved textbooks for ${subject}` },
+                        { strand: `Strand 2: Application`, sub_strand: `Advanced ${subject} Principles`, content_standard: `Apply ${subject} principles to practical scenarios`, indicators: `Solve WAEC/BECE standard problems`, resources: `Reference materials, tools` }
+                    ];
+                }
+            }
+
+            const weeks = [];
+            const instructionalWeeks = totalWeeks - 3;
+
+            for (let i = 1; i <= totalWeeks; i++) {
+                const we = fridays[i - 1] || "TBD";
+                if (i <= instructionalWeeks) {
+                    const item = topics[(i - 1) % topics.length];
+                    weeks.push({
+                        week_number: i,
+                        week_ending: we,
+                        strand: item.strand,
+                        sub_strand: item.sub_strand,
+                        content_standard: item.content_standard,
+                        indicators: item.indicators + " (BECE Focus)",
+                        resources: item.resources
+                    });
+                } else if (i === totalWeeks - 2) {
+                    weeks.push({ week_number: i, week_ending: we, strand: "REVISION", sub_strand: `Comprehensive ${subject} Past Questions Review`, content_standard: "Comprehensive mastery of all NaCCA strands", indicators: "Drill on WAEC past questions", resources: "BECE/WASSCE past questions compendium" });
+                } else if (i === totalWeeks - 1) {
+                    weeks.push({ week_number: i, week_ending: we, strand: "ASSESSMENT", sub_strand: "Terminal Mock Examination", content_standard: "Standardized testing on national standards", indicators: "Mock examination papers", resources: "Examination scripts, marking schemes" });
+                } else {
+                    weeks.push({ week_number: i, week_ending: we, strand: "SBA & VACATION", sub_strand: "SBA Collation & Terminal Reporting", content_standard: "Continuous assessment recording", indicators: "SBA computation", resources: "SBA registers, report sheets" });
+                }
+            }
+
+            app.engineScheme = {
+                teacher_name: app.activeTeacher ? app.activeTeacher.name : 'Teacher',
+                school_name: app.activeSchoolName,
+                subject: subject,
+                grade_level: grade,
+                weeks: weeks
+            };
+
+            engineRenderSchemeTable();
+            alert(`Weekly scheme for ${subject} (${grade}) generated successfully with NaCCA strands & BECE focus!`);
+        }
+
+        function engineRenderSchemeTable() {
+            const app = Alpine.$data(document.body);
+            if (!app.engineScheme) return;
+
+            const tbody = document.getElementById('engineSchemeTableBody');
+            tbody.innerHTML = '';
+            app.engineScheme.weeks.forEach((w, idx) => {
+                tbody.innerHTML += `
+                    <tr class="border-b hover:bg-slate-50">
+                        <td class="p-2.5 border-r text-center font-bold">${w.week_number}</td>
+                        <td class="p-2.5 border-r font-mono">${w.week_ending}</td>
+                        <td class="p-2.5 border-r"><input type="text" value="${w.strand}" oninput="engineUpdateSchemeCell(${idx}, 'strand', this.value)" class="w-full bg-transparent border-b border-dashed border-slate-300 focus:border-indigo-600 outline-none"></td>
+                        <td class="p-2.5 border-r"><input type="text" value="${w.sub_strand}" oninput="engineUpdateSchemeCell(${idx}, 'sub_strand', this.value)" class="w-full bg-transparent border-b border-dashed border-slate-300 focus:border-indigo-600 outline-none font-semibold"></td>
+                        <td class="p-2.5 border-r"><input type="text" value="${w.indicators}" oninput="engineUpdateSchemeCell(${idx}, 'indicators', this.value)" class="w-full bg-transparent border-b border-dashed border-slate-300 focus:border-indigo-600 outline-none"></td>
+                        <td class="p-2.5"><input type="text" value="${w.resources}" oninput="engineUpdateSchemeCell(${idx}, 'resources', this.value)" class="w-full bg-transparent border-b border-dashed border-slate-300 focus:border-indigo-600 outline-none"></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function engineUpdateSchemeCell(idx, field, val) {
+            const app = Alpine.$data(document.body);
+            if (app.engineScheme && app.engineScheme.weeks[idx]) {
+                app.engineScheme.weeks[idx][field] = val;
+            }
+        }
+
+        function engineExportSchemeWord() {
+            const app = Alpine.$data(document.body);
+            if (!app.engineScheme) { alert('Please generate scheme first!'); return; }
+            let rows = '';
+            app.engineScheme.weeks.forEach(w => {
+                rows += `<tr><td>${w.week_number}</td><td>${w.week_ending}</td><td>${w.strand}</td><td><b>${w.sub_strand}</b><br>${w.content_standard}</td><td>${w.indicators}</td><td>${w.resources}</td></tr>`;
+            });
+            const html = `<html xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"></head><body style="font-family:Arial;font-size:10pt;">
+                <h3 style="text-align:center;color:#1A73E8;">${app.engineScheme.school_name}</h3>
+                <h4 style="text-align:center;">SCHEME OF LEARNING — ${app.engineScheme.subject} (${app.engineScheme.grade_level})</h4>
+                <p style="text-align:center;">Teacher: ${app.engineScheme.teacher_name} | NaCCA & BECE Standard Aligned</p>
+                <table border="1" style="width:100%;border-collapse:collapse;font-size:9pt;">
+                    <tr style="background:#F1F3F4;"><th>Wk</th><th>Week Ending</th><th>NaCCA Strand</th><th>Sub Strand & Standards</th><th>Indicators & BECE Focus</th><th>TLM Resources</th></tr>
+                    ${rows}
+                </table>
+            </body></html>`;
+            const blob = new Blob(['\ufeff' + html], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = `Scheme_${app.engineScheme.subject}_${app.engineScheme.grade_level}.doc`; a.click();
+        }
+
+        function engineGenerateLessons() {
+            const app = Alpine.$data(document.body);
+            if (!app.engineScheme) { alert('Please generate weekly scheme first!'); return; }
+            
+            const teacherName = app.activeTeacher ? app.activeTeacher.name : 'Teacher';
+            const schoolName = app.activeSchoolName;
+            const subject = app.engineScheme.subject;
+            const grade = app.engineScheme.grade_level;
+            const weeksNotes = [];
+
+            app.engineScheme.weeks.forEach(w => {
+                weeksNotes.push({
+                    week_number: w.week_number,
+                    week_ending: w.week_ending,
+                    strand: w.strand,
+                    sub_strand: w.sub_strand,
+                    content_standard: w.content_standard,
+                    teacher_name: teacherName,
+                    school_name: schoolName,
+                    subject: subject,
+                    grade_level: grade,
+                    lessons: [
+                        {
+                            lesson_number: 1,
+                            day: `Monday • Week ${w.week_number}`,
+                            duration: '60 MINS',
+                            indicator: w.indicators,
+                            performance_indicator: `Learners can solve standard problems and answer BECE type questions on ${w.sub_strand}.`,
+                            resources: w.resources,
+                            phase1_starter: `Review prior knowledge. Pose a WAEC/BECE past question hook regarding ${w.sub_strand}.`,
+                            phase2_new_learning: `Step-by-step NaCCA standard instruction, worked examples, and guided practice on ${w.sub_strand} using ${w.resources}.`,
+                            phase3_reflection: `Learners summarize core concepts and solve a quick exit ticket problem.`
+                        }
+                    ]
+                });
+            });
+
+            app.engineLessons = { teacher_name: teacherName, school_name: schoolName, subject: subject, grade_level: grade, weeks: weeksNotes };
+            
+            const container = document.getElementById('engineLessonsContainer');
+            container.innerHTML = '';
+            weeksNotes.forEach(w => {
+                container.innerHTML += `
+                    <div class="p-4 border rounded-xl bg-white shadow-2xs space-y-2 text-xs">
+                        <div class="flex justify-between items-center border-b pb-2">
+                            <span class="font-bold text-indigo-950 text-sm">Week ${w.week_number} (${w.week_ending}) — ${w.sub_strand}</span>
+                            <span class="bg-indigo-100 text-indigo-800 font-bold px-2.5 py-0.5 rounded text-[11px]">Teacher: ${w.teacher_name} | ${w.subject} (${w.grade_level})</span>
+                        </div>
+                        <p class="text-slate-600"><b>Starter:</b> ${w.lessons[0].phase1_starter}</p>
+                        <p class="text-slate-600"><b>New Learning:</b> ${w.lessons[0].phase2_new_learning}</p>
+                        <p class="text-slate-600"><b>Reflection:</b> ${w.lessons[0].phase3_reflection}</p>
+                    </div>`;
+            });
+            alert('3-Phase Lesson Notes generated successfully with complete Teacher, Class, Subject, Week Number & Week Ending headers!');
+        }
+
+        function engineExportLessonsWord() {
+            const app = Alpine.$data(document.body);
+            if (!app.engineLessons) { alert('Please generate lessons first!'); return; }
+            let content = '';
+            app.engineLessons.weeks.forEach(w => {
+                content += `
+                    <h2 style="color:#174EA6;border-bottom:1px solid #1A73E8;">WEEK ${w.week_number} • WEEK ENDING: ${w.week_ending}</h2>
+                    <p><b>Teacher:</b> ${w.teacher_name} | <b>School:</b> ${w.school_name} | <b>Subject:</b> ${w.subject} (${w.grade_level})</p>
+                    <p><b>NaCCA Strand:</b> ${w.strand} | <b>Sub-Strand:</b> ${w.sub_strand}</p>
+                    <table border="1" style="width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:15px;">
+                        <tr style="background:#E8F0FE;"><th>Phase / Duration</th><th>Learners & Teacher Activities (BECE Focused)</th><th>Resources</th></tr>
+                        <tr><td style="font-weight:bold;">PHASE 1: STARTER (10m)</td><td>${w.lessons[0].phase1_starter}</td><td rowspan="3">${w.lessons[0].resources}</td></tr>
+                        <tr><td style="font-weight:bold;">PHASE 2: NEW LEARNING (40m)</td><td>${w.lessons[0].phase2_new_learning}</td></tr>
+                        <tr><td style="font-weight:bold;">PHASE 3: REFLECTION (10m)</td><td>${w.lessons[0].phase3_reflection}</td></tr>
+                    </table>`;
+            });
+            const html = `<html xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"></head><body style="font-family:Arial;font-size:10pt;">
+                <h3 style="text-align:center;color:#1A73E8;">${app.engineLessons.school_name}</h3>
+                <h4 style="text-align:center;">LESSON NOTES — ${app.engineLessons.subject} (${app.engineLessons.grade_level})</h4>
+                <p style="text-align:center;">Teacher: ${app.engineLessons.teacher_name} | Term: Term 1 | NaCCA / WAEC Standard</p>
+                <hr>${content}
+            </body></html>`;
+            const blob = new Blob(['\ufeff' + html], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = `Lesson_Notes_${app.engineLessons.subject}_${app.engineLessons.grade_level}.doc`; a.click();
+        }
+
+        function engineSubmitToMainPortal() {
+            const app = Alpine.$data(document.body);
+            if (!app.engineLessons || !app.activeTeacher) { alert('Please select your teacher profile and generate lessons first!'); return; }
+            
+            const dummyData = 'data:text/plain;charset=utf-8,' + encodeURIComponent('NaCCA Dynamic Lesson Engine Export for ' + app.engineLessons.subject);
+            
+            const lessonId = Date.now().toString();
+            const lessonData = {
+                id: lessonId,
+                subject: app.engineLessons.subject,
+                classLevel: app.engineLessons.grade_level,
+                term: 'Term 1',
+                week: 'Week 1',
+                year: '2026/2027',
+                fileName: `${app.engineLessons.subject}_Lesson_Notes.doc`,
+                fileData: dummyData,
+                status: 'Submitted',
+                feedback: 'Generated via NaCCA & BECE Engine',
+                rawDate: Date.now(),
+                schoolId: app.authenticatedSchoolId,
+                teacherId: app.activeTeacher.id,
+                teacherName: app.activeTeacher.name,
+                teacherContact: app.activeTeacher.contact,
+                timestamp: new Date().toLocaleDateString(),
+                isArchived: false
+            };
+
+            db.collection('lessons').doc(lessonId).set(lessonData).then(() => {
+                alert('Success! Dynamic lesson notes submitted directly to school vetting queue.');
+                app.teacherSubTab = 'upload';
+            }).catch(err => alert('Error submitting: ' + err.message));
+        }
+    </script>
+</body>
+</html>
