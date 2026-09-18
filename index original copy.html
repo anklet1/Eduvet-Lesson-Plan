@@ -3,34 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eduvet School Hub — Robust GES / NaCCA & WAEC/BECE Lesson Engine</title>
+    <title>Eduvet School Hub</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- PDF.js CDN for in-browser PDF Scheme text parsing -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <!-- Firebase Compat SDKs (Loaded first in head) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
-    <script>
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        gesNavy: '#0F2942',
-                        gesBlue: '#1A73E8',
-                        gesGold: '#D97706',
-                        gesGreen: '#059669'
-                    }
-                }
-            }
-        }
-    </script>
     <!-- Print-Only Styling Rules to isolate the Inspection Report cleanly into PDF -->
     <style>
         @media print {
@@ -199,11 +180,11 @@
         </template>
 
         <!-- ==================== PORTAL 1: TEACHER WORKSPACE ==================== -->
-        <div class="space-y-6" x-show="portalMode === 'teacher'">
+        <div class="space-y-6 no-print" x-show="portalMode === 'teacher'">
             
             <!-- Personalized Teacher Lagging Alert Banner -->
             <template x-if="activeTeacher && isTeacherLagging(activeTeacher.id)">
-                <div class="bg-rose-50 border-l-4 border-rose-500 p-4 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 no-print">
+                <div class="bg-rose-50 border-l-4 border-rose-500 p-4 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                     <div class="flex items-center space-x-3">
                         <span class="text-2xl">🚨</span>
                         <div>
@@ -215,30 +196,7 @@
                 </div>
             </template>
 
-            <!-- Teacher Portal Mode Sub-Switcher Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 no-print">
-                <div @click="teacherSubTab = 'upload'" class="cursor-pointer bg-white p-5 rounded-2xl border transition shadow-sm hover:shadow-md flex items-center space-x-4" :class="teacherSubTab === 'upload' ? 'border-indigo-600 ring-2 ring-indigo-600/20 bg-indigo-50/20' : 'border-slate-200'">
-                    <div class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl font-bold">
-                        <i class="fa fa-folder-open"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-bold text-indigo-950">Upload & Submission History</h3>
-                        <p class="text-xs text-slate-500">Manage, update, and track status of weekly lesson notes.</p>
-                    </div>
-                </div>
-                <div @click="teacherSubTab = 'engine'" class="cursor-pointer bg-white p-5 rounded-2xl border transition shadow-sm hover:shadow-md flex items-center space-x-4" :class="teacherSubTab === 'engine' ? 'border-indigo-600 ring-2 ring-indigo-600/20 bg-indigo-50/20' : 'border-slate-200'">
-                    <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl font-bold">
-                        <i class="fa fa-wand-magic-sparkles"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-bold text-indigo-950">Robust NaCCA & BECE Lesson Engine</h3>
-                        <p class="text-xs text-slate-500">Upload scheme, auto-align Strands/Sub-Strands & WAEC/BECE focus.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SUB-TAB 1: ORIGINAL FILE UPLOAD & HISTORY WORKSPACE -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8" x-show="teacherSubTab === 'upload'">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
                 <!-- Left Column: Metrics & Upload Form -->
                 <div class="space-y-6 lg:col-span-1">
                     <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-slate-200">
@@ -371,121 +329,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- SUB-TAB 2: EMBEDDED ROBUST NaCCA & BECE ENGINE -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-6" x-show="teacherSubTab === 'engine'">
-                
-                <!-- Engine Header Cards & Setup -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-slate-50 p-5 rounded-2xl border border-slate-200">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Class Level (KG1 - SHS 3)</label>
-                        <select id="engineClassSelect" class="w-full text-xs border p-2 rounded bg-white font-medium" onchange="updateEngineSubjects()">
-                            <optgroup label="Kindergarten">
-                                <option value="KG1">Kindergarten 1 (KG1)</option>
-                                <option value="KG2">Kindergarten 2 (KG2)</option>
-                            </optgroup>
-                            <optgroup label="Lower Primary">
-                                <option value="Basic 1">Basic 1 (Primary 1)</option>
-                                <option value="Basic 2">Basic 2 (Primary 2)</option>
-                                <option value="Basic 3">Basic 3 (Primary 3)</option>
-                            </optgroup>
-                            <optgroup label="Upper Primary">
-                                <option value="Basic 4">Basic 4 (Primary 4)</option>
-                                <option value="Basic 5">Basic 5 (Primary 5)</option>
-                                <option value="Basic 6">Basic 6 (Primary 6)</option>
-                            </optgroup>
-                            <optgroup label="Junior High School (JHS - BECE Focus)">
-                                <option value="Basic 7" selected>Basic 7 (JHS 1)</option>
-                                <option value="Basic 8">Basic 8 (JHS 2)</option>
-                                <option value="Basic 9">Basic 9 (JHS 3 - BECE)</option>
-                            </optgroup>
-                            <optgroup label="Senior High School (SHS - WASSCE Focus)">
-                                <option value="SHS 1">SHS Form 1</option>
-                                <option value="SHS 2">SHS Form 2</option>
-                                <option value="SHS 3">SHS Form 3</option>
-                            </optgroup>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Subject (NaCCA Standard)</label>
-                        <select id="engineSubjectSelect" class="w-full text-xs border p-2 rounded bg-white font-medium">
-                            <!-- Populated dynamically via updateEngineSubjects() -->
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Upload Termly Scheme (PDF/TXT)</label>
-                        <input type="file" id="engineSchemeFileInput" accept=".pdf,.txt" class="w-full text-xs text-slate-500 file:mr-1 file:py-1 file:px-2 file:rounded file:border-0 file:bg-indigo-50 file:text-indigo-700" onchange="engineHandleSchemeUpload(event)">
-                        <p id="engineUploadStatus" class="text-[10px] text-slate-500 mt-0.5">Upload scheme to auto-extract Strands/Sub-Strands.</p>
-                    </div>
-                    <div class="flex items-end">
-                        <button onclick="engineGenerateCustomScheme()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs py-2 px-3 rounded-xl shadow-sm transition flex items-center justify-center gap-1.5">
-                            <i class="fa fa-wand-magic-sparkles"></i> 1. Generate Weekly Scheme
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Scheme Table Preview with In-App Editing -->
-                <div class="space-y-3">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-sm font-bold text-indigo-950">📋 Generated Scheme of Learning (Aligned with NaCCA Strands & WAEC/BECE Standards)</h3>
-                        <button onclick="engineExportSchemeWord()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs px-3 py-1.5 rounded font-semibold transition">Download Scheme (.doc)</button>
-                    </div>
-                    <div class="overflow-x-auto border border-slate-200 rounded-xl max-h-[350px]">
-                        <table class="w-full text-left text-xs border-collapse" id="engineSchemeTable">
-                            <thead class="bg-slate-100 sticky top-0 border-b">
-                                <tr>
-                                    <th class="p-2.5 border-r font-bold w-12 text-center">Wk</th>
-                                    <th class="p-2.5 border-r font-bold w-24">Week Ending</th>
-                                    <th class="p-2.5 border-r font-bold w-32">NaCCA Strand</th>
-                                    <th class="p-2.5 border-r font-bold">Sub Strand & Content Standard</th>
-                                    <th class="p-2.5 border-r font-bold">Indicators & BECE Focus</th>
-                                    <th class="p-2.5 font-bold w-40">TLM Resources</th>
-                                </tr>
-                            </thead>
-                            <tbody id="engineSchemeTableBody">
-                                <tr><td colspan="6" class="p-8 text-center text-slate-400">Select class & subject, upload your termly scheme, and click "Generate Weekly Scheme".</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- 3-Phase Lesson Notes Engine Actions (Card UI with Explicit Generate Button) -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-slate-200">
-                    <div onclick="engineGenerateLessons()" class="cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white p-4 rounded-2xl transition shadow-md flex items-center space-x-3">
-                        <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center font-bold text-lg">
-                            <i class="fa fa-book-open"></i>
-                        </div>
-                        <div>
-                            <h4 class="text-xs font-black tracking-wide uppercase">2. Build Lesson Plans</h4>
-                            <p class="text-[11px] text-emerald-100">Click to Generate 3-Phase Notes</p>
-                        </div>
-                    </div>
-                    <div onclick="engineExportLessonsWord()" class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-2xl transition shadow-md flex items-center space-x-3">
-                        <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center font-bold text-lg">
-                            <i class="fa fa-file-word"></i>
-                        </div>
-                        <div>
-                            <h4 class="text-xs font-black tracking-wide uppercase">3. Download Lessons</h4>
-                            <p class="text-[11px] text-blue-100">Export Word Document (.doc)</p>
-                        </div>
-                    </div>
-                    <div onclick="engineSubmitToMainPortal()" class="cursor-pointer bg-indigo-900 hover:bg-indigo-950 text-white p-4 rounded-2xl transition shadow-md flex items-center space-x-3">
-                        <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center font-bold text-lg">
-                            <i class="fa fa-paper-plane"></i>
-                        </div>
-                        <div>
-                            <h4 class="text-xs font-black tracking-wide uppercase">4. Submit to Queue</h4>
-                            <p class="text-[11px] text-indigo-200">Send notes to vetting portal</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Generated Lessons Container Preview -->
-                <div id="engineLessonsContainer" class="space-y-4 max-h-[450px] overflow-y-auto pr-1">
-                    <p class="text-center text-slate-400 py-6 text-xs">Generated 3-phase lesson notes preview will appear here once you click "Build Lesson Plans".</p>
-                </div>
-            </div>
-
         </div>
 
         <!-- ==================== PORTAL 2: REVIEWER & INSPECTION DASHBOARD ==================== -->
@@ -807,43 +650,6 @@
     <!-- App Script Logic -->
     <script>
         // ==========================================
-        // GES / NACCA LEVEL-BASED SUBJECT MAPS
-        // ==========================================
-        const gesCurriculumMap = {
-            "KG1": ["Language and Literacy", "Numeracy", "Creative Arts", "Our World Our People", "Physical Education"],
-            "KG2": ["Language and Literacy", "Numeracy", "Creative Arts", "Our World Our People", "Physical Education"],
-            "Basic 1": ["English Language", "Mathematics", "Natural Science", "Our World Our People", "Ghanaian Language", "Religious and Moral Education (RME)", "Creative Arts", "Physical Education"],
-            "Basic 2": ["English Language", "Mathematics", "Natural Science", "Our World Our People", "Ghanaian Language", "Religious and Moral Education (RME)", "Creative Arts", "Physical Education"],
-            "Basic 3": ["English Language", "Mathematics", "Natural Science", "Our World Our People", "Ghanaian Language", "Religious and Moral Education (RME)", "Creative Arts", "Physical Education"],
-            "Basic 4": ["English Language", "Mathematics", "Natural Science", "Our World Our People", "Ghanaian Language", "Religious and Moral Education (RME)", "Creative Arts", "History of Ghana", "Physical Education"],
-            "Basic 5": ["English Language", "Mathematics", "Natural Science", "Our World Our People", "Ghanaian Language", "Religious and Moral Education (RME)", "Creative Arts", "History of Ghana", "Physical Education"],
-            "Basic 6": ["English Language", "Mathematics", "Natural Science", "Our World Our People", "Ghanaian Language", "Religious and Moral Education (RME)", "Creative Arts", "History of Ghana", "Physical Education"],
-            "Basic 7": ["English Language", "Mathematics", "Integrated Science", "Social Studies", "Computing / ICT", "Career Technology", "Creative Arts and Design", "Religious and Moral Education (RME)", "Ghanaian Language", "French", "Physical Education and Health", "History of Ghana"],
-            "Basic 8": ["English Language", "Mathematics", "Integrated Science", "Social Studies", "Computing / ICT", "Career Technology", "Creative Arts and Design", "Religious and Moral Education (RME)", "Ghanaian Language", "French", "Physical Education and Health", "History of Ghana"],
-            "Basic 9": ["English Language", "Mathematics", "Integrated Science", "Social Studies", "Computing / ICT", "Career Technology", "Creative Arts and Design", "Religious and Moral Education (RME)", "Ghanaian Language", "French", "Physical Education and Health", "History of Ghana"],
-            "SHS 1": ["English Language", "Core Mathematics", "Integrated Science", "Social Studies", "Elective Mathematics", "Physics", "Chemistry", "Biology", "Financial Accounting", "Costing", "Business Management", "Economics", "Geography", "History", "General Knowledge in Art", "Food and Nutrition", "Management in Living"],
-            "SHS 2": ["English Language", "Core Mathematics", "Integrated Science", "Social Studies", "Elective Mathematics", "Physics", "Chemistry", "Biology", "Financial Accounting", "Costing", "Business Management", "Economics", "Geography", "History", "General Knowledge in Art", "Food and Nutrition", "Management in Living"],
-            "SHS 3": ["English Language", "Core Mathematics", "Integrated Science", "Social Studies", "Elective Mathematics", "Physics", "Chemistry", "Biology", "Financial Accounting", "Costing", "Business Management", "Economics", "Geography", "History", "General Knowledge in Art", "Food and Nutrition", "Management in Living"]
-        };
-
-        function updateEngineSubjects() {
-            const classSelect = document.getElementById('engineClassSelect');
-            const subjectSelect = document.getElementById('engineSubjectSelect');
-            if (!classSelect || !subjectSelect) return;
-
-            const selectedClass = classSelect.value;
-            const subjects = gesCurriculumMap[selectedClass] || ["English Language", "Mathematics"];
-
-            subjectSelect.innerHTML = '';
-            subjects.forEach(subj => {
-                const opt = document.createElement('option');
-                opt.value = subj;
-                opt.textContent = subj;
-                subjectSelect.appendChild(opt);
-            });
-        }
-
-        // ==========================================
         // FIREBASE CONFIGURATION & INITIALIZATION
         // ==========================================
         const firebaseConfig = {
@@ -864,7 +670,6 @@
         function schoolApp() {
             return {
                 portalMode: 'teacher',
-                teacherSubTab: 'upload',
                 showOnboarding: false,
                 adminSubTab: 'queue',
                 showPinModal: false,
@@ -885,16 +690,21 @@
                 lessons: [],
                 
                 allAvailableSubjects: [
-                    'Career Technology',
-                    'Computing / ICT',
-                    'Mathematics',
-                    'Integrated Science',
-                    'Social Studies',
+                    'Our World Our People (OWOP)',
+                    'History of Ghana',
+                    'Creative Arts',
                     'English Language',
+                    'Mathematics',
+                    'Natural Science',
+                    'Ghanaian Language',
                     'Religious and Moral Education (RME)',
-                    'Creative Arts and Design',
+                    'Physical Education and Health',
                     'French',
-                    'Our World Our People (OWOP)'
+                    'Computing / ICT',
+                    'Social Studies',
+                    'Integrated Science',
+                    'Career Technology',
+                    'Creative Arts and Design'
                 ],
 
                 adminSearchQuery: '',
@@ -917,13 +727,8 @@
                     feedback: ''
                 },
 
-                // Engine state variables
-                engineScheme: null,
-                engineLessons: null,
-                parsedSchemeTopics: null,
-
                 init() {
-                    setTimeout(() => updateEngineSubjects(), 200);
+                    // Session requires manual login every refresh
                 },
 
                 getCurrentSystemWeekNumber() {
@@ -1311,301 +1116,6 @@
                     a.click();
                 }
             }
-        }
-
-        // --- ROBUST NaCCA SCHEME PARSER & WEEKLY ENGINE ---
-        async function engineHandleSchemeUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const statusEl = document.getElementById('engineUploadStatus');
-            statusEl.innerHTML = `<span class="text-indigo-600 font-bold"><i class="fa fa-spinner fa-spin mr-1"></i> Parsing "${file.name}"...</span>`;
-
-            if (file.name.endsWith('.pdf')) {
-                const fileReader = new FileReader();
-                fileReader.onload = async function() {
-                    try {
-                        const typedarray = new Uint8Array(this.result);
-                        const pdf = await pdfjsLib.getDocument(typedarray).promise;
-                        let fullText = '';
-                        for (let i = 1; i <= pdf.numPages; i++) {
-                            const page = await pdf.getPage(i);
-                            const textContent = await page.getTextContent();
-                            fullText += textContent.items.map(item => item.str).join(' ') + '\n';
-                        }
-                        engineParseSchemeText(fullText, file.name);
-                    } catch (e) {
-                        statusEl.innerHTML = `<span class="text-rose-600">Error reading PDF: ${e.message}</span>`;
-                    }
-                };
-                fileReader.readAsArrayBuffer(file);
-            } else {
-                const textReader = new FileReader();
-                textReader.onload = function(e) {
-                    engineParseSchemeText(e.target.result, file.name);
-                };
-                textReader.readAsText(file);
-            }
-        }
-
-        function engineParseSchemeText(rawText, fileName) {
-            const statusEl = document.getElementById('engineUploadStatus');
-            statusEl.innerHTML = `<span class="text-emerald-700 font-bold"><i class="fa fa-circle-check mr-1"></i> Extracted NaCCA Strands from "${fileName}"!</span>`;
-
-            const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 5);
-            const extracted = [];
-            let currentStrand = "NaCCA Core Strand";
-
-            for (let line of lines) {
-                if (/STRAND|UNIT|CHAPTER|MODULE|THEME/i.test(line)) {
-                    currentStrand = line;
-                } else if (line.length > 6) {
-                    extracted.push({
-                        strand: currentStrand,
-                        sub_strand: line.slice(0, 70),
-                        content_standard: "Demonstrate NaCCA standard competency in " + line.slice(0, 30),
-                        indicators: "Execute practical indicators & BECE past question drills",
-                        resources: "Standard GES textbooks, calculator, interactive tools"
-                    });
-                }
-            }
-
-            const app = Alpine.$data(document.body);
-            app.parsedSchemeTopics = extracted.length > 0 ? extracted : null;
-        }
-
-        function engineGenerateCustomScheme() {
-            const app = Alpine.$data(document.body);
-            const subject = document.getElementById('engineSubjectSelect').value;
-            const grade = document.getElementById('engineClassSelect').value;
-            const totalWeeks = 15;
-
-            const fridays = ['11-09-2026', '18-09-2026', '25-09-2026', '02-10-2026', '09-10-2026', '16-10-2026', '23-10-2026', '30-10-2026', '06-11-2026', '13-11-2026', '20-11-2026', '27-11-2026', '04-12-2026', '11-12-2026', '18-12-2026'];
-            
-            // Strictly fetch specific class/subject topics from uploaded file or generate based on selected subject ONLY
-            let topics = app.parsedSchemeTopics;
-            if (!topics || topics.length === 0) {
-                // Generate intelligent subject-specific curriculum topics without mixing subjects
-                if (subject.includes("Mathematics")) {
-                    topics = [
-                        { strand: "Strand 1: Number", sub_strand: "Number Operations & Real Numbers", content_standard: "Demonstrate understanding of number systems", indicators: "Perform operations accurately (BECE Focus)", resources: "Base ten blocks, charts" },
-                        { strand: "Strand 2: Algebra", sub_strand: "Algebraic Expressions & Equations", content_standard: "Translate word problems into algebraic expressions", indicators: "Solve linear equations", resources: "Graph sheets, algebra tiles" },
-                        { strand: "Strand 3: Geometry", sub_strand: "Shapes, Angles & Measurement", content_standard: "Demonstrate understanding of geometric properties", indicators: "Calculate angles and perimeters", resources: "Protractor, ruler, compass" },
-                        { strand: "Strand 4: Statistics", sub_strand: "Data Collection and Probability", content_standard: "Collect, organize, and interpret data", indicators: "Represent data on bar charts and pie charts", resources: "Graph boards, markers" }
-                    ];
-                } else if (subject.includes("Science")) {
-                    topics = [
-                        { strand: "Strand 1: Diversity of Matter", sub_strand: "Living and Non-Living Things", content_standard: "Classify matter into various categories", indicators: "Identify properties of materials", resources: "Beakers, specimens, magnets" },
-                        { strand: "Strand 2: Cycles", sub_strand: "Earth Science and Life Cycles", content_standard: "Understand natural cycles in the environment", indicators: "Describe water cycle and plant reproduction", resources: "Charts, potted plants" },
-                        { strand: "Strand 3: Systems", sub_strand: "The Human Body and Ecosystems", content_standard: "Analyze biological and physical systems", indicators: "Trace digestive and respiratory systems", resources: "Anatomical charts" }
-                    ];
-                } else {
-                    topics = [
-                        { strand: `Strand 1: Fundamentals`, sub_strand: `Introduction to ${subject}`, content_standard: `Demonstrate mastery of core ${subject} concepts`, indicators: `Execute practical indicators for ${subject}`, resources: `GES approved textbooks for ${subject}` },
-                        { strand: `Strand 2: Application`, sub_strand: `Advanced ${subject} Principles`, content_standard: `Apply ${subject} principles to practical scenarios`, indicators: `Solve WAEC/BECE standard problems`, resources: `Reference materials, tools` }
-                    ];
-                }
-            }
-
-            const weeks = [];
-            const instructionalWeeks = totalWeeks - 3;
-
-            for (let i = 1; i <= totalWeeks; i++) {
-                const we = fridays[i - 1] || "TBD";
-                if (i <= instructionalWeeks) {
-                    const item = topics[(i - 1) % topics.length];
-                    weeks.push({
-                        week_number: i,
-                        week_ending: we,
-                        strand: item.strand,
-                        sub_strand: item.sub_strand,
-                        content_standard: item.content_standard,
-                        indicators: item.indicators + " (BECE Focus)",
-                        resources: item.resources
-                    });
-                } else if (i === totalWeeks - 2) {
-                    weeks.push({ week_number: i, week_ending: we, strand: "REVISION", sub_strand: `Comprehensive ${subject} Past Questions Review`, content_standard: "Comprehensive mastery of all NaCCA strands", indicators: "Drill on WAEC past questions", resources: "BECE/WASSCE past questions compendium" });
-                } else if (i === totalWeeks - 1) {
-                    weeks.push({ week_number: i, week_ending: we, strand: "ASSESSMENT", sub_strand: "Terminal Mock Examination", content_standard: "Standardized testing on national standards", indicators: "Mock examination papers", resources: "Examination scripts, marking schemes" });
-                } else {
-                    weeks.push({ week_number: i, week_ending: we, strand: "SBA & VACATION", sub_strand: "SBA Collation & Terminal Reporting", content_standard: "Continuous assessment recording", indicators: "SBA computation", resources: "SBA registers, report sheets" });
-                }
-            }
-
-            app.engineScheme = {
-                teacher_name: app.activeTeacher ? app.activeTeacher.name : 'Teacher',
-                school_name: app.activeSchoolName,
-                subject: subject,
-                grade_level: grade,
-                weeks: weeks
-            };
-
-            engineRenderSchemeTable();
-            alert(`Weekly scheme for ${subject} (${grade}) generated successfully with NaCCA strands & BECE focus!`);
-        }
-
-        function engineRenderSchemeTable() {
-            const app = Alpine.$data(document.body);
-            if (!app.engineScheme) return;
-
-            const tbody = document.getElementById('engineSchemeTableBody');
-            tbody.innerHTML = '';
-            app.engineScheme.weeks.forEach((w, idx) => {
-                tbody.innerHTML += `
-                    <tr class="border-b hover:bg-slate-50">
-                        <td class="p-2.5 border-r text-center font-bold">${w.week_number}</td>
-                        <td class="p-2.5 border-r font-mono">${w.week_ending}</td>
-                        <td class="p-2.5 border-r"><input type="text" value="${w.strand}" oninput="engineUpdateSchemeCell(${idx}, 'strand', this.value)" class="w-full bg-transparent border-b border-dashed border-slate-300 focus:border-indigo-600 outline-none"></td>
-                        <td class="p-2.5 border-r"><input type="text" value="${w.sub_strand}" oninput="engineUpdateSchemeCell(${idx}, 'sub_strand', this.value)" class="w-full bg-transparent border-b border-dashed border-slate-300 focus:border-indigo-600 outline-none font-semibold"></td>
-                        <td class="p-2.5 border-r"><input type="text" value="${w.indicators}" oninput="engineUpdateSchemeCell(${idx}, 'indicators', this.value)" class="w-full bg-transparent border-b border-dashed border-slate-300 focus:border-indigo-600 outline-none"></td>
-                        <td class="p-2.5"><input type="text" value="${w.resources}" oninput="engineUpdateSchemeCell(${idx}, 'resources', this.value)" class="w-full bg-transparent border-b border-dashed border-slate-300 focus:border-indigo-600 outline-none"></td>
-                    </tr>
-                `;
-            });
-        }
-
-        function engineUpdateSchemeCell(idx, field, val) {
-            const app = Alpine.$data(document.body);
-            if (app.engineScheme && app.engineScheme.weeks[idx]) {
-                app.engineScheme.weeks[idx][field] = val;
-            }
-        }
-
-        function engineExportSchemeWord() {
-            const app = Alpine.$data(document.body);
-            if (!app.engineScheme) { alert('Please generate scheme first!'); return; }
-            let rows = '';
-            app.engineScheme.weeks.forEach(w => {
-                rows += `<tr><td>${w.week_number}</td><td>${w.week_ending}</td><td>${w.strand}</td><td><b>${w.sub_strand}</b><br>${w.content_standard}</td><td>${w.indicators}</td><td>${w.resources}</td></tr>`;
-            });
-            const html = `<html xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"></head><body style="font-family:Arial;font-size:10pt;">
-                <h3 style="text-align:center;color:#1A73E8;">${app.engineScheme.school_name}</h3>
-                <h4 style="text-align:center;">SCHEME OF LEARNING — ${app.engineScheme.subject} (${app.engineScheme.grade_level})</h4>
-                <p style="text-align:center;">Teacher: ${app.engineScheme.teacher_name} | NaCCA & BECE Standard Aligned</p>
-                <table border="1" style="width:100%;border-collapse:collapse;font-size:9pt;">
-                    <tr style="background:#F1F3F4;"><th>Wk</th><th>Week Ending</th><th>NaCCA Strand</th><th>Sub Strand & Standards</th><th>Indicators & BECE Focus</th><th>TLM Resources</th></tr>
-                    ${rows}
-                </table>
-            </body></html>`;
-            const blob = new Blob(['\ufeff' + html], { type: 'application/msword' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url; a.download = `Scheme_${app.engineScheme.subject}_${app.engineScheme.grade_level}.doc`; a.click();
-        }
-
-        function engineGenerateLessons() {
-            const app = Alpine.$data(document.body);
-            if (!app.engineScheme) { alert('Please generate weekly scheme first!'); return; }
-            
-            const teacherName = app.activeTeacher ? app.activeTeacher.name : 'Teacher';
-            const schoolName = app.activeSchoolName;
-            const subject = app.engineScheme.subject;
-            const grade = app.engineScheme.grade_level;
-            const weeksNotes = [];
-
-            app.engineScheme.weeks.forEach(w => {
-                weeksNotes.push({
-                    week_number: w.week_number,
-                    week_ending: w.week_ending,
-                    strand: w.strand,
-                    sub_strand: w.sub_strand,
-                    content_standard: w.content_standard,
-                    teacher_name: teacherName,
-                    school_name: schoolName,
-                    subject: subject,
-                    grade_level: grade,
-                    lessons: [
-                        {
-                            lesson_number: 1,
-                            day: `Monday • Week ${w.week_number}`,
-                            duration: '60 MINS',
-                            indicator: w.indicators,
-                            performance_indicator: `Learners can solve standard problems and answer BECE type questions on ${w.sub_strand}.`,
-                            resources: w.resources,
-                            phase1_starter: `Review prior knowledge. Pose a WAEC/BECE past question hook regarding ${w.sub_strand}.`,
-                            phase2_new_learning: `Step-by-step NaCCA standard instruction, worked examples, and guided practice on ${w.sub_strand} using ${w.resources}.`,
-                            phase3_reflection: `Learners summarize core concepts and solve a quick exit ticket problem.`
-                        }
-                    ]
-                });
-            });
-
-            app.engineLessons = { teacher_name: teacherName, school_name: schoolName, subject: subject, grade_level: grade, weeks: weeksNotes };
-            
-            const container = document.getElementById('engineLessonsContainer');
-            container.innerHTML = '';
-            weeksNotes.forEach(w => {
-                container.innerHTML += `
-                    <div class="p-4 border rounded-xl bg-white shadow-2xs space-y-2 text-xs">
-                        <div class="flex justify-between items-center border-b pb-2">
-                            <span class="font-bold text-indigo-950 text-sm">Week ${w.week_number} (${w.week_ending}) — ${w.sub_strand}</span>
-                            <span class="bg-indigo-100 text-indigo-800 font-bold px-2.5 py-0.5 rounded text-[11px]">Teacher: ${w.teacher_name} | ${w.subject} (${w.grade_level})</span>
-                        </div>
-                        <p class="text-slate-600"><b>Starter:</b> ${w.lessons[0].phase1_starter}</p>
-                        <p class="text-slate-600"><b>New Learning:</b> ${w.lessons[0].phase2_new_learning}</p>
-                        <p class="text-slate-600"><b>Reflection:</b> ${w.lessons[0].phase3_reflection}</p>
-                    </div>`;
-            });
-            alert('3-Phase Lesson Notes generated successfully with complete Teacher, Class, Subject, Week Number & Week Ending headers!');
-        }
-
-        function engineExportLessonsWord() {
-            const app = Alpine.$data(document.body);
-            if (!app.engineLessons) { alert('Please generate lessons first!'); return; }
-            let content = '';
-            app.engineLessons.weeks.forEach(w => {
-                content += `
-                    <h2 style="color:#174EA6;border-bottom:1px solid #1A73E8;">WEEK ${w.week_number} • WEEK ENDING: ${w.week_ending}</h2>
-                    <p><b>Teacher:</b> ${w.teacher_name} | <b>School:</b> ${w.school_name} | <b>Subject:</b> ${w.subject} (${w.grade_level})</p>
-                    <p><b>NaCCA Strand:</b> ${w.strand} | <b>Sub-Strand:</b> ${w.sub_strand}</p>
-                    <table border="1" style="width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:15px;">
-                        <tr style="background:#E8F0FE;"><th>Phase / Duration</th><th>Learners & Teacher Activities (BECE Focused)</th><th>Resources</th></tr>
-                        <tr><td style="font-weight:bold;">PHASE 1: STARTER (10m)</td><td>${w.lessons[0].phase1_starter}</td><td rowspan="3">${w.lessons[0].resources}</td></tr>
-                        <tr><td style="font-weight:bold;">PHASE 2: NEW LEARNING (40m)</td><td>${w.lessons[0].phase2_new_learning}</td></tr>
-                        <tr><td style="font-weight:bold;">PHASE 3: REFLECTION (10m)</td><td>${w.lessons[0].phase3_reflection}</td></tr>
-                    </table>`;
-            });
-            const html = `<html xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"></head><body style="font-family:Arial;font-size:10pt;">
-                <h3 style="text-align:center;color:#1A73E8;">${app.engineLessons.school_name}</h3>
-                <h4 style="text-align:center;">LESSON NOTES — ${app.engineLessons.subject} (${app.engineLessons.grade_level})</h4>
-                <p style="text-align:center;">Teacher: ${app.engineLessons.teacher_name} | Term: Term 1 | NaCCA / WAEC Standard</p>
-                <hr>${content}
-            </body></html>`;
-            const blob = new Blob(['\ufeff' + html], { type: 'application/msword' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url; a.download = `Lesson_Notes_${app.engineLessons.subject}_${app.engineLessons.grade_level}.doc`; a.click();
-        }
-
-        function engineSubmitToMainPortal() {
-            const app = Alpine.$data(document.body);
-            if (!app.engineLessons || !app.activeTeacher) { alert('Please select your teacher profile and generate lessons first!'); return; }
-            
-            const dummyData = 'data:text/plain;charset=utf-8,' + encodeURIComponent('NaCCA Dynamic Lesson Engine Export for ' + app.engineLessons.subject);
-            
-            const lessonId = Date.now().toString();
-            const lessonData = {
-                id: lessonId,
-                subject: app.engineLessons.subject,
-                classLevel: app.engineLessons.grade_level,
-                term: 'Term 1',
-                week: 'Week 1',
-                year: '2026/2027',
-                fileName: `${app.engineLessons.subject}_Lesson_Notes.doc`,
-                fileData: dummyData,
-                status: 'Submitted',
-                feedback: 'Generated via NaCCA & BECE Engine',
-                rawDate: Date.now(),
-                schoolId: app.authenticatedSchoolId,
-                teacherId: app.activeTeacher.id,
-                teacherName: app.activeTeacher.name,
-                teacherContact: app.activeTeacher.contact,
-                timestamp: new Date().toLocaleDateString(),
-                isArchived: false
-            };
-
-            db.collection('lessons').doc(lessonId).set(lessonData).then(() => {
-                alert('Success! Dynamic lesson notes submitted directly to school vetting queue.');
-                app.teacherSubTab = 'upload';
-            }).catch(err => alert('Error submitting: ' + err.message));
         }
     </script>
 </body>
