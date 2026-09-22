@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eduvet School Hub</title>
+    <title>Eduvet School Hub </title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -75,7 +75,7 @@
         }
     </style>
 </head>
-<body class="bg-blue-900/10 text-slate-800 font-sans min-h-screen flex flex-col overflow-x-hidden m-0 p-0" x-data="schoolApp()">
+<body class="bg-blue-900/10 text-slate-800 font-sans min-h-screen flex flex-col overflow-x-hidden" x-data="schoolApp()">
 
     <!-- ==================== SCHOOL GATEWAY / LOGIN & REGISTRATION OVERLAY ==================== -->
     <div x-show="!authenticatedSchoolId" class="fixed inset-0 bg-blue-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
@@ -110,7 +110,7 @@
             <!-- School Login Form -->
             <form x-show="gatewayTab === 'login'" @submit.prevent="loginSchool()" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-medium text-slate-700 mb-1">Enter School ID (e.g. APA-983)</label>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Enter School ID (e.g. AHK-983)</label>
                     <input type="text" x-model="loginInputId" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm uppercase font-mono tracking-wide" placeholder="ATAK-983">
                 </div>
                 <button type="submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-medium py-2.5 rounded-lg text-sm transition shadow-sm">Access School Portal</button>
@@ -120,11 +120,11 @@
             <form x-show="gatewayTab === 'register'" @submit.prevent="registerSchool()" class="space-y-3">
                 <div>
                     <label class="block text-xs font-medium text-slate-700 mb-1">Official School Name</label>
-                    <input type="text" x-model="regForm.name" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="School Name">
+                    <input type="text" x-model="regForm.name" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="Atakora D/A Junior High">
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-slate-700 mb-1">District / Region Location</label>
-                    <input type="text" x-model="regForm.location" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="Kwahu  North">
+                    <input type="text" x-model="regForm.location" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="Kwahu Afram Plains North">
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-slate-700 mb-1">Headteacher / Administrator Name</label>
@@ -134,7 +134,7 @@
                     <label class="block text-xs font-medium text-slate-700 mb-1">Headteacher Contact</label>
                     <input type="text" x-model="regForm.headContact" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm" placeholder="054xxxxxxx">
                 </div>
-                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg text-sm transition shadow-sm mt-2">Generate School ID to continue!</button>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg text-sm transition shadow-sm mt-2">Generate School ID & Register</button>
             </form>
         </div>
     </div>
@@ -165,7 +165,7 @@
     <div x-show="showPaymentModal" class="fixed inset-0 bg-blue-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print" style="display: none;">
         <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 space-y-5 border border-slate-200 text-center" @click.away="showPaymentModal = false">
             <div class="w-12 h-12 bg-blue-900 text-cyan-400 rounded-full flex items-center justify-center text-xl font-black mx-auto mb-2">P</div>
-            <h3 class="text-base font-black text-slate-900">Payment Checkout</h3>
+            <h3 class="text-base font-black text-slate-900">Paystack Storefront Checkout</h3>
             <p class="text-xs text-slate-500" x-text="paymentType === 'single' ? 'Single Lesson Plan (GHS 5.00)' : 'All Term Weeks Package (GHS 45.00)'"></p>
             
             <div class="bg-slate-50 p-3 rounded-xl border text-xs space-y-1 text-left font-medium">
@@ -203,7 +203,7 @@
         </div>
     </div>
 
-    <!-- Top Navbar (Mobile View Optimized Header) -->
+    <!-- Top Navbar (Mobile View Optimized Header with Teacher Selector added next to Online indicator) -->
     <header class="bg-blue-900 text-white shadow-md no-print lg:hidden">
         <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center gap-3">
             <div class="flex items-center space-x-2">
@@ -215,23 +215,32 @@
                 <span class="text-sm font-black tracking-tight">edu<span class="text-teal-400">vet</span></span>
             </div>
             <div class="flex items-center gap-2">
+                <!-- Teacher Profile Dropdown added right next to online indicator on mobile -->
+                <div x-show="portalMode === 'teacher'">
+                    <select x-model="selectedTeacherId" @change="verifyTeacherSession($event)" class="bg-blue-950 text-white border border-blue-700 rounded px-2 py-1 text-[11px] focus:outline-none">
+                        <option value="">-- Select Profile --</option>
+                        <template x-for="t in sortedTeachers" :key="t.id">
+                            <option :value="t.id" x-text="t.name"></option>
+                        </template>
+                    </select>
+                </div>
                 <span class="bg-emerald-600 text-white px-2 py-0.5 rounded text-[9px]" x-text="isOnline ? '🟢 Online' : '🟠 Offline'"></span>
-                <button @click="logoutSchool()" class="bg-rose-600 px-2 py-1 rounded text-xs">Logout</button>
+                <button @click="logoutSchool()" class="bg-rose-600 px-2 py-1 rounded text-xs"></button>
             </div>
         </div>
-        <!-- Mobile Quick Navigation Bar for professional layout -->
+        <!-- Mobile Quick Navigation Bar -->
         <div class="bg-blue-950 px-3 py-2 flex overflow-x-auto gap-2 text-xs no-scrollbar border-t border-blue-800">
             <button @click="portalMode = 'teacher'; teacherSubTab = 'upload'" :class="portalMode === 'teacher' && teacherSubTab === 'upload' ? 'bg-blue-800 font-bold' : 'text-blue-200'" class="px-3 py-1.5 rounded-lg whitespace-nowrap transition">Upload Lesson</button>
-            <button @click="portalMode = 'teacher'; checkEngineTab()" :class="portalMode === 'teacher' && teacherSubTab === 'engine' ? 'bg-blue-800 font-bold' : 'text-blue-200'" class="px-3 py-1.5 rounded-lg whitespace-nowrap transition">Generate Lesson</button>
+            <button @click="portalMode = 'teacher'; checkEngineTab()" :class="portalMode === 'teacher' && teacherSubTab === 'engine' ? 'bg-blue-800 font-bold' : 'text-blue-200'" class="px-3 py-1.5 rounded-lg whitespace-nowrap transition">Generate Lesson Plan</button>
             <button @click="attemptReviewerAccess()" :class="portalMode === 'reviewer' ? 'bg-rose-700 font-bold' : 'text-rose-200'" class="px-3 py-1.5 rounded-lg whitespace-nowrap transition">Reviewer</button>
             <button x-show="portalMode === 'reviewer'" @click="portalMode = 'settings'" :class="portalMode === 'settings' ? 'bg-blue-800 font-bold' : 'text-blue-200'" class="px-3 py-1.5 rounded-lg whitespace-nowrap transition">Settings</button>
         </div>
     </header>
 
-    <!-- Main App Layout with Professional Desktop Left Sidebar & Mobile Flexibility -->
+    <!-- Main App Layout with Professional Desktop Left Sidebar -->
     <div class="flex-grow flex flex-col lg:flex-row w-full max-w-[1700px] mx-auto bg-blue-950/5" x-show="authenticatedSchoolId">
         
-        <!-- Desktop Left Sidebar Navigation (Hidden on small screens, stacked cleanly) -->
+        <!-- Desktop Left Sidebar Navigation (Blue Pane) -->
         <aside class="hidden lg:flex w-72 bg-blue-900 text-blue-50 flex-col justify-between p-5 space-y-6 shrink-0 no-print shadow-2xl border-r border-blue-800">
             
             <!-- Branding & School Info -->
@@ -263,7 +272,7 @@
 
                 <!-- Teacher Selector in Sidebar -->
                 <div x-show="portalMode === 'teacher'" class="space-y-1.5">
-                    <label class="block text-[11px] font-bold text-blue-200">Active Teacher Profile:</label>
+                    <label class="block text-[11px] font-bold text-blue-200">Active  Profile:</label>
                     <select x-model="selectedTeacherId" @change="verifyTeacherSession($event)" class="w-full bg-blue-950 text-white border border-blue-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-teal-400 shadow-sm">
                         <option value="">-- Select Your Name --</option>
                         <template x-for="t in sortedTeachers" :key="t.id">
@@ -272,7 +281,7 @@
                     </select>
                 </div>
 
-                <!-- Navigation Links / Menus -->
+                <!-- Navigation Links / Menus (Vertically Stacked) -->
                 <nav class="space-y-2 pt-2">
                     <div class="text-[10px] font-bold uppercase tracking-wider text-blue-300 px-3 mb-1">Navigation Menu</div>
                     
@@ -284,11 +293,11 @@
                     <!-- NaCCA Lesson Engine Card Button -->
                     <button @click="portalMode = 'teacher'; checkEngineTab()" :class="portalMode === 'teacher' && teacherSubTab === 'engine' ? 'bg-blue-800 text-white shadow-md font-bold' : 'hover:bg-blue-800/60 text-blue-100'" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs transition">
                         <i class="fa fa-wand-magic-sparkles w-4 text-center text-amber-300"></i>
-                        <span class="flex-1 text-left">NaCCA Lesson Engine</span>
+                        <span class="flex-1 text-left">Generate Lesson</span>
                         <span x-show="!isEngineUnlocked" class="text-[9px] bg-amber-500/30 text-amber-200 px-1.5 py-0.5 rounded font-mono">🔒</span>
                     </button>
 
-                    <!-- Reviewer Card Button -->
+                    <!-- Reviewer Card Button (Red color with white text, protected with PIN verification) -->
                     <button @click="attemptReviewerAccess()" :class="portalMode === 'reviewer' ? 'bg-rose-700 text-white shadow-lg font-bold ring-2 ring-white/30' : 'bg-rose-600 hover:bg-rose-700 text-white shadow-md font-bold'" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs transition">
                         <i class="fa fa-shield-halved w-4 text-center text-white"></i>
                         <span class="flex-1 text-left">Reviewer & Inspection</span>
@@ -316,78 +325,84 @@
         </aside>
 
         <!-- Main Content Area -->
-        <main class="flex-grow p-3 sm:p-6 lg:p-8 space-y-4 max-w-6xl w-full relative">
+        <main class="flex-grow p-4 sm:p-6 lg:p-8 space-y-6 max-w-6xl w-full relative">
 
             <!-- Watermark for Print / Report Generation -->
             
 
-            <!-- ==================== DESKTOP HEADER (NO TOP LOGO CREST, WITH SVG LOGO + TITLE) ==================== -->
+            <!-- ==================== CLEAN HEADER & ANNOUNCEMENT CARD ==================== -->
             <div class="space-y-4 no-print">
-                <div class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gradient-to-r from-blue-900 to-indigo-900 text-white">
-                    <div class="flex items-center space-x-3 sm:space-x-4">
-                        <div class="w-12 h-12 sm:w-14 sm:h-14 bg-white rounded-2xl flex items-center justify-center p-2 shadow-md shrink-0">
-                            <svg class="w-full h-full" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M10 25C10 25 25 35 45 28V75C25 82 10 70 10 70V25Z" fill="#2563EB"/>
-                                <path d="M90 25C90 25 75 35 55 28V75C75 82 90 70 90 70V25Z" fill="#0D9488"/>
-                                <path d="M28 50L44 65L74 32" stroke="#F97316" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
+                <!-- Big Header and Logo -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gradient-to-r from-blue-900 to-indigo-900 text-white">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center p-2.5 shadow-md shrink-0 overflow-hidden">
+                            <template x-if="schoolLogoData">
+                                <img :src="schoolLogoData" class="w-full h-full object-cover">
+                            </template>
+                            <template x-if="!schoolLogoData">
+                                <svg class="w-full h-full" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M10 25C10 25 25 35 45 28V75C25 82 10 70 10 70V25Z" fill="#2563EB"/>
+                                    <path d="M90 25C90 25 75 35 55 28V75C75 82 90 70 90 70V25Z" fill="#0D9488"/>
+                                    <path d="M28 50L44 65L74 32" stroke="#F97316" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </template>
                         </div>
                         <div>
-                            <h1 class="text-xl sm:text-3xl font-black tracking-tight leading-tight text-white">
-                                edu<span class="text-teal-400">vet</span> <span class="font-light text-indigo-200 text-base sm:text-xl block sm:inline" x-text="activeSchoolName"></span>
+                            <h1 class="text-2xl sm:text-3xl font-black tracking-tight leading-none text-white">
+                                edu<span class="text-teal-400">vet</span> <span class="font-light text-indigo-200 text-lg sm:text-xl" x-text="activeSchoolName"></span>
                             </h1>
-                            <p class="text-[11px] sm:text-xs text-indigo-200 mt-0.5 font-medium">Institutional Lesson Plan & Inspection Management Portal</p>
+                            <p class="text-xs text-indigo-200 mt-1 font-medium">Institutional Lesson Plan & Inspection Management Portal</p>
                         </div>
                     </div>
                     
-                    <!-- Live Countdown Timer -->
-                    <div class="bg-white/10 backdrop-blur-md px-3.5 py-2 rounded-xl border border-white/20 text-left md:text-right text-xs w-full md:w-auto">
-                        <div class="text-[9px] sm:text-[10px] text-amber-300 uppercase tracking-wider font-bold">⏰ Deadline Countdown (Wed)</div>
-                        <div class="font-mono font-bold text-white text-xs sm:text-sm" x-text="countdownTimerString"></div>
+                    <!-- Live Countdown Timer to Wednesday Submission Deadline -->
+                    <div class="bg-white/10 backdrop-blur-md px-4 py-2.5 rounded-xl border border-white/20 text-right text-xs">
+                        <div class="text-[10px] text-amber-300 uppercase tracking-wider font-bold">Deadline Countdown (Wed)</div>
+                        <div class="font-mono font-bold text-white text-sm" x-text="countdownTimerString"></div>
                     </div>
                 </div>
 
                 <!-- Announcement Notice Board Card -->
                 <template x-if="schoolNotification">
-                    <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-l-4 border-l-blue-900">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-900 flex items-center justify-center text-lg shrink-0 font-bold">
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-l-4 border-l-blue-900">
+                        <div class="flex items-center space-x-3.5">
+                            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-900 flex items-center justify-center text-xl shrink-0 font-bold">
                                 📢
                             </div>
                             <div>
-                                <h3 class="text-xs sm:text-sm font-bold text-blue-950">School Announcement & Notice Board</h3>
+                                <h3 class="text-sm font-bold text-blue-950">School Announcement & Notice Board</h3>
                                 <p class="text-xs text-slate-600 font-medium mt-0.5" x-text="schoolNotification"></p>
                             </div>
                         </div>
-                        <button x-show="portalMode === 'reviewer'" @click="promptUpdateNotification()" class="text-xs bg-blue-900 hover:bg-blue-800 text-white px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl font-medium transition shrink-0 shadow-sm">Edit Notice</button>
+                        <button x-show="portalMode === 'reviewer'" @click="promptUpdateNotification()" class="text-xs bg-blue-900 hover:bg-blue-800 text-white px-3.5 py-2 rounded-xl font-medium transition shrink-0 shadow-sm">Edit Notice</button>
                     </div>
                 </template>
             </div>
 
             <!-- ==================== PORTAL 1: TEACHER WORKSPACE ==================== -->
-            <div class="space-y-4 sm:space-y-6" x-show="portalMode === 'teacher'">
+            <div class="space-y-6" x-show="portalMode === 'teacher'">
                 
                 <!-- Personalized Teacher Lagging Alert Banner -->
                 <template x-if="activeTeacher && isTeacherLagging(activeTeacher.id)">
-                    <div class="bg-rose-50 border-l-4 border-rose-500 p-3 sm:p-4 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 no-print">
+                    <div class="bg-rose-50 border-l-4 border-rose-500 p-4 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 no-print">
                         <div class="flex items-center space-x-3">
-                            <span class="text-xl sm:text-2xl">🚨</span>
+                            <span class="text-2xl">🚨</span>
                             <div>
-                                <h3 class="text-xs sm:text-sm font-bold text-rose-900">Compliance Warning: Missing Weekly Lesson Plan</h3>
-                                <p class="text-[11px] sm:text-xs text-rose-700">Staff ID: <span class="font-mono font-bold" x-text="activeTeacher.id"></span> | Contact: <span x-text="activeTeacher.contact"></span>. Please submit your required lesson plan immediately for <span x-text="activeSchoolName"></span>.</p>
+                                <h3 class="text-sm font-bold text-rose-900">Compliance Warning: Missing Weekly Lesson Plan</h3>
+                                <p class="text-xs text-rose-700">Staff ID: <span class="font-mono font-bold" x-text="activeTeacher.id"></span> | Contact: <span x-text="activeTeacher.contact"></span>. Please submit your required lesson plan immediately for <span x-text="activeSchoolName"></span>.</p>
                             </div>
                         </div>
-                        <span class="bg-rose-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0">Action Required</span>
+                        <span class="bg-rose-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">Action Required</span>
                     </div>
                 </template>
 
                 <!-- SUB-TAB 1: ORIGINAL FILE UPLOAD & HISTORY WORKSPACE -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6" x-show="teacherSubTab === 'upload'">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8" x-show="teacherSubTab === 'upload'">
                     <!-- Left Column: Metrics & Upload Form -->
-                    <div class="space-y-4 sm:space-y-6 lg:col-span-1">
+                    <div class="space-y-6 lg:col-span-1">
                         <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
-                            <h2 class="text-sm sm:text-base font-bold text-blue-950 mb-3" x-text="activeSchoolName + ' - Metrics'"></h2>
-                            <div class="space-y-2 text-xs">
+                            <h2 class="text-base font-bold text-blue-950 mb-3" x-text="activeSchoolName + ' - Metrics'"></h2>
+                            <div class="space-y-2 text-sm">
                                 <div class="flex justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-100">
                                     <span class="text-slate-600">Total Submissions:</span>
                                     <span class="font-bold text-blue-900" x-text="teacherFilteredLessons.length"></span>
@@ -404,13 +419,13 @@
                         </div>
 
                         <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
-                            <h2 class="text-sm sm:text-base font-semibold mb-1 text-blue-950" x-text="editingId ? 'Update Lesson Plan' : 'Submit Prepared Plan'"></h2>
+                            <h2 class="text-base sm:text-lg font-semibold mb-1 text-blue-950" x-text="editingId ? 'Update Lesson Plan' : 'Submit Prepared Plan'"></h2>
                             <p class="text-xs text-slate-500 mb-4" x-text="'Staff ID: ' + (activeTeacher ? activeTeacher.id : '')"></p>
                             
-                            <form @submit.prevent="submitLessonFile" class="space-y-3.5">
+                            <form @submit.prevent="submitLessonFile" class="space-y-4">
                                 <div>
                                     <label class="block text-xs font-medium text-slate-700 mb-1">Subject</label>
-                                    <select x-model="form.subject" required class="w-full rounded-xl border-slate-300 border px-3 py-2 text-xs sm:text-sm bg-white">
+                                    <select x-model="form.subject" required class="w-full rounded-xl border-slate-300 border px-3.5 py-2.5 text-sm bg-white">
                                         <option value="">Select subject...</option>
                                         <template x-for="subj in allAvailableSubjects" :key="subj">
                                             <option :value="subj" x-text="subj"></option>
@@ -420,13 +435,13 @@
 
                                 <div>
                                     <label class="block text-xs font-medium text-slate-700 mb-1">Class Level</label>
-                                    <input type="text" x-model="form.classLevel" required class="w-full rounded-xl border-slate-300 border px-3 py-2 text-xs sm:text-sm" placeholder="e.g. Basic 4 / JHS 2">
+                                    <input type="text" x-model="form.classLevel" required class="w-full rounded-xl border-slate-300 border px-3.5 py-2.5 text-sm" placeholder="e.g. Basic 4 / JHS 2">
                                 </div>
 
                                 <div class="grid grid-cols-3 gap-2">
                                     <div>
                                         <label class="block text-xs font-medium text-slate-700 mb-1">Term</label>
-                                        <select x-model="form.term" required class="w-full rounded-xl border-slate-300 border px-1.5 py-2 text-xs bg-white">
+                                        <select x-model="form.term" required class="w-full rounded-xl border-slate-300 border px-2 py-2.5 text-xs bg-white">
                                             <option value="">Term...</option>
                                             <option value="Term 1">Term 1</option>
                                             <option value="Term 2">Term 2</option>
@@ -435,7 +450,7 @@
                                     </div>
                                     <div>
                                         <label class="block text-xs font-medium text-slate-700 mb-1">Week</label>
-                                        <select x-model="form.week" required class="w-full rounded-xl border-slate-300 border px-1.5 py-2 text-xs bg-white">
+                                        <select x-model="form.week" required class="w-full rounded-xl border-slate-300 border px-2 py-2.5 text-xs bg-white">
                                             <option value="">Week...</option>
                                             <template x-for="w in 18" :key="w">
                                                 <option :value="'Week ' + w" x-text="'Wk ' + w"></option>
@@ -444,7 +459,7 @@
                                     </div>
                                     <div>
                                         <label class="block text-xs font-medium text-slate-700 mb-1">Year</label>
-                                        <select x-model="form.year" required class="w-full rounded-xl border-slate-300 border px-1.5 py-2 text-xs bg-white">
+                                        <select x-model="form.year" required class="w-full rounded-xl border-slate-300 border px-2 py-2.5 text-xs bg-white">
                                             <option value="2026/2027">26/27</option>
                                             <option value="2027/2028">27/28</option>
                                         </select>
@@ -454,25 +469,25 @@
                                 <!-- Scheme of Learning Submission Field -->
                                 <div>
                                     <label class="block text-xs font-medium text-slate-700 mb-1">Scheme of Learning File / Link (.pdf, .doc)</label>
-                                    <input type="file" @change="handleSchemeFileUpload($event)" accept=".pdf,.doc,.docx" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-900">
+                                    <input type="file" @change="handleSchemeFileUpload($event)" accept=".pdf,.doc,.docx" class="w-full text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-900">
                                     <span class="text-xs text-teal-600 mt-1 block font-medium break-all" x-show="form.schemeFileName" x-text="'Scheme Attached: ' + form.schemeFileName"></span>
                                 </div>
 
                                 <!-- Optional Other Learning Resources Field for Teachers -->
                                 <div>
                                     <label class="block text-xs font-medium text-slate-700 mb-1">Other Learning Resources / Links (Optional)</label>
-                                    <input type="text" x-model="form.otherResources" class="w-full rounded-xl border-slate-300 border px-3 py-2 text-xs sm:text-sm" placeholder="e.g. YouTube video links, educational apps, etc.">
+                                    <input type="text" x-model="form.otherResources" class="w-full rounded-xl border-slate-300 border px-3.5 py-2.5 text-sm" placeholder="e.g. YouTube video links, educational apps, etc.">
                                 </div>
 
                                 <div>
                                     <label class="block text-xs font-medium text-slate-700 mb-1">Lesson Plan Document (Word / PDF)</label>
-                                    <input type="file" @change="handleFileUpload($event)" accept=".pdf,.doc,.docx" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-900">
+                                    <input type="file" @change="handleFileUpload($event)" accept=".pdf,.doc,.docx" class="w-full text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-900">
                                     <span class="text-xs text-emerald-600 mt-1 block font-medium break-all" x-show="form.fileName" x-text="'Attached: ' + form.fileName"></span>
                                 </div>
 
                                 <div class="flex space-x-2 pt-2">
-                                    <button type="submit" class="flex-1 bg-blue-900 hover:bg-blue-800 text-white font-medium py-2.5 px-4 rounded-xl text-xs sm:text-sm transition shadow-sm" x-text="editingId ? 'Update' : 'Submit'"></button>
-                                    <button type="button" @click="resetForm()" x-show="editingId" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium py-2.5 px-4 rounded-xl text-xs sm:text-sm">Cancel</button>
+                                    <button type="submit" class="flex-1 bg-blue-900 hover:bg-blue-800 text-white font-medium py-2.5 px-4 rounded-lg text-sm transition shadow-sm" x-text="editingId ? 'Update' : 'Submit'"></button>
+                                    <button type="button" @click="resetForm()" x-show="editingId" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium py-2.5 px-4 rounded-lg text-sm">Cancel</button>
                                 </div>
                             </form>
                         </div>
@@ -480,17 +495,17 @@
 
                     <!-- Right Column: Submission History -->
                     <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 lg:col-span-2 flex flex-col">
-                        <h2 class="text-base sm:text-lg font-semibold text-blue-950 mb-4">My Submitted Lesson Plans & Schemes</h2>
+                        <h2 class="text-lg font-semibold text-blue-950 mb-4">My Submitted Lesson Plans & Schemes</h2>
 
                         <div class="space-y-4 flex-grow overflow-y-auto max-h-[600px] pr-1">
                             <template x-for="lesson in teacherFilteredLessons" :key="lesson.id">
-                                <div class="border border-slate-200 rounded-2xl p-3.5 sm:p-4 bg-white flex flex-col justify-between hover:shadow-md transition">
+                                <div class="border border-slate-200 rounded-2xl p-4 bg-white flex flex-col justify-between hover:shadow-md transition">
                                     <div>
                                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
                                             <div class="flex flex-wrap items-center gap-1.5">
-                                                <span class="bg-blue-100 text-blue-900 text-[10px] sm:text-[11px] font-semibold px-2.5 py-0.5 rounded-lg" x-text="lesson.subject"></span>
-                                                <span class="bg-slate-100 text-slate-700 text-[10px] sm:text-[11px] px-2.5 py-0.5 rounded-lg" x-text="lesson.classLevel"></span>
-                                                <span class="bg-blue-50 text-blue-900 text-[10px] sm:text-[11px] font-medium px-2.5 py-0.5 rounded-lg border border-blue-100" x-text="lesson.term + ' | ' + lesson.week + ' (' + lesson.year + ')'"></span>
+                                                <span class="bg-blue-100 text-blue-900 text-[11px] font-semibold px-2.5 py-0.5 rounded-lg" x-text="lesson.subject"></span>
+                                                <span class="bg-slate-100 text-slate-700 text-[11px] px-2.5 py-0.5 rounded-lg" x-text="lesson.classLevel"></span>
+                                                <span class="bg-blue-50 text-blue-900 text-[11px] font-medium px-2.5 py-0.5 rounded-lg border border-blue-100" x-text="lesson.term + ' | ' + lesson.week + ' (' + lesson.year + ')'"></span>
                                             </div>
                                             <span class="text-xs font-bold px-3 py-1 rounded-full" 
                                                   :class="{
@@ -508,7 +523,7 @@
                                                     📎 Lesson Plan: <span x-text="lesson.fileName"></span>
                                                 </a>
                                                 <a x-show="lesson.schemeFileName" :href="lesson.schemeFileData" :download="lesson.schemeFileName" class="text-teal-700 hover:underline font-semibold flex items-center gap-1.5 break-all">
-                                                    📘 Scheme: <span x-text="lesson.schemeFileName"></span>
+                                                    📘 Scheme of Learning: <span x-text="lesson.schemeFileName"></span>
                                                 </a>
                                                 <p x-show="lesson.otherResources" class="text-slate-600 text-[11px] pt-1">
                                                     🔗 <strong>Other Resources:</strong> <span x-text="lesson.otherResources"></span>
@@ -537,10 +552,10 @@
                 </div>
 
                 <!-- SUB-TAB 2: EMBEDDED DYNAMIC NaCCA ENGINE -->
-                <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6" x-show="teacherSubTab === 'engine'">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6" x-show="teacherSubTab === 'engine'">
                     
                     <!-- Engine Header Cards & Setup -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200">
+                    <div class="grid grid-cols-1 md:grid-cols-6 gap-3 bg-slate-50 p-5 rounded-2xl border border-slate-200">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">Level (KG, PRI, JHS, SHS)</label>
                             <select id="engineLevelSelect" class="w-full text-xs border p-2.5 rounded-xl bg-white font-medium" onchange="updateEngineClasses()">
@@ -589,8 +604,8 @@
 
                     <!-- Scheme Table Preview with Fixed Format -->
                     <div class="space-y-3">
-                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-                            <h3 class="text-xs sm:text-sm font-bold text-blue-950">📋 Scheme of Learning (Fixed NaCCA Format: Sub-Strands as Main Topic)</h3>
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-sm font-bold text-blue-950">📋 Scheme of Learning (Fixed NaCCA Format: Sub-Strands as Main Topic)</h3>
                             <button onclick="engineExportSchemeWord()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs px-3.5 py-2 rounded-xl font-semibold transition">Download Scheme (.doc)</button>
                         </div>
                         <div class="overflow-x-auto border border-slate-200 rounded-2xl max-h-[350px]">
@@ -614,41 +629,41 @@
                     </div>
 
                     <!-- 3-Phase Portrait Lesson Notes Engine Actions -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-4 border-t border-slate-200">
-                        <div onclick="engineGenerateLessons()" class="cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white p-3.5 rounded-2xl transition shadow-md flex items-center space-x-3">
-                            <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center font-bold text-base">
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 pt-4 border-t border-slate-200">
+                        <div onclick="engineGenerateLessons()" class="cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white p-4 rounded-2xl transition shadow-md flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center font-bold text-lg">
                                 <i class="fa fa-book-open"></i>
                             </div>
                             <div>
                                 <h4 class="text-xs font-black tracking-wide uppercase">2. Build Lessons</h4>
-                                <p class="text-[10px] text-emerald-100">Table Structure</p>
+                                <p class="text-[11px] text-emerald-100">Table Structure (3-5 Lessons/Wk)</p>
                             </div>
                         </div>
-                        <div onclick="requestDownload('single')" class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white p-3.5 rounded-2xl transition shadow-md flex items-center space-x-3">
-                            <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center font-bold text-base">
+                        <div onclick="requestDownload('single')" class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-2xl transition shadow-md flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center font-bold text-lg">
                                 <i class="fa fa-file-arrow-down"></i>
                             </div>
                             <div>
                                 <h4 class="text-xs font-black tracking-wide uppercase">3. Single Plan Download</h4>
-                                <p class="text-[10px] text-blue-100" x-text="isPaidSingle ? 'Unlocked (GHS 5)' : '🔒 Pay GHS 5'"></p>
+                                <p class="text-[11px] text-blue-100" x-text="isPaidSingle ? 'Unlocked (GHS 5)' : '🔒 Pay GHS 5.00'"></p>
                             </div>
                         </div>
-                        <div onclick="requestDownload('all')" class="cursor-pointer bg-indigo-700 hover:bg-indigo-800 text-white p-3.5 rounded-2xl transition shadow-md flex items-center space-x-3">
-                            <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center font-bold text-base">
+                        <div onclick="requestDownload('all')" class="cursor-pointer bg-indigo-700 hover:bg-indigo-800 text-white p-4 rounded-2xl transition shadow-md flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center font-bold text-lg">
                                 <i class="fa fa-shield-halved"></i>
                             </div>
                             <div>
                                 <h4 class="text-xs font-black tracking-wide uppercase">4. All Term Weeks</h4>
-                                <p class="text-[10px] text-indigo-200" x-text="isPaidAll ? 'Unlocked (GHS 45)' : '🔒 Pay GHS 45'"></p>
+                                <p class="text-[11px] text-indigo-200" x-text="isPaidAll ? 'Unlocked (GHS 45)' : '🔒 Pay GHS 45.00'"></p>
                             </div>
                         </div>
-                        <div onclick="engineSubmitToMainPortal()" class="cursor-pointer bg-slate-800 hover:bg-slate-900 text-white p-3.5 rounded-2xl transition shadow-md flex items-center space-x-3">
-                            <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center font-bold text-base">
+                        <div onclick="engineSubmitToMainPortal()" class="cursor-pointer bg-slate-800 hover:bg-slate-900 text-white p-4 rounded-2xl transition shadow-md flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center font-bold text-lg">
                                 <i class="fa fa-paper-plane"></i>
                             </div>
                             <div>
                                 <h4 class="text-xs font-black tracking-wide uppercase">5. Submit to Queue</h4>
-                                <p class="text-[10px] text-slate-300">Vetting Portal</p>
+                                <p class="text-[11px] text-slate-300">Vetting Portal</p>
                             </div>
                         </div>
                     </div>
@@ -753,7 +768,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-slate-700 mb-1">Unique Staff ID (PIN)</label>
-                            <input type="text" x-model="teacherForm.id" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm uppercase" placeholder="GES-421" :disabled="editingTeacherId">
+                            <input type="text" x-model="teacherForm.id" required class="w-full rounded-lg border-slate-300 border px-3 py-2 text-sm uppercase" placeholder="GES-0021" :disabled="editingTeacherId">
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-slate-700 mb-1">Phone Contact</label>
@@ -804,7 +819,7 @@
                     <!-- Teachers Yet to Submit Color-Coded Alert Widget -->
                     <div class="bg-amber-50 border border-amber-200 p-4 rounded-2xl space-y-2">
                         <div class="flex justify-between items-center">
-                            <h4 class="text-xs font-bold uppercase tracking-wider text-amber-900">⚠️ Teachers Yet to Submit (Pending Compliance)</h4>
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-amber-900">Teachers Yet to Submit (Pending Compliance)</h4>
                             <span class="bg-amber-200 text-amber-900 font-bold px-2 py-0.5 rounded-full text-[11px]" x-text="laggingTeachers.length + ' Pending'"></span>
                         </div>
                         <div class="flex flex-wrap gap-2 pt-1">
@@ -876,10 +891,10 @@
                                                 </div>
                                                 <div class="text-xs pt-1 flex flex-wrap items-center gap-3">
                                                     <a :href="lesson.fileData" :download="lesson.fileName" class="text-blue-900 hover:underline font-semibold inline-flex items-center gap-1.5 bg-white p-2 rounded-lg border border-blue-100 break-all shadow-sm">
-                                                        📥 Lesson Plan: <span x-text="lesson.fileName"></span>
+                                                        Lesson Plan: <span x-text="lesson.fileName"></span>
                                                     </a>
                                                     <a x-show="lesson.schemeFileName" :href="lesson.schemeFileData" :download="lesson.schemeFileName" class="text-teal-700 hover:underline font-semibold inline-flex items-center gap-1.5 bg-white p-2 rounded-lg border border-teal-100 break-all shadow-sm">
-                                                        📘 Scheme: <span x-text="lesson.schemeFileName"></span>
+                                                        Scheme: <span x-text="lesson.schemeFileName"></span>
                                                     </a>
                                                     <span class="text-slate-500 text-[11px] font-medium bg-white px-2.5 py-1 rounded-lg border border-slate-200" x-text="'🕒 Submitted: ' + (lesson.submissionDay || 'Today') + ', ' + (lesson.submissionTime || '08:00 AM')"></span>
                                                 </div>
@@ -903,7 +918,7 @@
 
                     <!-- History Tab (Grouped & Sorted) -->
                     <div x-show="adminSubTab === 'history'" class="space-y-4 max-h-[550px] overflow-x-auto no-print">
-                        <div class="text-xs text-slate-500 mb-2 font-medium">📋 Submissions grouped by Teacher Name, ID, Subject, and Week Number:</div>
+                        <div class="text-xs text-slate-500 mb-2 font-medium">Submissions grouped by Teacher Name, ID, Subject, and Week Number:</div>
                         <table class="w-full text-left text-sm border-collapse min-w-[650px]">
                            <thead>
                                <tr class="bg-slate-100 text-slate-700 text-xs uppercase">
@@ -952,12 +967,7 @@
                         <!-- Inspection Report starts directly with School Name as Heading 1 -->
                         <div class="space-y-3 border-b border-slate-200 pb-4">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                                <div class="flex items-center space-x-3">
-                                    <template x-if="schoolLogoData">
-                                        <img :src="schoolLogoData" class="w-12 h-12 object-contain rounded border bg-white p-1">
-                                    </template>
-                                    <h1 class="text-2xl sm:text-3xl font-black text-blue-950 tracking-tight" x-text="activeSchoolName"></h1>
-                                </div>
+                                <h1 class="text-2xl sm:text-3xl font-black text-blue-950 tracking-tight" x-text="activeSchoolName"></h1>
                                 <button @click="window.print()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs px-3.5 py-2 rounded-xl font-medium transition shadow-sm no-print">🖨️ Print / Export Report</button>
                             </div>
                             <div class="text-xs text-slate-600 font-medium space-x-2">
@@ -995,7 +1005,7 @@
 
                             <!-- Enhanced Teacher Record Breakdown Table -->
                             <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 space-y-4 shadow-sm">
-                                <h4 class="text-sm font-bold text-blue-950">📋 Staff Compliance & Submission Audit Breakdown</h4>
+                                <h4 class="text-sm font-bold text-blue-950">Staff Compliance & Submission Audit Breakdown</h4>
                                 <div class="overflow-x-auto">
                                     <table class="w-full text-left text-sm border-collapse min-w-[500px]">
                                         <thead>
@@ -1176,7 +1186,7 @@
                 showPinModal: false,
                 enteredPin: '',
 
-                // Feature Lock State (Code: 1863)
+                // Feature Lock State (Code: )
                 isEngineUnlocked: false,
                 showFeatureLockModal: false,
                 enteredFeatureCode: '',
@@ -1320,7 +1330,7 @@
                         this.showFeatureLockModal = false;
                         this.enteredFeatureCode = '';
                         this.teacherSubTab = 'engine';
-                        alert('✨ Feature unlocked successfully with code 1863!');
+                        alert('✨ Feature unlocked successfully!');
                     } else {
                         alert('❌ Incorrect Code! Access denied.');
                         this.enteredFeatureCode = '';
