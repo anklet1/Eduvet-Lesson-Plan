@@ -221,7 +221,7 @@
         </div>
         <!-- Mobile Quick Navigation Bar for professional layout -->
         <div class="bg-blue-950 px-3 py-2 flex overflow-x-auto gap-2 text-xs no-scrollbar border-t border-blue-800">
-            <button @click="portalMode = 'teacher'; teacherSubTab = 'upload'" :class="portalMode === 'teacher' && teacherSubTab === 'upload' ? 'bg-blue-800 font-bold' : 'text-blue-200'" class="px-3 py-1.5 rounded-lg whitespace-nowrap transition">Uploads Plan</button>
+            <button @click="portalMode = 'teacher'; teacherSubTab = 'upload'" :class="portalMode === 'teacher' && teacherSubTab === 'upload' ? 'bg-blue-800 font-bold' : 'text-blue-200'" class="px-3 py-1.5 rounded-lg whitespace-nowrap transition">Upload Lesson</button>
             <button @click="portalMode = 'teacher'; checkEngineTab()" :class="portalMode === 'teacher' && teacherSubTab === 'engine' ? 'bg-blue-800 font-bold' : 'text-blue-200'" class="px-3 py-1.5 rounded-lg whitespace-nowrap transition">Generate Lesson</button>
             <button @click="attemptReviewerAccess()" :class="portalMode === 'reviewer' ? 'bg-rose-700 font-bold' : 'text-rose-200'" class="px-3 py-1.5 rounded-lg whitespace-nowrap transition">Reviewer</button>
             <button x-show="portalMode === 'reviewer'" @click="portalMode = 'settings'" :class="portalMode === 'settings' ? 'bg-blue-800 font-bold' : 'text-blue-200'" class="px-3 py-1.5 rounded-lg whitespace-nowrap transition">Settings</button>
