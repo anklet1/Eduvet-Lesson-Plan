@@ -283,8 +283,8 @@
             </div>
             <div>
                 <span class="text-[10px] font-black tracking-widest uppercase bg-amber-100 text-amber-900 px-3 py-1 rounded-full">EDUVET PRO LICENSING & PRICING</span>
-                <h3 class="text-xl sm:text-2xl font-black text-slate-900 mt-2">Package Plans</h3>
-                <p class="text-xs text-slate-500 mt-1 max-w-2xl mx-auto">Compare packages for individual teachers and full basic/secondary institutions.</p>
+                <h3 class="text-xl sm:text-2xl font-black text-slate-900 mt-2">Eduvet Package Plans: Free to Pro Feature Matrix</h3>
+                <p class="text-xs text-slate-500 mt-1 max-w-2xl mx-auto">Compare packages for individual teachers and full basic/secondary institutions. Fully aligned with Ghana NaCCA, GES SBA & WAEC standards.</p>
             </div>
 
             <!-- COMPREHENSIVE 4-TIER FEATURE COMPARISON MATRIX TABLE -->
@@ -296,7 +296,7 @@
                             <th class="p-3 border-r border-slate-800 text-center w-[17%] bg-slate-900">
                                 <div class="text-slate-200 font-bold">Free Tier</div>
                                 <div class="text-[11px] text-slate-300 font-black">GH₵ 0.00</div>
-                                <span class="text-[8px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded font-bold uppercase inline-block mt-0.5">Limited</span>
+                                <span class="text-[8px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded font-bold uppercase inline-block mt-0.5">Free Forever</span>
                             </th>
                             <th class="p-3 border-r border-slate-800 text-center w-[18%] bg-slate-900">
                                 <div class="text-emerald-400 font-black">Teacher Pro</div>
@@ -524,7 +524,7 @@
             <!-- License Key Form -->
             <form @submit.prevent="verifyFeatureCode()" class="space-y-2.5">
                 <div>
-                    <label class="block text-[11px] font-bold text-slate-600 mb-1 text-left"> Enter License Key</label>
+                    <label class="block text-[11px] font-bold text-slate-600 mb-1 text-left">Have an Activation License Key or School Code? (Demo Key: 1863)</label>
                     <input type="text" x-model="enteredFeatureCode" placeholder="Enter Pro Key (e.g. 1863 or EDUVET-PRO-2026)" class="w-full text-center tracking-widest text-sm sm:text-base rounded-xl border-slate-300 border py-2.5 font-mono focus:outline-none focus:border-blue-900 bg-slate-50 font-bold uppercase" required>
                 </div>
                 <button type="submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm flex items-center justify-center gap-2">
@@ -616,7 +616,7 @@
         </div>
     </div>
 
-    <!-- Secure PIN Modal Overlay for Reviewer (PIN xxxx-->
+    <!-- Secure PIN Modal Overlay for Reviewer (PIN 0543) -->
     <div x-show="showPinModal" class="fixed inset-0 bg-blue-950/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print" style="display: none;">
         <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 space-y-4 border border-slate-200" @click.away="showPinModal = false">
             <div class="text-center">
@@ -627,7 +627,7 @@
             
             <form @submit.prevent="verifyPin()" class="space-y-3">
                 <div>
-                    <input type="password" x-model="enteredPin" placeholder="Enter PIN xxxx" autofocus class="w-full text-center tracking-widest text-lg rounded-lg border-slate-300 border px-3 py-2 focus:outline-none focus:border-blue-900" maxlength="8" required>
+                    <input type="password" x-model="enteredPin" placeholder="Enter PIN (0543)" autofocus class="w-full text-center tracking-widest text-lg rounded-lg border-slate-300 border px-3 py-2 focus:outline-none focus:border-blue-900" maxlength="8" required>
                 </div>
                 <div class="flex gap-2 pt-1">
                     <button type="submit" class="flex-1 bg-blue-900 hover:bg-blue-800 text-white text-xs font-medium py-2.5 rounded-lg transition">Login</button>
@@ -2520,7 +2520,7 @@
     <footer class="bg-white border-t border-slate-200 py-4 mt-auto no-print">
         <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 font-medium space-y-1">
             <p>© 2026 Edubyte Africa Inc. All rights reserved.</p>
-            <p class="text-slate-400">Eduvet School Hub — Powered by Edubyte Africa Inc. | Contact: +233 543 521 863</p>
+            <p class="text-slate-400">Eduvet School Hub — Powered by Edubyte Africa Inc. | Contact: +233 543 521 863 | Fully Aligned with Ghana NaCCA, WAEC & GES Standards</p>
         </div>
     </footer>
 
@@ -4481,7 +4481,7 @@
             };
 
             db.collection('lessons').doc(newLessonId).set(lessonPayload).then(() => {
-                alert(`Lesson Plan submitted successfully to ${app.activeSchoolName} Vetting Queue for Headteacher approval!`);
+                alert(`🚀 NaCCA Lesson Plan submitted successfully to ${app.activeSchoolName} Vetting Queue for Headteacher approval!`);
                 app.teacherSubTab = 'upload';
             }).catch(err => {
                 // If offline, save locally

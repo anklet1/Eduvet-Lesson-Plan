@@ -1,3 +1,17 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/eduvet.css",
+      "destination": "/eduvet.css"
+    },
+    {
+      "source": "/eduvet.html",
+      "destination": "/eduvet.html"
+    },
+    {
+      "source": "/((?!.*\\..*).*)$",
+      "destination": "/index.html"
+    }
+  ]
 }
