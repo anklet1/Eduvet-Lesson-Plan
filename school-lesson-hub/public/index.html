@@ -862,9 +862,12 @@
 
             <template x-if="activeSisoLesson">
                 <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-1">
-                    <!-- Pure Teacher Name without Teacher ID attached -->
-                    <div><strong>Educator:</strong> <span class="font-bold text-slate-900" x-text="activeSisoLesson.teacherName"></span></div>
-                    <div><strong>Subject:</strong> <span x-text="activeSisoLesson.subject + ' — ' + activeSisoLesson.classLevel + ' (' + activeSisoLesson.week + ')'"></span></div>
+                    <div>
+                        <strong>Educator:</strong> 
+                        <span class="font-bold text-slate-900" x-text="activeSisoLesson.teacherName"></span>
+                        <span class="font-mono text-blue-800 bg-blue-100/80 border border-blue-200 px-1.5 py-0.5 rounded text-[11px] font-bold ml-1" x-text="'[' + (activeSisoLesson.teacherId || 'N/A') + ']'"></span>
+                    </div>
+                    <div><strong>Subject:</strong> <span class="font-bold text-blue-950" x-text="activeSisoLesson.subject"></span> <span class="text-slate-600" x-text="'— ' + activeSisoLesson.classLevel + ' (' + activeSisoLesson.term + ' • ' + activeSisoLesson.week + ')'"></span></div>
                 </div>
             </template>
 
@@ -1071,6 +1074,12 @@
                     <span>Reviewer</span>
                 </div>
 
+                <!-- SISO Active Badge (In SISO mode) -->
+                <div x-show="portalMode === 'siso'" class="text-[10px] font-black bg-amber-400 text-slate-950 px-2 py-1 rounded-lg border border-amber-300 flex items-center gap-1 shadow-sm">
+                    <i class="fa fa-building-columns text-[10px]"></i>
+                    <span>SISO</span>
+                </div>
+
                 <!-- Pro Badge / Offers Button -->
                 <button x-show="portalMode !== 'siso'" @click="showProUpgradeModal = true" class="px-2 py-1 rounded-lg text-[10px] font-black uppercase flex items-center gap-1 transition shadow-xs" :class="isPro ? 'bg-amber-400 text-amber-950' : 'bg-amber-500/20 text-amber-300 border border-amber-400/40'">
                     <i class="fa fa-crown text-[10px]"></i>
@@ -1137,20 +1146,14 @@
                         
                         <button @click="portalMode = 'teacher'; teacherSubTab = 'upload'" :class="portalMode === 'teacher' && teacherSubTab === 'upload' ? 'bg-blue-800 text-white shadow-md font-bold' : 'hover:bg-blue-800/60 text-blue-100'" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs transition">
                             <i class="fa fa-folder-open w-4 text-center text-teal-300"></i>
-                            <span>Upload & History</span>
+                            <span>Upload</span>
                         </button>
 
-                        <!-- NaCCA Lesson Engine Card Button -->
+                        <!-- Lesson Plan Engine Card Button -->
                         <button @click="portalMode = 'teacher'; checkEngineTab()" :class="portalMode === 'teacher' && teacherSubTab === 'engine' ? 'bg-blue-800 text-white shadow-md font-bold' : 'hover:bg-blue-800/60 text-blue-100'" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs transition">
                             <i class="fa fa-wand-magic-sparkles w-4 text-center text-amber-300"></i>
-                            <span class="flex-1 text-left">NaCCA Lesson Engine</span>
+                            <span class="flex-1 text-left">Plan</span>
                             <span x-show="!isEngineUnlocked" class="text-[9px] bg-amber-500/30 text-amber-200 px-1.5 py-0.5 rounded font-mono">🔒</span>
-                        </button>
-
-                        <!-- Continuous Assessment (SBA) Gradebook -->
-                        <button @click="portalMode = 'teacher'; teacherSubTab = 'sba'" :class="portalMode === 'teacher' && teacherSubTab === 'sba' ? 'bg-blue-800 text-white shadow-md font-bold' : 'hover:bg-blue-800/60 text-blue-100'" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs transition">
-                            <i class="fa fa-file-pen w-4 text-center text-emerald-300"></i>
-                            <span class="flex-1 text-left">GES SBA Gradebook</span>
                         </button>
 
                         <div class="text-[10px] font-bold uppercase tracking-wider text-blue-300 px-3 pt-3 mb-1">Administration</div>
@@ -1837,212 +1840,271 @@
                     </div>
                 </div>
 
-                <!-- SUB-TAB 3: GES CONTINUOUS ASSESSMENT (SBA) GRADEBOOK (FOR TEACHERS) -->
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6" x-show="teacherSubTab === 'sba'">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b pb-4">
-                        <div>
-                            <h3 class="text-base font-bold text-blue-950">📊 GES Continuous Assessment (SBA) Gradebook</h3>
-                            <p class="text-xs text-slate-500">Class Score (50%) + Exam Score (50%) = 100% | WAEC 9-Point Stanine Grading</p>
-                        </div>
-                        <div class="flex flex-wrap items-center gap-2">
-                            <button @click="downloadSbaExcelTemplate()" class="bg-blue-900 hover:bg-blue-800 text-white text-xs px-3.5 py-2 rounded-xl font-bold transition shadow-sm flex items-center gap-1.5">
-                                <i class="fa fa-file-excel text-emerald-300"></i> Download Excel Marksheet
-                            </button>
-                            <label class="cursor-pointer bg-slate-800 hover:bg-slate-900 text-white text-xs px-3.5 py-2 rounded-xl font-bold transition shadow-sm flex items-center gap-1.5">
-                                <i class="fa fa-file-arrow-up text-amber-300"></i> Upload Filled Marksheet
-                                <input type="file" @change="handleSbaExcelUpload($event)" accept=".csv,.txt" class="hidden">
-                            </label>
-                            <button @click="saveSbaScores()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-4 py-2 rounded-xl font-bold transition shadow-sm flex items-center gap-1.5">
-                                <i class="fa fa-floppy-disk"></i> Save SBA Grades
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Excel Data Type Integrity & Bulk Registration Guidance Callout -->
-                    <div class="bg-blue-50/80 border border-blue-200 p-3.5 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-blue-950">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-8 h-8 rounded-lg bg-blue-900 text-white flex items-center justify-center shrink-0">
-                                <i class="fa fa-shield-halved text-emerald-400"></i>
-                            </div>
-                            <div>
-                                <span class="font-extrabold block">Excel Data Type & Range Integrity Active:</span>
-                                <span class="text-slate-600 text-[11px]">Strict verification on import: HW [0–15], Project [0–15], Test [0–20], Exam [0–50]. New learners are automatically registered.</span>
-                            </div>
-                        </div>
-                        <span class="text-[10px] bg-emerald-100 text-emerald-900 border border-emerald-300 px-2.5 py-1 rounded-full font-bold uppercase tracking-wider shrink-0">
-                            ✓ UTF-8 Excel Ready
-                        </span>
-                    </div>
-
-                    <!-- Class & Subject Filter Bar -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs">
-                        <div>
-                            <label class="block font-bold text-slate-700 mb-1">Class</label>
-                            <select x-model="sbaClassFilter" class="w-full border p-2 rounded-lg bg-white">
-                                <option value="Basic 7">Basic 7 (JHS 1)</option>
-                                <option value="Basic 8">Basic 8 (JHS 2)</option>
-                                <option value="Basic 9">Basic 9 (JHS 3)</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block font-bold text-slate-700 mb-1">Subject</label>
-                            <select x-model="sbaSubjectFilter" class="w-full border p-2 rounded-lg bg-white">
-                                <template x-for="subj in allAvailableSubjects" :key="subj">
-                                    <option :value="subj" x-text="subj"></option>
-                                </template>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block font-bold text-slate-700 mb-1">Term</label>
-                            <select x-model="settingsForm.activeTerm" class="w-full border p-2 rounded-lg bg-white font-bold text-blue-900">
-                                <option value="Term 1">Term 1</option>
-                                <option value="Term 2">Term 2</option>
-                                <option value="Term 3">Term 3</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Spreadsheet Table -->
-                    <div class="overflow-x-auto border border-slate-200 rounded-xl">
-                        <table class="w-full text-left text-xs border-collapse min-w-[700px]">
-                            <thead class="bg-slate-100 text-slate-700 font-bold border-b text-[11px] uppercase">
-                                <tr>
-                                    <th class="p-3 sticky left-0 bg-slate-100 z-10 shadow-xs">Student Name</th>
-                                    <th class="p-3 text-center">Class Task / HW (15)</th>
-                                    <th class="p-3 text-center">Group Project (15)</th>
-                                    <th class="p-3 text-center">Mid-Term Test (20)</th>
-                                    <th class="p-3 text-center bg-blue-50 text-blue-900">Total Class Score (50%)</th>
-                                    <th class="p-3 text-center bg-indigo-50 text-indigo-900">End of Term Exam (50%)</th>
-                                    <th class="p-3 text-center bg-emerald-50 text-emerald-950 font-bold">Overall Mark (100%)</th>
-                                    <th class="p-3 text-center">WAEC Grade</th>
-                                    <th class="p-3 text-center">Remark</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-200">
-                                <template x-for="(stu, idx) in sbaStudents" :key="stu.id">
-                                    <tr class="hover:bg-slate-50 transition">
-                                        <td class="p-3 font-semibold text-slate-900 sticky left-0 bg-white z-10 shadow-xs" x-text="stu.name"></td>
-                                        <td class="p-2 text-center">
-                                            <input type="number" min="0" max="15" x-model.number="stu.hw" class="w-14 text-center border rounded p-1 font-mono text-xs">
-                                        </td>
-                                        <td class="p-2 text-center">
-                                            <input type="number" min="0" max="15" x-model.number="stu.project" class="w-14 text-center border rounded p-1 font-mono text-xs">
-                                        </td>
-                                        <td class="p-2 text-center">
-                                            <input type="number" min="0" max="20" x-model.number="stu.test" class="w-14 text-center border rounded p-1 font-mono text-xs">
-                                        </td>
-                                        <td class="p-3 text-center font-bold text-blue-900 bg-blue-50/50" x-text="calculateClassScore(stu)"></td>
-                                        <td class="p-2 text-center bg-indigo-50/50">
-                                            <input type="number" min="0" max="50" x-model.number="stu.exam" class="w-14 text-center border rounded p-1 font-mono font-bold text-xs">
-                                        </td>
-                                        <td class="p-3 text-center font-black text-emerald-700 bg-emerald-50/50 text-sm" x-text="calculateTotalScore(stu)"></td>
-                                        <td class="p-3 text-center">
-                                            <span class="px-2 py-0.5 rounded text-[11px] font-bold"
-                                                  :class="getWaecGradeClass(calculateTotalScore(stu))"
-                                                  x-text="getWaecGrade(calculateTotalScore(stu))"></span>
-                                        </td>
-                                        <td class="p-3 text-center text-slate-600 font-medium text-[11px]" x-text="getWaecRemark(calculateTotalScore(stu))"></td>
-                                    </tr>
-                                </template>
-                            </tbody>
-                        </table>
-                    </div>
                 </div>
-
             </div>
 
             <!-- ==================== PORTAL 2: REVIEWER & INSPECTION DASHBOARD ==================== -->
             
         <!-- ========================================== -->
-        <!-- SISO CIRCUIT INSPECTION PORTAL (WEEK-BY-WEEK) -->
-        <!-- ========================================== -->
+        <!-- SISO CIRCUIT INSPECTION PORTAL (TEACHER-BY-TEACHER & WEEK-BY-WEEK) -->
+        <!-- =================================================================== -->
         <div class="space-y-6" x-show="portalMode === 'siso'" x-cloak>
-            <!-- SISO Header -->
-            <div class="bg-gradient-to-r from-slate-900 to-amber-950 text-white p-5 rounded-2xl shadow-sm border border-amber-900/40 space-y-4">
+            <!-- High-Contrast Executive Navy/Gold SISO Header -->
+            <div class="bg-[#011B33] text-white p-5 sm:p-6 rounded-2xl shadow-lg border-2 border-amber-400 space-y-4">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div class="flex items-center space-x-3.5">
-                        <div class="w-12 h-12 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center font-black text-xl shadow-md">
+                        <div class="w-14 h-14 rounded-2xl bg-amber-400 text-slate-950 flex items-center justify-center font-black text-2xl shadow-md border-2 border-amber-300 shrink-0">
                             🇬🇭
                         </div>
                         <div>
-                            <span class="text-[10px] font-black tracking-widest uppercase bg-amber-400/20 text-amber-300 border border-amber-400/30 px-2.5 py-0.5 rounded-full inline-block mb-1">GHANA EDUCATION SERVICE • CIRCUIT SUPERVISION</span>
-                            <h3 class="text-lg font-black text-white">SISO School Improvement & Quality Portal</h3>
-                            <p class="text-xs text-amber-200/70">Official Circuit Inspection, Curriculum Vetting & Pedagogical Advice</p>
+                            <div class="flex items-center gap-2 flex-wrap mb-1">
+                                <span class="text-[11px] font-black tracking-widest uppercase bg-amber-400 text-slate-950 px-2.5 py-0.5 rounded-full inline-block shadow-sm">
+                                    GHANA EDUCATION SERVICE • CIRCUIT SUPERVISION
+                                </span>
+                                <span class="text-[10px] font-mono font-bold bg-white/20 text-cyan-200 px-2 py-0.5 rounded-md border border-white/20">
+                                    OFFICIAL QUALITY ASSURANCE
+                                </span>
+                            </div>
+                            <h3 class="text-xl sm:text-2xl font-black text-white tracking-tight">SISO School Improvement & Quality Portal</h3>
+                            <p class="text-xs sm:text-sm text-amber-300 font-semibold mt-0.5">Teacher-by-Teacher Curriculum Vetting, Subject Submissions & Pedagogical Oversight</p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <button @click="portalMode = 'teacher'; teacherSubTab = 'upload'" class="bg-white/10 hover:bg-white/20 text-white text-xs px-3.5 py-2 rounded-xl font-bold transition flex items-center gap-1.5 border border-white/20">
-                            <i class="fa fa-arrow-left"></i> Exit to Teacher
+                    <div class="flex items-center gap-2 shrink-0">
+                        <button @click="portalMode = 'teacher'; teacherSubTab = 'upload'" class="bg-white hover:bg-slate-100 text-slate-950 text-xs px-4 py-2.5 rounded-xl font-black transition flex items-center gap-1.5 shadow-md border border-slate-200 active:scale-95">
+                            <i class="fa fa-arrow-left text-amber-600"></i> Exit to Teacher
                         </button>
                     </div>
                 </div>
 
                 <!-- Assigned School Scoping Card (SISO only sees schools assigned to them via School ID) -->
-                <div class="bg-amber-900/40 border border-amber-500/30 rounded-xl p-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs">
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold">
-                            <i class="fa fa-school-flag text-xs"></i>
+                <div class="bg-[#032952] border-2 border-amber-400/60 rounded-xl p-3.5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-xs shadow-inner">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-sm shadow-sm shrink-0">
+                            <i class="fa fa-school-flag text-base"></i>
                         </div>
                         <div>
-                            <span class="text-slate-300">Assigned Inspection School:</span>
-                            <strong class="text-white font-bold ml-1" x-text="activeSchoolName"></strong>
-                            <span class="text-cyan-300 font-mono text-[11px] ml-1.5" x-text="'[' + authenticatedSchoolId + ']'"></span>
+                            <div class="text-slate-300 font-medium">Assigned Inspection School:</div>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <strong class="text-white font-extrabold text-sm sm:text-base tracking-tight" x-text="activeSchoolName"></strong>
+                                <span class="text-cyan-300 font-mono text-xs font-bold bg-blue-950/80 px-2 py-0.5 rounded border border-cyan-400/40" x-text="'[' + authenticatedSchoolId + ']'"></span>
+                            </div>
                         </div>
                     </div>
-                    <button type="button" @click="showSisoSchoolModal = true" class="bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-400/40 px-3 py-1.5 rounded-lg font-bold text-xs transition flex items-center gap-1.5 shadow-xs">
-                        <i class="fa fa-arrows-rotate text-[10px]"></i> Switch Assigned School ID
+                    <button type="button" @click="showSisoSchoolModal = true" class="bg-amber-400 hover:bg-amber-300 active:bg-amber-500 text-slate-950 px-3.5 py-2 rounded-xl font-black text-xs transition flex items-center gap-2 shadow-sm shrink-0">
+                        <i class="fa fa-arrows-rotate text-xs"></i> Switch Assigned School ID
                     </button>
                 </div>
             </div>
 
-            <!-- Week-by-Week Navigation Bar -->
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 space-y-3">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-100 pb-2.5">
-                    <div>
-                        <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                            <i class="fa fa-calendar-week text-amber-600"></i> Week-by-Week Lesson Plan Vetting
-                        </h4>
-                        <p class="text-[11px] text-slate-500">Inspect curriculum coverage and provide official SISO feedback week-by-week</p>
+            <!-- SISO Controls & Filters Toolbar -->
+            <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                <!-- Top Row: View Mode Switcher + Term Selector + Search -->
+                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 border-b border-slate-100 pb-3.5">
+                    <!-- Left: View Mode Toggle -->
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-xs font-black text-slate-700 uppercase tracking-wider">View Mode:</span>
+                        <div class="inline-flex bg-slate-100 p-1 rounded-xl border border-slate-200">
+                            <button type="button" @click="sisoViewMode = 'teacher_grouped'" :class="sisoViewMode === 'teacher_grouped' ? 'bg-[#011B33] text-amber-400 shadow-sm font-black' : 'text-slate-700 hover:text-slate-900 font-semibold'" class="px-3 py-1.5 rounded-lg text-xs transition flex items-center gap-1.5">
+                                <i class="fa fa-user-group text-xs"></i>
+                                <span>Teacher-by-Teacher</span>
+                            </button>
+                            <button type="button" @click="sisoViewMode = 'list'" :class="sisoViewMode === 'list' ? 'bg-[#011B33] text-amber-400 shadow-sm font-black' : 'text-slate-700 hover:text-slate-900 font-semibold'" class="px-3 py-1.5 rounded-lg text-xs transition flex items-center gap-1.5">
+                                <i class="fa fa-list-check text-xs"></i>
+                                <span>All Submissions Stream</span>
+                            </button>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs font-bold text-slate-700">Filter Term:</span>
-                        <select x-model="sisoActiveTerm" class="text-xs rounded-lg border-slate-300 border px-2.5 py-1.5 bg-slate-50 font-medium">
-                            <option value="Term 1">Term 1</option>
-                            <option value="Term 2">Term 2</option>
-                            <option value="Term 3">Term 3</option>
-                        </select>
+
+                    <!-- Right: Search + Term + Teacher Dropdown + Sort -->
+                    <div class="flex items-center gap-2 flex-wrap w-full lg:w-auto">
+                        <!-- Term Filter -->
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs font-bold text-slate-600">Term:</span>
+                            <select x-model="sisoActiveTerm" class="text-xs rounded-xl border-slate-300 border px-2.5 py-1.5 bg-slate-50 font-semibold text-slate-800 focus:ring-1 focus:ring-amber-500">
+                                <option value="">All Terms</option>
+                                <option value="Term 1">Term 1</option>
+                                <option value="Term 2">Term 2</option>
+                                <option value="Term 3">Term 3</option>
+                            </select>
+                        </div>
+
+                        <!-- Teacher Filter -->
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs font-bold text-slate-600">Teacher:</span>
+                            <select x-model="sisoTeacherFilter" class="text-xs rounded-xl border-slate-300 border px-2.5 py-1.5 bg-slate-50 font-semibold text-slate-800 max-w-[150px] truncate focus:ring-1 focus:ring-amber-500">
+                                <option value="all">All Teachers</option>
+                                <template x-for="t in sisoTeachersList" :key="t.id">
+                                    <option :value="t.id" x-text="t.name + ' (' + t.id + ')'"></option>
+                                </template>
+                            </select>
+                        </div>
+
+                        <!-- Sort Filter -->
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs font-bold text-slate-600">Sort:</span>
+                            <select x-model="sisoSortBy" class="text-xs rounded-xl border-slate-300 border px-2.5 py-1.5 bg-slate-50 font-semibold text-slate-800 focus:ring-1 focus:ring-amber-500">
+                                <option value="teacher">Teacher (A-Z)</option>
+                                <option value="subject">Subject</option>
+                                <option value="week">Week</option>
+                                <option value="status">Status</option>
+                                <option value="recent">Most Recent</option>
+                            </select>
+                        </div>
+
+                        <!-- Keyword Search Input -->
+                        <div class="relative flex-grow sm:flex-grow-0 sm:w-48">
+                            <i class="fa fa-magnifying-glass absolute left-3 top-2.5 text-xs text-slate-400"></i>
+                            <input type="text" x-model="sisoSearchQuery" placeholder="Search teacher, ID, subject..." class="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-amber-500">
+                        </div>
                     </div>
                 </div>
 
-                <!-- Weekly Pill Buttons -->
-                <div class="flex overflow-x-auto gap-1.5 pb-2 no-scrollbar">
-                    <button type="button" @click="sisoActiveWeek = 'all'" class="px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0" :class="sisoActiveWeek === 'all' ? 'bg-amber-600 text-white shadow-sm' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'">
-                        All Weeks (<span x-text="sisoAllLessonsCount"></span>)
-                    </button>
-                    <template x-for="w in 15" :key="w">
-                        <button type="button" @click="sisoActiveWeek = 'Week ' + w" class="px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1" :class="sisoActiveWeek === ('Week ' + w) ? 'bg-amber-600 text-white shadow-sm' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'">
-                            <span x-text="'Week ' + w"></span>
-                            <span class="text-[10px] px-1.5 py-0.2 rounded-full font-mono" :class="sisoActiveWeek === ('Week ' + w) ? 'bg-white/30 text-white' : 'bg-slate-200 text-slate-600'" x-text="getSisoWeekLessonCount('Week ' + w)"></span>
+                <!-- Week-by-Week Navigation Pills -->
+                <div class="space-y-1.5">
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="font-bold text-slate-700 flex items-center gap-1.5">
+                            <i class="fa fa-calendar-week text-amber-600"></i> Filter by Curriculum Week:
+                        </span>
+                        <span class="text-slate-500 text-[11px]" x-text="'Showing ' + sisoFilteredLessons.length + ' Lesson Submission(s)'"></span>
+                    </div>
+
+                    <!-- Weekly Pill Buttons -->
+                    <div class="flex overflow-x-auto gap-1.5 pb-2 no-scrollbar">
+                        <button type="button" @click="sisoActiveWeek = 'all'" class="px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0" :class="sisoActiveWeek === 'all' ? 'bg-[#011B33] text-amber-400 shadow-sm font-black' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'">
+                            All Weeks (<span x-text="sisoAllLessonsCount"></span>)
                         </button>
-                    </template>
+                        <template x-for="w in 15" :key="w">
+                            <button type="button" @click="sisoActiveWeek = 'Week ' + w" class="px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1" :class="sisoActiveWeek === ('Week ' + w) ? 'bg-[#011B33] text-amber-400 shadow-sm font-black' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'">
+                                <span x-text="'Week ' + w"></span>
+                                <span class="text-[10px] px-1.5 py-0.2 rounded-full font-mono font-bold" :class="sisoActiveWeek === ('Week ' + w) ? 'bg-amber-400/20 text-amber-300' : 'bg-slate-200 text-slate-600'" x-text="getSisoWeekLessonCount('Week ' + w)"></span>
+                            </button>
+                        </template>
+                    </div>
                 </div>
             </div>
 
-            <!-- SISO Weekly Lesson Submissions Cards -->
-            <div class="space-y-4">
+            <!-- VIEW MODE 1: TEACHER-BY-TEACHER GROUPED VIEW -->
+            <div x-show="sisoViewMode === 'teacher_grouped'" class="space-y-6">
+                <template x-for="group in sisoGroupedByTeacher" :key="group.teacherId">
+                    <div class="bg-white border-2 border-slate-200 hover:border-amber-400/80 rounded-2xl p-5 shadow-sm space-y-4 transition">
+                        <!-- Teacher Profile Banner Header (Staff ID tied directly to Teacher) -->
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 pb-3.5">
+                            <div class="flex items-center space-x-3.5">
+                                <div class="w-12 h-12 rounded-2xl bg-[#011B33] text-amber-400 font-mono font-black flex items-center justify-center text-sm uppercase shadow-sm border border-amber-400/30 shrink-0" x-text="group.teacherName ? group.teacherName.substring(0,2) : 'ED'"></div>
+                                <div>
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <h4 class="text-base font-extrabold text-slate-900" x-text="group.teacherName"></h4>
+                                        <!-- Teacher ID Badge Tied to Educator -->
+                                        <span class="font-mono text-xs font-black bg-blue-100 text-blue-900 px-2.5 py-0.5 rounded-lg border border-blue-300 shadow-2xs flex items-center gap-1">
+                                            <i class="fa fa-id-badge text-blue-700 text-[10px]"></i>
+                                            <span x-text="'Staff ID: ' + group.teacherId"></span>
+                                        </span>
+                                    </div>
+                                    <div class="text-xs text-slate-500 flex items-center gap-2 flex-wrap mt-0.5">
+                                        <span x-show="group.teacherContact" class="font-medium text-slate-600" x-text="'📞 ' + group.teacherContact"></span>
+                                        <span x-show="group.teacherContact && group.assignedSubjects">•</span>
+                                        <span x-show="group.assignedSubjects" class="text-slate-600" x-text="'Subjects: ' + group.assignedSubjects"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Submission Compliance Stats for this Teacher -->
+                            <div class="flex items-center gap-2">
+                                <span class="bg-blue-50 text-blue-900 border border-blue-200 text-xs font-bold px-3 py-1 rounded-full" x-text="group.lessons.length + ' Lesson Plan(s)'"></span>
+                                <span class="bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold px-3 py-1 rounded-full" x-text="group.lessons.filter(l => l.status === 'Approved').length + ' Approved'"></span>
+                            </div>
+                        </div>
+
+                        <!-- Lessons List Tied to this Teacher and Subjects -->
+                        <div class="space-y-3">
+                            <template x-for="lesson in group.lessons" :key="lesson.id">
+                                <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/70 hover:bg-amber-50/20 hover:border-amber-300 transition space-y-3">
+                                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
+                                        <!-- Left: Subject, Class, Week, and Teacher ID tie -->
+                                        <div class="space-y-1.5">
+                                            <div class="flex items-center gap-2 flex-wrap">
+                                                <span class="font-black text-sm text-slate-900" x-text="lesson.subject"></span>
+                                                <!-- Teacher ID explicitly tied to subject submission -->
+                                                <span class="font-mono text-[11px] font-bold bg-white text-slate-700 border border-slate-300 px-2 py-0.5 rounded-md" x-text="'Staff ID: ' + lesson.teacherId"></span>
+                                                <span class="bg-slate-200/80 text-slate-800 text-xs px-2.5 py-0.5 rounded-full font-semibold" x-text="lesson.classLevel"></span>
+                                                <span class="bg-blue-100 text-blue-950 text-xs font-mono font-bold px-2.5 py-0.5 rounded-full" x-text="lesson.term + ' • ' + lesson.week"></span>
+                                                <span class="text-xs font-bold px-2.5 py-0.5 rounded-full" :class="lesson.status === 'Approved' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-amber-100 text-amber-800 border border-amber-300'" x-text="lesson.status === 'Approved' ? '✓ Headteacher Approved' : 'Pending Head Review'"></span>
+                                            </div>
+                                            <div class="text-xs text-slate-600 flex items-center gap-2 flex-wrap">
+                                                <span x-show="lesson.topic" class="font-semibold text-slate-800" x-text="'Topic: ' + lesson.topic"></span>
+                                                <span x-show="lesson.topic && lesson.subStrand">•</span>
+                                                <span x-show="lesson.subStrand" class="text-slate-600" x-text="'Sub-Strand: ' + lesson.subStrand"></span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Right: Actions (Download, Scheme, Discussion, SISO Feedback) -->
+                                        <div class="flex items-center gap-2 flex-wrap shrink-0">
+                                            <!-- Download Lesson Plan -->
+                                            <a :href="lesson.fileData" :download="lesson.fileName" class="bg-white hover:bg-slate-100 text-slate-800 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 border border-slate-300 shadow-2xs">
+                                                <i class="fa fa-download text-blue-700"></i> Download
+                                            </a>
+                                            <!-- Download Scheme if available -->
+                                            <a x-show="lesson.schemeFileName" :href="lesson.schemeFileData" :download="lesson.schemeFileName" class="bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 border border-teal-200">
+                                                <i class="fa fa-file-excel text-teal-600"></i> Scheme
+                                            </a>
+                                            <!-- Discussion Thread -->
+                                            <button type="button" @click="openCommentThread(lesson)" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-900 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 border border-indigo-200 shadow-2xs">
+                                                <i class="fa fa-comments text-indigo-600"></i> Discussion (<span x-text="(lesson.comments || []).length"></span>)
+                                            </button>
+                                            <!-- Official SISO Supervision Feedback Button -->
+                                            <button type="button" @click="openSisoFeedbackModal(lesson)" class="bg-[#011B33] hover:bg-blue-900 text-amber-400 text-xs font-black px-3.5 py-2 rounded-xl transition shadow-sm flex items-center gap-1.5 border border-amber-400/40">
+                                                <i class="fa fa-signature text-amber-300"></i>
+                                                <span x-text="lesson.sisoFeedback ? 'Update SISO Feedback' : 'Add SISO Feedback'"></span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Existing SISO Feedback Box -->
+                                    <div x-show="lesson.sisoFeedback" class="bg-amber-50/80 border border-amber-300 p-3.5 rounded-xl space-y-1 text-xs text-amber-950">
+                                        <div class="flex items-center justify-between">
+                                            <span class="font-black text-amber-950 flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
+                                                <i class="fa fa-building-columns text-amber-700"></i> Official SISO Supervision Feedback
+                                            </span>
+                                            <span class="font-bold px-2 py-0.5 rounded text-[10px]" :class="lesson.sisoFeedback?.rating === 'Exemplary' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-amber-200 text-amber-900 border border-amber-300'" x-text="lesson.sisoFeedback?.rating || 'Commendable'"></span>
+                                        </div>
+                                        <p class="text-slate-800 pt-0.5 font-medium" x-text="lesson.sisoFeedback?.note || lesson.sisoFeedback?.recommendations"></p>
+                                        <p class="text-[10px] text-amber-800 font-semibold" x-text="'Signed by: ' + (lesson.sisoFeedback?.officer || 'SISO Officer') + ' on ' + (lesson.sisoFeedback?.date || '')"></p>
+                                    </div>
+
+                                    <!-- Headteacher Digital Stamp Seal Badge (if approved) -->
+                                    <div x-show="lesson.status === 'Approved' && lesson.stamp" class="text-xs text-emerald-800 flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200 w-fit">
+                                        <i class="fa fa-stamp text-emerald-600"></i>
+                                        <span x-text="'Headteacher Digital Stamp Validated (' + (lesson.stamp?.stampId || '') + ')'"></span>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+
+                <div x-show="sisoGroupedByTeacher.length === 0" class="text-center py-12 text-slate-400 text-sm bg-white rounded-2xl border p-8">
+                    <i class="fa fa-folder-open text-3xl text-slate-300 mb-2 block"></i>
+                    <p class="font-semibold text-slate-600">No lesson submissions found matching your filters.</p>
+                    <p class="text-xs text-slate-400 mt-1">Try switching the week, term, teacher filter, or clearing your search keywords.</p>
+                </div>
+            </div>
+
+            <!-- VIEW MODE 2: ALL SUBMISSIONS STREAM VIEW -->
+            <div x-show="sisoViewMode === 'list'" class="space-y-4">
                 <template x-for="lesson in sisoFilteredLessons" :key="lesson.id">
                     <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4 hover:border-amber-400 transition">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-100 pb-3">
                             <div class="space-y-1">
                                 <div class="flex items-center gap-2 flex-wrap">
-                                    <span class="font-bold text-sm text-slate-900" x-text="lesson.subject"></span>
+                                    <span class="font-black text-sm text-slate-900" x-text="lesson.subject"></span>
                                     <span class="bg-slate-100 text-slate-700 text-xs px-2.5 py-0.5 rounded-full font-semibold" x-text="lesson.classLevel"></span>
                                     <span class="bg-blue-100 text-blue-900 text-xs font-mono font-bold px-2.5 py-0.5 rounded-full" x-text="lesson.term + ' • ' + lesson.week"></span>
                                     <span class="text-xs font-bold px-2.5 py-0.5 rounded-full" :class="lesson.status === 'Approved' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'" x-text="lesson.status === 'Approved' ? '✓ Headteacher Approved' : 'Pending Head Review'"></span>
                                 </div>
-                                <p class="text-xs text-slate-600">
-                                    <!-- Pure Teacher Name without Teacher ID attached -->
-                                    <strong>Educator:</strong> <span class="font-semibold text-slate-900" x-text="lesson.teacherName"></span>
+                                <p class="text-xs text-slate-600 flex items-center gap-2 flex-wrap">
+                                    <!-- Teacher Name AND Staff ID tied together -->
+                                    <span><strong>Educator:</strong> <span class="font-bold text-slate-900" x-text="lesson.teacherName"></span></span>
+                                    <span class="font-mono text-xs font-bold bg-blue-50 text-blue-900 px-2 py-0.5 rounded border border-blue-200" x-text="'Staff ID: ' + lesson.teacherId"></span>
                                     <span x-show="lesson.teacherContact" class="text-slate-400" x-text="' | Tel: ' + lesson.teacherContact"></span>
                                 </p>
                             </div>
@@ -2062,15 +2124,15 @@
                                     <i class="fa fa-comments text-indigo-600"></i> Discussion (<span x-text="(lesson.comments || []).length"></span>)
                                 </button>
                                 <!-- SISO Official Supervisory Feedback -->
-                                <button type="button" @click="openSisoFeedbackModal(lesson)" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition shadow-sm flex items-center gap-1.5">
-                                    <i class="fa fa-signature"></i>
+                                <button type="button" @click="openSisoFeedbackModal(lesson)" class="bg-[#011B33] hover:bg-blue-900 text-amber-400 text-xs font-black px-3.5 py-2 rounded-xl transition shadow-sm flex items-center gap-1.5 border border-amber-400/40">
+                                    <i class="fa fa-signature text-amber-300"></i>
                                     <span x-text="lesson.sisoFeedback ? 'Update SISO Feedback' : 'Add SISO Feedback'"></span>
                                 </button>
                             </div>
                         </div>
 
                         <!-- Existing SISO Feedback Box -->
-                        <div x-show="lesson.sisoFeedback" class="bg-amber-50/70 border border-amber-200 p-3.5 rounded-xl space-y-1 text-xs text-amber-950">
+                        <div x-show="lesson.sisoFeedback" class="bg-amber-50/80 border border-amber-300 p-3.5 rounded-xl space-y-1 text-xs text-amber-950">
                             <div class="flex items-center justify-between">
                                 <span class="font-black text-amber-900 flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
                                     <i class="fa fa-building-columns text-amber-700"></i> Official SISO Supervision Feedback
@@ -2090,7 +2152,7 @@
                 </template>
 
                 <div x-show="sisoFilteredLessons.length === 0" class="text-center py-12 text-slate-400 text-sm bg-white rounded-2xl border p-8">
-                    <p>No lesson submissions found for this selected week and term.</p>
+                    <p>No lesson submissions found for this selected week, term, and filter.</p>
                 </div>
             </div>
         </div>
@@ -2207,9 +2269,10 @@
                     <!-- Navigation Sub-Tabs -->
                     <div class="flex flex-col lg:flex-row justify-between items-center gap-4 border-b border-slate-100 pb-4 no-print">
                         <div class="flex overflow-x-auto no-scrollbar gap-1.5 w-full lg:w-auto pb-1">
-                            <button @click="adminSubTab = 'queue'" :class="adminSubTab === 'queue' ? 'bg-blue-900 text-white shadow-sm' : 'bg-slate-100 text-slate-700'" class="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl text-xs font-semibold transition">Vetting Queue</button>
-                            <button @click="adminSubTab = 'history'" :class="adminSubTab === 'history' ? 'bg-blue-900 text-white shadow-sm' : 'bg-slate-100 text-slate-700'" class="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl text-xs font-semibold transition">Teachers History</button>
-                            <button @click="adminSubTab = 'broadsheet'" :class="adminSubTab === 'broadsheet' ? 'bg-blue-900 text-white shadow-sm' : 'bg-slate-100 text-slate-700'" class="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl text-xs font-semibold transition">📊 Master Broad Sheet</button>
+                            <button @click="adminSubTab = 'queue'" :class="adminSubTab === 'queue' ? 'bg-blue-900 text-white shadow-sm font-bold' : 'bg-slate-100 text-slate-700'" class="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl text-xs font-semibold transition">Vetting Queue</button>
+                            <button @click="adminSubTab = 'history'" :class="adminSubTab === 'history' ? 'bg-blue-900 text-white shadow-sm font-bold' : 'bg-slate-100 text-slate-700'" class="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl text-xs font-semibold transition">Teachers History</button>
+                            <button @click="adminSubTab = 'sba'" :class="adminSubTab === 'sba' ? 'bg-blue-900 text-white shadow-sm font-bold' : 'bg-slate-100 text-slate-700'" class="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5"><i class="fa fa-file-pen text-emerald-400"></i> SBA Gradebook</button>
+                            <button @click="adminSubTab = 'broadsheet'" :class="adminSubTab === 'broadsheet' ? 'bg-blue-900 text-white shadow-sm font-bold' : 'bg-slate-100 text-slate-700'" class="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl text-xs font-semibold transition">📊 Master Broad Sheet</button>
                             <button @click="adminSubTab = 'exam_analysis'" :class="adminSubTab === 'exam_analysis' ? 'bg-blue-900 text-white shadow-sm' : 'bg-slate-100 text-slate-700'" class="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl text-xs font-semibold transition">📈 Admin Exam Analysis</button>
                             <button @click="adminSubTab = 'terminal_report'" :class="adminSubTab === 'terminal_report' ? 'bg-blue-900 text-white shadow-sm' : 'bg-slate-100 text-slate-700'" class="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl text-xs font-semibold transition">🇬🇭 GES Terminal Reports</button>
                             <button @click="adminSubTab = 'admissions'" :class="adminSubTab === 'admissions' ? 'bg-blue-900 text-white shadow-sm' : 'bg-slate-100 text-slate-700'" class="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl text-xs font-semibold transition">Admissions & Enrolment</button>
@@ -2778,6 +2841,118 @@
                         </div>
                     </div>
 
+                    <!-- ==================== TAB: GES CONTINUOUS ASSESSMENT (SBA) GRADEBOOK (REVIEWER ACTIVATED) ==================== -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6" x-show="adminSubTab === 'sba'">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b pb-4">
+                            <div>
+                                <h3 class="text-base font-bold text-blue-950">📊 GES Continuous Assessment (SBA) Gradebook</h3>
+                                <p class="text-xs text-slate-500">Class Score (50%) + Exam Score (50%) = 100% | WAEC 9-Point Stanine Grading</p>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <button @click="downloadSbaExcelTemplate()" class="bg-blue-900 hover:bg-blue-800 text-white text-xs px-3.5 py-2 rounded-xl font-bold transition shadow-sm flex items-center gap-1.5">
+                                    <i class="fa fa-file-excel text-emerald-300"></i> Download Excel Marksheet
+                                </button>
+                                <label class="cursor-pointer bg-slate-800 hover:bg-slate-900 text-white text-xs px-3.5 py-2 rounded-xl font-bold transition shadow-sm flex items-center gap-1.5">
+                                    <i class="fa fa-file-arrow-up text-amber-300"></i> Upload Filled Marksheet
+                                    <input type="file" @change="handleSbaExcelUpload($event)" accept=".csv,.txt" class="hidden">
+                                </label>
+                                <button @click="saveSbaScores()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-4 py-2 rounded-xl font-bold transition shadow-sm flex items-center gap-1.5">
+                                    <i class="fa fa-floppy-disk"></i> Save SBA Grades
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Excel Data Type Integrity & Bulk Registration Guidance Callout -->
+                        <div class="bg-blue-50/80 border border-blue-200 p-3.5 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-blue-950">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-lg bg-blue-900 text-white flex items-center justify-center shrink-0">
+                                    <i class="fa fa-shield-halved text-emerald-400"></i>
+                                </div>
+                                <div>
+                                    <span class="font-extrabold block">Excel Data Type & Range Integrity Active:</span>
+                                    <span class="text-slate-600 text-[11px]">Strict verification on import: HW [0–15], Project [0–15], Test [0–20], Exam [0–50]. New learners are automatically registered.</span>
+                                </div>
+                            </div>
+                            <span class="text-[10px] bg-emerald-100 text-emerald-900 border border-emerald-300 px-2.5 py-1 rounded-full font-bold uppercase tracking-wider shrink-0">
+                                ✓ UTF-8 Excel Ready
+                            </span>
+                        </div>
+
+                        <!-- Class & Subject Filter Bar -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs">
+                            <div>
+                                <label class="block font-bold text-slate-700 mb-1">Class</label>
+                                <select x-model="sbaClassFilter" class="w-full border p-2 rounded-lg bg-white">
+                                    <option value="Basic 7">Basic 7 (JHS 1)</option>
+                                    <option value="Basic 8">Basic 8 (JHS 2)</option>
+                                    <option value="Basic 9">Basic 9 (JHS 3)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-700 mb-1">Subject</label>
+                                <select x-model="sbaSubjectFilter" class="w-full border p-2 rounded-lg bg-white">
+                                    <template x-for="subj in allAvailableSubjects" :key="subj">
+                                        <option :value="subj" x-text="subj"></option>
+                                    </template>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-700 mb-1">Term</label>
+                                <select x-model="settingsForm.activeTerm" class="w-full border p-2 rounded-lg bg-white font-bold text-blue-900">
+                                    <option value="Term 1">Term 1</option>
+                                    <option value="Term 2">Term 2</option>
+                                    <option value="Term 3">Term 3</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Spreadsheet Table -->
+                        <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                            <table class="w-full text-left text-xs border-collapse min-w-[700px]">
+                                <thead class="bg-slate-100 text-slate-700 font-bold border-b text-[11px] uppercase">
+                                    <tr>
+                                        <th class="p-3 sticky left-0 bg-slate-100 z-10 shadow-xs">Student Name</th>
+                                        <th class="p-3 text-center">Class Task / HW (15)</th>
+                                        <th class="p-3 text-center">Group Project (15)</th>
+                                        <th class="p-3 text-center">Mid-Term Test (20)</th>
+                                        <th class="p-3 text-center bg-blue-50 text-blue-900">Total Class Score (50%)</th>
+                                        <th class="p-3 text-center bg-indigo-50 text-indigo-900">End of Term Exam (50%)</th>
+                                        <th class="p-3 text-center bg-emerald-50 text-emerald-950 font-bold">Overall Mark (100%)</th>
+                                        <th class="p-3 text-center">WAEC Grade</th>
+                                        <th class="p-3 text-center">Remark</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-200">
+                                    <template x-for="(stu, idx) in sbaStudents" :key="stu.id">
+                                        <tr class="hover:bg-slate-50 transition">
+                                            <td class="p-3 font-semibold text-slate-900 sticky left-0 bg-white z-10 shadow-xs" x-text="stu.name"></td>
+                                            <td class="p-2 text-center">
+                                                <input type="number" min="0" max="15" x-model.number="stu.hw" class="w-14 text-center border rounded p-1 font-mono text-xs">
+                                            </td>
+                                            <td class="p-2 text-center">
+                                                <input type="number" min="0" max="15" x-model.number="stu.project" class="w-14 text-center border rounded p-1 font-mono text-xs">
+                                            </td>
+                                            <td class="p-2 text-center">
+                                                <input type="number" min="0" max="20" x-model.number="stu.test" class="w-14 text-center border rounded p-1 font-mono text-xs">
+                                            </td>
+                                            <td class="p-3 text-center font-bold text-blue-900 bg-blue-50/50" x-text="calculateClassScore(stu)"></td>
+                                            <td class="p-2 text-center bg-indigo-50/50">
+                                                <input type="number" min="0" max="50" x-model.number="stu.exam" class="w-14 text-center border rounded p-1 font-mono font-bold text-xs">
+                                            </td>
+                                            <td class="p-3 text-center font-black text-emerald-700 bg-emerald-50/50 text-sm" x-text="calculateTotalScore(stu)"></td>
+                                            <td class="p-3 text-center">
+                                                <span class="px-2 py-0.5 rounded text-[11px] font-bold"
+                                                      :class="getWaecGradeClass(calculateTotalScore(stu))"
+                                                      x-text="getWaecGrade(calculateTotalScore(stu))"></span>
+                                            </td>
+                                            <td class="p-3 text-center text-slate-600 font-medium text-[11px]" x-text="getWaecRemark(calculateTotalScore(stu))"></td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                     <!-- ==================== TAB: INSTITUTIONAL MASTER BROAD SHEET ==================== -->
                     <div x-show="adminSubTab === 'broadsheet'" class="space-y-6">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b pb-4 no-print">
@@ -3256,18 +3431,13 @@
     <nav x-show="authenticatedSchoolId" x-cloak class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-blue-950/95 backdrop-blur-md border-t border-blue-800/80 px-2 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] flex justify-around items-center text-center shadow-2xl no-print" style="display: none;">
         <button type="button" @click="portalMode = 'teacher'; teacherSubTab = 'upload'" class="flex flex-col items-center justify-center py-1 px-3 rounded-xl transition min-w-[56px] min-h-[46px]" :class="portalMode === 'teacher' && teacherSubTab === 'upload' ? 'bg-blue-900/80 text-teal-300 font-extrabold shadow-sm' : 'text-blue-200/70 hover:text-white'">
             <i class="fa fa-folder-open text-base mb-0.5"></i>
-            <span class="text-[10px]">Lessons</span>
+            <span class="text-[10px]">Upload</span>
         </button>
 
         <button type="button" @click="portalMode = 'teacher'; checkEngineTab()" class="flex flex-col items-center justify-center py-1 px-3 rounded-xl transition relative min-w-[56px] min-h-[46px]" :class="portalMode === 'teacher' && teacherSubTab === 'engine' ? 'bg-blue-900/80 text-amber-300 font-extrabold shadow-sm' : 'text-blue-200/70 hover:text-white'">
             <i class="fa fa-wand-magic-sparkles text-base mb-0.5"></i>
-            <span class="text-[10px]">NaCCA</span>
+            <span class="text-[10px]">Plan</span>
             <span x-show="!isPro" class="absolute top-1 right-2 w-2 h-2 rounded-full bg-amber-400"></span>
-        </button>
-
-        <button type="button" @click="portalMode = 'teacher'; teacherSubTab = 'sba'" class="flex flex-col items-center justify-center py-1 px-3 rounded-xl transition min-w-[56px] min-h-[46px]" :class="portalMode === 'teacher' && teacherSubTab === 'sba' ? 'bg-blue-900/80 text-emerald-400 font-extrabold shadow-sm' : 'text-blue-200/70 hover:text-white'">
-            <i class="fa fa-file-pen text-base mb-0.5"></i>
-            <span class="text-[10px]">SBA</span>
         </button>
 
         <button type="button" @click="attemptReviewerAccess()" class="flex flex-col items-center justify-center py-1 px-3 rounded-xl transition min-w-[56px] min-h-[46px]" :class="portalMode === 'reviewer' ? 'bg-rose-900/80 text-rose-300 font-extrabold shadow-sm' : 'text-blue-200/70 hover:text-white'">
@@ -5470,6 +5640,10 @@
                 sisoComment: '',
                 sisoActiveTerm: 'Term 1',
                 sisoActiveWeek: 'all',
+                sisoViewMode: 'teacher_grouped',
+                sisoTeacherFilter: 'all',
+                sisoSortBy: 'teacher',
+                sisoSearchQuery: '',
 
                 reviewerYearFilter: '',
                 reviewerTeacherFilter: '',
@@ -7338,15 +7512,81 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                     return this.activeLessons.filter(l => l.week === week).length;
                 },
 
+                get sisoTeachersList() {
+                    const map = new Map();
+                    (this.sortedTeachers || []).forEach(t => {
+                        if (t && t.id) map.set(t.id, { id: t.id, name: t.name || t.id, contact: t.contact || '', subjects: t.subjects || '' });
+                    });
+                    (this.activeLessons || []).forEach(l => {
+                        if (l && l.teacherId && !map.has(l.teacherId)) {
+                            map.set(l.teacherId, { id: l.teacherId, name: l.teacherName || l.teacherId, contact: l.teacherContact || '', subjects: l.subject || '' });
+                        }
+                    });
+                    return Array.from(map.values()).sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+                },
+
                 get sisoFilteredLessons() {
-                    let items = this.activeLessons;
+                    let items = [...(this.activeLessons || [])];
                     if (this.sisoActiveTerm) {
                         items = items.filter(l => l.term === this.sisoActiveTerm);
                     }
                     if (this.sisoActiveWeek && this.sisoActiveWeek !== 'all') {
                         items = items.filter(l => l.week === this.sisoActiveWeek);
                     }
+                    if (this.sisoTeacherFilter && this.sisoTeacherFilter !== 'all') {
+                        items = items.filter(l => l.teacherId === this.sisoTeacherFilter);
+                    }
+                    const q = (this.sisoSearchQuery || '').toLowerCase().trim();
+                    if (q) {
+                        items = items.filter(l => 
+                            (l.teacherName && l.teacherName.toLowerCase().includes(q)) ||
+                            (l.teacherId && l.teacherId.toLowerCase().includes(q)) ||
+                            (l.subject && l.subject.toLowerCase().includes(q)) ||
+                            (l.classLevel && l.classLevel.toLowerCase().includes(q)) ||
+                            (l.topic && l.topic.toLowerCase().includes(q)) ||
+                            (l.subStrand && l.subStrand.toLowerCase().includes(q))
+                        );
+                    }
+                    if (this.sisoSortBy === 'teacher') {
+                        items.sort((a, b) => (a.teacherName || '').localeCompare(b.teacherName || ''));
+                    } else if (this.sisoSortBy === 'subject') {
+                        items.sort((a, b) => (a.subject || '').localeCompare(b.subject || ''));
+                    } else if (this.sisoSortBy === 'week') {
+                        items.sort((a, b) => {
+                            const wa = parseInt((a.week || '').replace(/\D/g, '')) || 0;
+                            const wb = parseInt((b.week || '').replace(/\D/g, '')) || 0;
+                            return wa - wb;
+                        });
+                    } else if (this.sisoSortBy === 'status') {
+                        items.sort((a, b) => (b.status === 'Approved' ? 1 : 0) - (a.status === 'Approved' ? 1 : 0));
+                    }
                     return items;
+                },
+
+                get sisoGroupedByTeacher() {
+                    const filtered = this.sisoFilteredLessons;
+                    const map = {};
+                    
+                    filtered.forEach(lesson => {
+                        const tid = lesson.teacherId || 'UNASSIGNED';
+                        if (!map[tid]) {
+                            const teacherRecord = (this.teachers || []).find(t => t.id === tid);
+                            map[tid] = {
+                                teacherId: tid,
+                                teacherName: lesson.teacherName || (teacherRecord ? teacherRecord.name : 'Unknown Educator'),
+                                teacherContact: lesson.teacherContact || (teacherRecord ? teacherRecord.contact : ''),
+                                assignedSubjects: teacherRecord ? teacherRecord.subjects : (lesson.subject || ''),
+                                lessons: []
+                            };
+                        }
+                        map[tid].lessons.push(lesson);
+                    });
+
+                    const groups = Object.values(map);
+                    if (this.sisoSortBy === 'teacher') {
+                        groups.sort((a, b) => (a.teacherName || '').localeCompare(b.teacherName || ''));
+                    }
+                    return groups;
                 },
                 
                 reviewAction(lesson, newStatus) {
