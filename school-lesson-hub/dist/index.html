@@ -624,7 +624,12 @@
             
             <form @submit.prevent="verifySisoPin()" class="space-y-3">
                 <div>
-                    <input type="password" x-model="enteredSisoPin" placeholder="Enter SISO PIN (Default: 2026)" autofocus class="w-full text-center tracking-widest text-lg rounded-lg border-slate-300 border px-3 py-2 focus:outline-none focus:border-amber-600 font-bold" maxlength="8" required>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Assigned School ID</label>
+                    <input type="text" x-model="sisoAssignedSchoolId" placeholder="e.g. ATAK-983" class="w-full text-center uppercase tracking-wider text-sm rounded-lg border-slate-300 border px-3 py-2 font-mono font-bold focus:outline-none focus:border-amber-600" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">SISO Inspection PIN</label>
+                    <input type="password" x-model="enteredSisoPin" placeholder="Default: 2026" autofocus class="w-full text-center tracking-widest text-lg rounded-lg border-slate-300 border px-3 py-2 focus:outline-none focus:border-amber-600 font-bold" maxlength="8" required>
                 </div>
                 <div class="flex gap-2 pt-1">
                     <button type="submit" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 rounded-lg transition shadow-sm">Enter SISO Portal</button>
@@ -647,7 +652,8 @@
 
             <template x-if="activeSisoLesson">
                 <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-1">
-                    <div><strong>Educator:</strong> <span x-text="activeSisoLesson.teacherName + ' (' + activeSisoLesson.teacherId + ')'"></span></div>
+                    <!-- Pure Teacher Name without Teacher ID attached -->
+                    <div><strong>Educator:</strong> <span class="font-bold text-slate-900" x-text="activeSisoLesson.teacherName"></span></div>
                     <div><strong>Subject:</strong> <span x-text="activeSisoLesson.subject + ' — ' + activeSisoLesson.classLevel + ' (' + activeSisoLesson.week + ')'"></span></div>
                 </div>
             </template>
@@ -856,7 +862,7 @@
                 </div>
 
                 <!-- Pro Badge / Offers Button -->
-                <button @click="showProUpgradeModal = true" class="px-2 py-1 rounded-lg text-[10px] font-black uppercase flex items-center gap-1 transition shadow-xs" :class="isPro ? 'bg-amber-400 text-amber-950' : 'bg-amber-500/20 text-amber-300 border border-amber-400/40'">
+                <button x-show="portalMode !== 'siso'" @click="showProUpgradeModal = true" class="px-2 py-1 rounded-lg text-[10px] font-black uppercase flex items-center gap-1 transition shadow-xs" :class="isPro ? 'bg-amber-400 text-amber-950' : 'bg-amber-500/20 text-amber-300 border border-amber-400/40'">
                     <i class="fa fa-crown text-[10px]"></i>
                     <span x-text="isPro ? 'PRO' : 'PRO'"></span>
                 </button>
@@ -914,50 +920,84 @@
                 </div>
 
                 <!-- Navigation Links / Menus -->
-                <nav class="space-y-2 pt-2">
-                    <div class="text-[10px] font-bold uppercase tracking-wider text-blue-300 px-3 mb-1">Academic Modules</div>
-                    
-                    <button @click="portalMode = 'teacher'; teacherSubTab = 'upload'" :class="portalMode === 'teacher' && teacherSubTab === 'upload' ? 'bg-blue-800 text-white shadow-md font-bold' : 'hover:bg-blue-800/60 text-blue-100'" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs transition">
-                        <i class="fa fa-folder-open w-4 text-center text-teal-300"></i>
-                        <span>Upload & History</span>
-                    </button>
+                <nav class="pt-2">
+                    <!-- Standard Modules & Pro Pricing: Visible for Teachers and Reviewers, Hidden for SISO -->
+                    <div x-show="portalMode !== 'siso'" class="space-y-2">
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-blue-300 px-3 mb-1">Academic Modules</div>
+                        
+                        <button @click="portalMode = 'teacher'; teacherSubTab = 'upload'" :class="portalMode === 'teacher' && teacherSubTab === 'upload' ? 'bg-blue-800 text-white shadow-md font-bold' : 'hover:bg-blue-800/60 text-blue-100'" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs transition">
+                            <i class="fa fa-folder-open w-4 text-center text-teal-300"></i>
+                            <span>Upload & History</span>
+                        </button>
 
-                    <!-- NaCCA Lesson Engine Card Button -->
-                    <button @click="portalMode = 'teacher'; checkEngineTab()" :class="portalMode === 'teacher' && teacherSubTab === 'engine' ? 'bg-blue-800 text-white shadow-md font-bold' : 'hover:bg-blue-800/60 text-blue-100'" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs transition">
-                        <i class="fa fa-wand-magic-sparkles w-4 text-center text-amber-300"></i>
-                        <span class="flex-1 text-left">NaCCA Lesson Engine</span>
-                        <span x-show="!isEngineUnlocked" class="text-[9px] bg-amber-500/30 text-amber-200 px-1.5 py-0.5 rounded font-mono">🔒</span>
-                    </button>
+                        <!-- NaCCA Lesson Engine Card Button -->
+                        <button @click="portalMode = 'teacher'; checkEngineTab()" :class="portalMode === 'teacher' && teacherSubTab === 'engine' ? 'bg-blue-800 text-white shadow-md font-bold' : 'hover:bg-blue-800/60 text-blue-100'" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs transition">
+                            <i class="fa fa-wand-magic-sparkles w-4 text-center text-amber-300"></i>
+                            <span class="flex-1 text-left">NaCCA Lesson Engine</span>
+                            <span x-show="!isEngineUnlocked" class="text-[9px] bg-amber-500/30 text-amber-200 px-1.5 py-0.5 rounded font-mono">🔒</span>
+                        </button>
 
-                    <!-- Continuous Assessment (SBA) Gradebook -->
-                    <button @click="portalMode = 'teacher'; teacherSubTab = 'sba'" :class="portalMode === 'teacher' && teacherSubTab === 'sba' ? 'bg-blue-800 text-white shadow-md font-bold' : 'hover:bg-blue-800/60 text-blue-100'" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs transition">
-                        <i class="fa fa-file-pen w-4 text-center text-emerald-300"></i>
-                        <span class="flex-1 text-left">GES SBA Gradebook</span>
-                    </button>
+                        <!-- Continuous Assessment (SBA) Gradebook -->
+                        <button @click="portalMode = 'teacher'; teacherSubTab = 'sba'" :class="portalMode === 'teacher' && teacherSubTab === 'sba' ? 'bg-blue-800 text-white shadow-md font-bold' : 'hover:bg-blue-800/60 text-blue-100'" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs transition">
+                            <i class="fa fa-file-pen w-4 text-center text-emerald-300"></i>
+                            <span class="flex-1 text-left">GES SBA Gradebook</span>
+                        </button>
 
-                    <div class="text-[10px] font-bold uppercase tracking-wider text-blue-300 px-3 pt-3 mb-1">Administration</div>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-blue-300 px-3 pt-3 mb-1">Administration</div>
 
-                    <!-- Reviewer & Inspection Dashboard Button -->
-                    <button @click="attemptReviewerAccess()" :class="portalMode === 'reviewer' ? 'bg-rose-700 text-white shadow-lg font-bold ring-2 ring-white/30' : 'bg-rose-600 hover:bg-rose-700 text-white shadow-md font-bold'" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs transition">
-                        <i class="fa fa-shield-halved w-4 text-center text-white"></i>
-                        <span class="flex-1 text-left">Reviewer & Inspection</span>
-                        <span class="text-[10px] bg-white/20 text-white px-1.5 py-0.5 rounded font-mono">🔒 PIN</span>
-                    </button>
+                        <!-- Reviewer & Inspection Dashboard Button -->
+                        <button @click="attemptReviewerAccess()" :class="portalMode === 'reviewer' ? 'bg-rose-700 text-white shadow-lg font-bold ring-2 ring-white/30' : 'bg-rose-600 hover:bg-rose-700 text-white shadow-md font-bold'" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs transition">
+                            <i class="fa fa-shield-halved w-4 text-center text-white"></i>
+                            <span class="flex-1 text-left">Reviewer & Inspection</span>
+                            <span class="text-[10px] bg-white/20 text-white px-1.5 py-0.5 rounded font-mono">🔒 PIN</span>
+                        </button>
 
-                    
-                    <!-- SISO Circuit Inspection Button -->
-                    <button @click="attemptSisoAccess()" :class="portalMode === 'siso' ? 'bg-amber-600 text-white shadow-lg font-bold ring-2 ring-white/30' : 'bg-slate-800/80 hover:bg-slate-800 text-amber-200 border border-amber-500/40 shadow-sm font-semibold'" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs transition">
-                        <i class="fa fa-building-columns w-4 text-center text-amber-300"></i>
-                        <span class="flex-1 text-left">GES SISO Circuit Portal</span>
-                        <span class="text-[9px] bg-amber-400 text-slate-950 font-bold px-1.5 py-0.5 rounded">SISO</span>
-                    </button>
+                        <!-- SISO Circuit Inspection Button -->
+                        <button @click="attemptSisoAccess()" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs transition bg-slate-800/80 hover:bg-slate-800 text-amber-200 border border-amber-500/40 shadow-sm font-semibold">
+                            <i class="fa fa-building-columns w-4 text-center text-amber-300"></i>
+                            <span class="flex-1 text-left">GES SISO Circuit Portal</span>
+                            <span class="text-[9px] bg-amber-400 text-slate-950 font-bold px-1.5 py-0.5 rounded">SISO</span>
+                        </button>
 
-                    <!-- Packages & Pricing Matrix Button -->
-                    <button @click="showProUpgradeModal = true" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs transition bg-amber-500/10 hover:bg-amber-500/20 text-amber-200 border border-amber-400/30">
-                        <i class="fa fa-gem w-4 text-center text-amber-300"></i>
-                        <span class="flex-1 text-left font-bold">Package Plans & Offers</span>
-                        <span class="text-[9px] bg-amber-400 text-slate-950 font-black px-1.5 py-0.5 rounded">PRICING</span>
-                    </button>
+                        <!-- Packages & Pricing Matrix Button (Hidden in SISO mode) -->
+                        <button @click="showProUpgradeModal = true" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs transition bg-amber-500/10 hover:bg-amber-500/20 text-amber-200 border border-amber-400/30">
+                            <i class="fa fa-gem w-4 text-center text-amber-300"></i>
+                            <span class="flex-1 text-left font-bold">Package Plans & Offers</span>
+                            <span class="text-[9px] bg-amber-400 text-slate-950 font-black px-1.5 py-0.5 rounded">PRICING</span>
+                        </button>
+                    </div>
+
+                    <!-- Dedicated SISO Navigation Menu: Only relevant circuit inspection features shown -->
+                    <div x-show="portalMode === 'siso'" class="space-y-3">
+                        <div class="text-[10px] font-black uppercase tracking-wider text-amber-300 px-1 mb-1">
+                            Circuit Oversight
+                        </div>
+                        
+                        <div class="bg-amber-600 text-white shadow-lg font-bold ring-2 ring-white/30 w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs">
+                            <i class="fa fa-building-columns w-4 text-center text-white"></i>
+                            <span class="flex-1 text-left">GES Circuit Portal</span>
+                            <span class="text-[9px] bg-amber-400 text-slate-950 font-black px-1.5 py-0.5 rounded">ACTIVE</span>
+                        </div>
+
+                        <!-- Assigned School Card in Sidebar -->
+                        <div class="p-3.5 bg-slate-800/90 rounded-2xl border border-amber-500/30 text-xs space-y-2">
+                            <div class="text-[10px] text-amber-300 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                                <i class="fa fa-school-flag text-amber-400"></i> Assigned School
+                            </div>
+                            <div class="font-bold text-white text-xs truncate" x-text="activeSchoolName"></div>
+                            <div class="text-[11px] font-mono text-cyan-300 font-semibold" x-text="'ID: ' + authenticatedSchoolId"></div>
+                            
+                            <button type="button" @click="showSisoSchoolModal = true" class="w-full mt-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 text-[11px] font-bold py-2 px-2.5 rounded-xl border border-amber-400/40 transition flex items-center justify-center gap-1.5">
+                                <i class="fa fa-arrows-rotate text-[10px]"></i> Switch Assigned School
+                            </button>
+                        </div>
+
+                        <!-- Exit SISO Portal Button -->
+                        <button @click="portalMode = 'teacher'; teacherSubTab = 'upload'" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs transition bg-slate-800/60 hover:bg-slate-800 text-slate-300 border border-slate-700">
+                            <i class="fa fa-arrow-left w-4 text-center"></i>
+                            <span>Exit SISO Portal</span>
+                        </button>
+                    </div>
                 </nav>
             </div>
 
@@ -976,8 +1016,8 @@
         <!-- Main Content Area -->
         <main class="flex-grow p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8 space-y-6 max-w-6xl w-full relative">
 
-            <!-- ==================== CLEAN HEADER & ANNOUNCEMENT CARD ==================== -->
-            <div class="space-y-4 no-print">
+            <!-- ==================== CLEAN HEADER & ANNOUNCEMENT CARD (Hidden in SISO mode) ==================== -->
+            <div class="space-y-4 no-print" x-show="portalMode !== 'siso'">
                 <!-- Big Header and Logo -->
                 <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gradient-to-r from-blue-900 to-indigo-900 text-white">
                     <div class="flex items-center space-x-4">
@@ -1708,20 +1748,39 @@
         <!-- ========================================== -->
         <div class="space-y-6" x-show="portalMode === 'siso'" x-cloak>
             <!-- SISO Header -->
-            <div class="bg-gradient-to-r from-slate-900 to-amber-950 text-white p-5 rounded-2xl shadow-sm border border-amber-900/40 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div class="flex items-center space-x-3.5">
-                    <div class="w-12 h-12 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center font-black text-xl shadow-md">
-                        🇬🇭
+            <div class="bg-gradient-to-r from-slate-900 to-amber-950 text-white p-5 rounded-2xl shadow-sm border border-amber-900/40 space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div class="flex items-center space-x-3.5">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center font-black text-xl shadow-md">
+                            🇬🇭
+                        </div>
+                        <div>
+                            <span class="text-[10px] font-black tracking-widest uppercase bg-amber-400/20 text-amber-300 border border-amber-400/30 px-2.5 py-0.5 rounded-full inline-block mb-1">GHANA EDUCATION SERVICE • CIRCUIT SUPERVISION</span>
+                            <h3 class="text-lg font-black text-white">SISO School Improvement & Quality Portal</h3>
+                            <p class="text-xs text-amber-200/70">Official Circuit Inspection, Curriculum Vetting & Pedagogical Advice</p>
+                        </div>
                     </div>
-                    <div>
-                        <span class="text-[10px] font-black tracking-widest uppercase bg-amber-400/20 text-amber-300 border border-amber-400/30 px-2.5 py-0.5 rounded-full inline-block mb-1">GHANA EDUCATION SERVICE • CIRCUIT SUPERVISION</span>
-                        <h3 class="text-lg font-black text-white">SISO School Improvement & Quality Portal</h3>
-                        <p class="text-xs text-amber-200/70" x-text="'Monitoring & Pedagogical Oversight for ' + activeSchoolName"></p>
+                    <div class="flex items-center gap-2">
+                        <button @click="portalMode = 'teacher'; teacherSubTab = 'upload'" class="bg-white/10 hover:bg-white/20 text-white text-xs px-3.5 py-2 rounded-xl font-bold transition flex items-center gap-1.5 border border-white/20">
+                            <i class="fa fa-arrow-left"></i> Exit to Teacher
+                        </button>
                     </div>
                 </div>
-                <div class="flex items-center gap-2">
-                    <button @click="portalMode = 'teacher'; teacherSubTab = 'upload'" class="bg-white/10 hover:bg-white/20 text-white text-xs px-3.5 py-2 rounded-xl font-bold transition flex items-center gap-1.5 border border-white/20">
-                        <i class="fa fa-arrow-left"></i> Exit to Teacher
+
+                <!-- Assigned School Scoping Card (SISO only sees schools assigned to them via School ID) -->
+                <div class="bg-amber-900/40 border border-amber-500/30 rounded-xl p-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold">
+                            <i class="fa fa-school-flag text-xs"></i>
+                        </div>
+                        <div>
+                            <span class="text-slate-300">Assigned Inspection School:</span>
+                            <strong class="text-white font-bold ml-1" x-text="activeSchoolName"></strong>
+                            <span class="text-cyan-300 font-mono text-[11px] ml-1.5" x-text="'[' + authenticatedSchoolId + ']'"></span>
+                        </div>
+                    </div>
+                    <button type="button" @click="showSisoSchoolModal = true" class="bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-400/40 px-3 py-1.5 rounded-lg font-bold text-xs transition flex items-center gap-1.5 shadow-xs">
+                        <i class="fa fa-arrows-rotate text-[10px]"></i> Switch Assigned School ID
                     </button>
                 </div>
             </div>
@@ -1772,19 +1831,29 @@
                                     <span class="text-xs font-bold px-2.5 py-0.5 rounded-full" :class="lesson.status === 'Approved' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'" x-text="lesson.status === 'Approved' ? '✓ Headteacher Approved' : 'Pending Head Review'"></span>
                                 </div>
                                 <p class="text-xs text-slate-600">
-                                    <strong>Educator:</strong> <span class="font-semibold text-slate-900" x-text="lesson.teacherName"></span> 
-                                    (<span class="font-mono text-blue-900 font-bold" x-text="lesson.teacherId"></span>)
+                                    <!-- Pure Teacher Name without Teacher ID attached -->
+                                    <strong>Educator:</strong> <span class="font-semibold text-slate-900" x-text="lesson.teacherName"></span>
                                     <span x-show="lesson.teacherContact" class="text-slate-400" x-text="' | Tel: ' + lesson.teacherContact"></span>
                                 </p>
                             </div>
 
-                            <!-- Actions -->
-                            <div class="flex items-center gap-2">
+                            <!-- Relevant SISO Actions: Comment, Download, and Feedback -->
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <!-- Download Lesson Plan -->
                                 <a :href="lesson.fileData" :download="lesson.fileName" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 border border-slate-300">
                                     <i class="fa fa-download text-slate-600"></i> Download
                                 </a>
+                                <!-- Download Scheme if available -->
+                                <a x-show="lesson.schemeFileName" :href="lesson.schemeFileData" :download="lesson.schemeFileName" class="bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 border border-teal-200">
+                                    <i class="fa fa-file-excel text-teal-600"></i> Scheme
+                                </a>
+                                <!-- Discussion / Comment Thread -->
+                                <button type="button" @click="openCommentThread(lesson)" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-900 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 border border-indigo-200 shadow-sm">
+                                    <i class="fa fa-comments text-indigo-600"></i> Discussion (<span x-text="(lesson.comments || []).length"></span>)
+                                </button>
+                                <!-- SISO Official Supervisory Feedback -->
                                 <button type="button" @click="openSisoFeedbackModal(lesson)" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition shadow-sm flex items-center gap-1.5">
-                                    <i class="fa fa-comment-dots"></i>
+                                    <i class="fa fa-signature"></i>
                                     <span x-text="lesson.sisoFeedback ? 'Update SISO Feedback' : 'Add SISO Feedback'"></span>
                                 </button>
                             </div>
@@ -3002,7 +3071,7 @@
             <span class="text-[10px]">SISO</span>
         </button>
 
-        <button type="button" @click="showProUpgradeModal = true" class="flex flex-col items-center justify-center py-1 px-3 rounded-xl transition text-amber-300 hover:text-amber-200 min-w-[56px] min-h-[46px]">
+        <button x-show="portalMode !== 'siso'" type="button" @click="showProUpgradeModal = true" class="flex flex-col items-center justify-center py-1 px-3 rounded-xl transition text-amber-300 hover:text-amber-200 min-w-[56px] min-h-[46px]">
             <i class="fa fa-crown text-base mb-0.5"></i>
             <span class="text-[10px]">Pro Plan</span>
         </button>
@@ -5167,6 +5236,9 @@
                 showPinModal: false,
                 showSisoPinModal: false,
                 enteredSisoPin: '',
+                sisoAssignedSchoolId: '',
+                showSisoSchoolModal: false,
+                sisoSwitchInputId: '',
                 showSisoFeedbackModal: false,
                 activeSisoLesson: null,
                 sisoOfficerName: '',
@@ -5933,8 +6005,8 @@
                 sendLessonComment() {
                     if (!this.activeCommentLesson) return;
                     
-                    const senderName = this.portalMode === 'reviewer' ? 'Headteacher / Reviewer' : (this.activeTeacher?.name || 'Teacher');
-                    const roleTag = this.portalMode === 'reviewer' ? 'Reviewer' : 'Teacher';
+                    const senderName = this.portalMode === 'siso' ? (this.sisoOfficerName || 'GES SISO Circuit Officer') : (this.portalMode === 'reviewer' ? 'Headteacher / Reviewer' : (this.activeTeacher?.name || 'Teacher'));
+                    const roleTag = this.portalMode === 'siso' ? 'SISO' : (this.portalMode === 'reviewer' ? 'Reviewer' : 'Teacher');
 
                     const newMsg = {
                         sender: senderName,
@@ -6802,12 +6874,16 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                 },
 
                 attemptSisoAccess() {
+                    this.sisoAssignedSchoolId = this.authenticatedSchoolId || 'ATAK-983';
+                    this.enteredSisoPin = '';
                     this.showSisoPinModal = true;
                 },
 
                 verifySisoPin() {
                     const pin = (this.enteredSisoPin || '').trim();
+                    const targetSchoolId = (this.sisoAssignedSchoolId || this.authenticatedSchoolId || 'ATAK-983').trim().toUpperCase();
                     if (pin === '2026' || pin === '0543') {
+                        this.switchSisoSchool(targetSchoolId, false);
                         this.portalMode = 'siso';
                         this.showSisoPinModal = false;
                         this.enteredSisoPin = '';
@@ -6815,6 +6891,46 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                     } else {
                         alert('Incorrect SISO Inspection PIN (Use default: 2026)');
                         this.enteredSisoPin = '';
+                    }
+                },
+
+                switchSisoSchool(targetSchoolId, showAlert = true) {
+                    const cleanId = (targetSchoolId || '').trim().toUpperCase();
+                    if (!cleanId) return;
+
+                    const localRegistered = JSON.parse(localStorage.getItem('eduvet_registered_schools') || '{}');
+                    const localSchoolRecord = JSON.parse(localStorage.getItem('eduvet_school_' + cleanId) || 'null');
+
+                    const sch = localSchoolRecord || localRegistered[cleanId] || {
+                        id: cleanId,
+                        name: cleanId === 'ATAK-983' ? 'Atakora D/A Junior High School' : `${cleanId} Basic School`,
+                        headName: cleanId === 'ATAK-983' ? 'Mr. Felix Fleku' : 'Headteacher',
+                        headContact: cleanId === 'ATAK-983' ? '0543521863' : ''
+                    };
+
+                    this.authenticatedSchoolId = sch.id;
+                    this.activeSchoolName = sch.name;
+                    this.activeHeadName = sch.headName || 'Headteacher';
+                    this.activeHeadContact = sch.headContact || '';
+
+                    // Load only the lesson submissions for this assigned school ID
+                    const localLessons = JSON.parse(localStorage.getItem('eduvet_lessons_' + sch.id) || '[]');
+                    if (localLessons && Array.isArray(localLessons)) {
+                        this.lessons = localLessons;
+                    } else {
+                        this.lessons = [];
+                    }
+
+                    // Load teachers for this assigned school
+                    const localTeachers = JSON.parse(localStorage.getItem('eduvet_teachers_' + sch.id) || 'null');
+                    if (localTeachers && Array.isArray(localTeachers) && localTeachers.length > 0) {
+                        this.teachers = localTeachers;
+                    }
+
+                    this.showSisoSchoolModal = false;
+                    this.sisoSwitchInputId = '';
+                    if (showAlert) {
+                        alert('✓ Switched to assigned school: ' + sch.name + ' (' + sch.id + ')');
                     }
                 },
 
