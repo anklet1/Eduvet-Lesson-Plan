@@ -207,7 +207,7 @@
         [x-cloak] { display: none !important; }
     </style>
 </head>
-<body class="bg-blue-900/10 text-slate-800 font-sans min-h-screen flex flex-col overflow-x-hidden pb-24 lg:pb-0" x-data="schoolApp()">
+<body class="bg-slate-50 text-slate-900 font-sans min-h-screen flex flex-col overflow-x-hidden pb-24 lg:pb-0" x-data="schoolApp()">
 
     <!-- ==================== SCHOOL GATEWAY / LOGIN & REGISTRATION OVERLAY ==================== -->
     <div x-show="!authenticatedSchoolId" x-cloak class="fixed inset-0 bg-blue-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
@@ -1095,7 +1095,7 @@
     </header>
 
     <!-- Main App Layout with Professional Desktop Left Sidebar -->
-    <div class="flex-grow flex flex-col lg:flex-row w-full max-w-[1700px] mx-auto bg-blue-950/5" x-show="authenticatedSchoolId" x-cloak>
+    <div class="flex-grow flex flex-col lg:flex-row w-full max-w-[1700px] mx-auto bg-white lg:bg-slate-50/40" x-show="authenticatedSchoolId" x-cloak>
         
         <!-- Desktop Left Sidebar Navigation (Blue Pane) -->
         <aside class="hidden lg:flex w-72 bg-blue-900 text-blue-50 flex-col justify-between p-5 space-y-6 shrink-0 no-print shadow-2xl border-r border-blue-800">
@@ -1227,80 +1227,90 @@
         </aside>
 
         <!-- Main Content Area -->
-        <main class="flex-grow p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8 space-y-6 max-w-6xl w-full relative">
+        <main class="flex-grow p-4 sm:p-5 lg:px-6 lg:py-4 pb-24 lg:pb-8 space-y-3.5 max-w-6xl w-full relative">
 
             <!-- ==================== CLEAN HEADER & ANNOUNCEMENT CARD (Hidden in SISO mode) ==================== -->
-            <div class="space-y-4 no-print" x-show="portalMode !== 'siso'">
-                <!-- Big Header and Logo -->
-                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gradient-to-r from-blue-900 to-indigo-900 text-white">
-                    <div class="flex items-center space-x-4">
-                        <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center p-2.5 shadow-md shrink-0 overflow-hidden">
+            <div class="space-y-2.5 no-print" x-show="portalMode !== 'siso'">
+                <!-- Big Header and Logo: Crisp White Card with Black & Blue Typography -->
+                <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-xs border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-3.5">
+                    <div class="flex items-center space-x-3.5">
+                        <div class="w-12 h-12 bg-blue-50 border border-blue-200 rounded-xl flex items-center justify-center p-2 shadow-xs shrink-0 overflow-hidden">
                             <template x-if="schoolLogoData">
                                 <img :src="schoolLogoData" class="w-full h-full object-cover">
                             </template>
                             <template x-if="!schoolLogoData">
                                 <svg class="w-full h-full" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M10 25C10 25 25 35 45 28V75C25 82 10 70 10 70V25Z" fill="#2563EB"/>
+                                    <path d="M10 25C10 25 25 35 45 28V75C25 82 10 70 10 70V25Z" fill="#1E3A8A"/>
                                     <path d="M90 25C90 25 75 35 55 28V75C75 82 90 70 90 70V25Z" fill="#0D9488"/>
-                                    <path d="M28 50L44 65L74 32" stroke="#F97316" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M28 50L44 65L74 32" stroke="#F59E0B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
                             </template>
                         </div>
                         <div>
-                            <h1 class="text-2xl sm:text-3xl font-black tracking-tight leading-none text-white">
-                                edu<span class="text-teal-400">vet</span> <span class="font-light text-indigo-200 text-lg sm:text-xl" x-text="activeSchoolName"></span>
-                            </h1>
-                            <p class="text-xs text-indigo-200 mt-1 font-medium">Institutional Lesson Plan, SBA & Inspection Management Portal</p>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <h1 class="text-xl sm:text-2xl font-black tracking-tight leading-none text-slate-900">
+                                    edu<span class="text-teal-600">vet</span>
+                                </h1>
+                                <span class="text-slate-300 font-light">•</span>
+                                <span class="font-extrabold text-blue-950 text-base sm:text-lg tracking-tight truncate max-w-[280px] sm:max-w-md" x-text="activeSchoolName"></span>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-1 font-medium">Institutional Lesson Plan, SBA & Inspection Management Portal</p>
                         </div>
                     </div>
                     
                     <!-- Eduvet Pro Status & Live Countdown Timer -->
-                    <div class="flex flex-wrap items-center gap-3">
-                        <div x-show="isPro" class="bg-gradient-to-r from-amber-400 to-amber-300 text-amber-950 font-black px-3.5 py-2 rounded-xl text-xs flex items-center gap-1.5 shadow-sm border border-amber-200">
-                            <i class="fa fa-crown text-amber-900"></i>
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        <div x-show="isPro" class="bg-amber-100 text-amber-950 font-black px-3 py-1.5 rounded-xl text-xs flex items-center gap-1.5 shadow-2xs border border-amber-300">
+                            <i class="fa fa-crown text-amber-700"></i>
                             <span>PRO ACTIVE</span>
                             <span class="text-[9px] bg-amber-900/10 px-1.5 py-0.5 rounded font-bold uppercase" x-text="proTier"></span>
                         </div>
-                        <button x-show="!isPro" @click="showProUpgradeModal = true" class="bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 hover:from-amber-300 hover:to-amber-200 text-amber-950 font-black px-3.5 py-2 rounded-xl text-xs transition shadow-md flex items-center gap-1.5 border border-amber-300">
-                            <i class="fa fa-bolt text-amber-900"></i>
+                        <button x-show="!isPro" @click="showProUpgradeModal = true" class="bg-amber-400 hover:bg-amber-300 active:bg-amber-500 text-slate-950 font-black px-3.5 py-2 rounded-xl text-xs transition shadow-2xs flex items-center gap-1.5 border border-amber-400">
+                            <i class="fa fa-bolt text-slate-950"></i>
                             <span>UPGRADE TO PRO</span>
                         </button>
-                        <div class="bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20 text-right text-xs">
-                            <div class="text-[10px] text-amber-300 uppercase tracking-wider font-bold">GES Wednesday Deadline</div>
-                            <div class="font-mono font-bold text-white text-sm" x-text="countdownTimerString"></div>
+                        <div class="bg-blue-50/80 border border-blue-200/80 px-3.5 py-1.5 rounded-xl text-right text-xs shadow-2xs">
+                            <div class="text-[10px] text-blue-900 uppercase tracking-wider font-extrabold">GES Wednesday Deadline</div>
+                            <div class="font-mono font-black text-blue-950 text-xs sm:text-sm" x-text="countdownTimerString"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Announcement Notice Board Card -->
+                <!-- Announcement Notice Board Card (Compact) -->
                 <template x-if="schoolNotification">
-                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-l-4 border-l-blue-900">
-                        <div class="flex items-center space-x-3.5">
-                            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-900 flex items-center justify-center text-xl shrink-0 font-bold">
+                    <div class="bg-white border border-slate-200 rounded-xl p-3 px-4 shadow-2xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-l-4 border-l-blue-900">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-900 flex items-center justify-center text-sm shrink-0 font-bold">
                                 📢
                             </div>
                             <div>
-                                <h3 class="text-sm font-bold text-blue-950">School Announcement & Notice Board</h3>
-                                <p class="text-xs text-slate-600 font-medium mt-0.5" x-text="schoolNotification"></p>
+                                <h3 class="text-xs font-bold text-blue-950">School Announcement & Notice Board</h3>
+                                <p class="text-xs text-slate-600 font-medium" x-text="schoolNotification"></p>
                             </div>
                         </div>
-                        <button x-show="portalMode === 'reviewer'" @click="promptUpdateNotification()" class="text-xs bg-blue-900 hover:bg-blue-800 text-white px-3.5 py-2 rounded-xl font-medium transition shrink-0 shadow-sm">Edit Notice</button>
+                        <button x-show="portalMode === 'reviewer'" @click="promptUpdateNotification()" class="text-xs bg-blue-900 hover:bg-blue-800 text-white px-3 py-1.5 rounded-lg font-medium transition shrink-0 shadow-xs">Edit Notice</button>
                     </div>
                 </template>
             </div>
 
             <!-- ==================== PORTAL 1: TEACHER WORKSPACE ==================== -->
-            <div class="space-y-6" x-show="portalMode === 'teacher'" x-cloak>
+            <div class="space-y-3.5" x-show="portalMode === 'teacher'" x-cloak>
                 
-                <!-- Prominent Educator Profile Selection Prompt (Shown when no profile is active) -->
-                <div x-show="!selectedTeacherId" class="bg-blue-50 border-2 border-dashed border-blue-300 rounded-2xl p-6 text-center text-blue-900 shadow-sm no-print">
-                    <div class="w-12 h-12 bg-blue-100 text-blue-800 rounded-full flex items-center justify-center mx-auto mb-2 text-xl font-bold">
-                        👤
+                <!-- Compact Educator Profile Selection Prompt (Removes huge dead space) -->
+                <div x-show="!selectedTeacherId" class="bg-blue-50/90 border border-blue-200 rounded-xl px-4 py-2.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-xs text-blue-950 shadow-2xs no-print">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-7 h-7 rounded-lg bg-blue-100 text-blue-900 flex items-center justify-center text-sm font-bold shrink-0">
+                            👤
+                        </span>
+                        <div>
+                            <strong class="font-extrabold text-blue-950">Active Educator Profile Required:</strong>
+                            <span class="text-slate-600 ml-1">Please select your name from the <strong>Active Educator Profile</strong> dropdown in the left sidebar to activate your lesson records and planning tools.</span>
+                        </div>
                     </div>
-                    <h3 class="text-base font-bold text-blue-950">Select Your Educator Profile</h3>
-                    <p class="text-xs text-slate-600 max-w-md mx-auto mt-1">
-                        Please choose your name from the <strong>"Active Educator Profile"</strong> dropdown in the left sidebar (or top bar on mobile) to load your lesson submissions, lesson engine, and SBA gradebook.
-                    </p>
+                    <div class="hidden sm:flex items-center gap-1.5 text-[11px] font-bold text-blue-900 bg-white px-2.5 py-1 rounded-lg border border-blue-200 shrink-0">
+                        <i class="fa fa-arrow-left text-[10px] text-blue-700"></i>
+                        <span>Use Left Sidebar</span>
+                    </div>
                 </div>
                 
                 <!-- Personalized Teacher Lagging Alert Banner -->
@@ -1318,7 +1328,7 @@
                 </template>
 
                 <!-- SUB-TAB 1: ORIGINAL FILE UPLOAD & HISTORY WORKSPACE -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8" x-show="teacherSubTab === 'upload'">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-5" x-show="teacherSubTab === 'upload'">
                     <!-- Left Column: Metrics & Upload Form -->
                     <div class="space-y-6 lg:col-span-1">
                         <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
@@ -3467,6 +3477,7 @@
 
     <!-- App Script Logic -->
     <script>
+        var db;
         // ==========================================
         // SAFE ALPINE.JS DATA ACCESS HELPER (ALPINE V3 COMPATIBLE)
         // ==========================================
@@ -5460,19 +5471,18 @@
             measurementId: "G-90YYJC66X3"
         };
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
+        if (typeof firebase !== 'undefined' && firebase && firebase.apps) {
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            db = firebase.firestore();
+            try {
+                db.settings({
+                    experimentalAutoDetectLongPolling: true,
+                    merge: true
+                });
+            } catch (e) {}
         }
-        const db = firebase.firestore();
-
-        // Enable Firestore Offline Persistence
-        // Configure Firestore with long-polling fallback for constrained networks
-        try {
-            db.settings({
-                experimentalAutoDetectLongPolling: true,
-                merge: true
-            });
-        } catch (e) {}
 
         // Enable Firestore Offline Persistence safely (Only when running under HTTP/S)
         try {
