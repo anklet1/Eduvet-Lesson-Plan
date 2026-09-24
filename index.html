@@ -41,6 +41,12 @@
     </script>
     <!-- Print-Only Styling Rules to isolate the Inspection Report or Portrait Lesson Plans cleanly into PDF -->
     <style>
+    /* Desktop Rendering Performance Boost */
+    .space-y-6 > *, .space-y-4 > * {
+        content-visibility: auto;
+        contain-intrinsic-size: 100px;
+    }
+
         @media print {
             body * {
                 visibility: hidden;
