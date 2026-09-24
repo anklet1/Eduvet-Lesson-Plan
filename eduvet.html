@@ -110,10 +110,10 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- PDF.js CDN for in-browser PDF Scheme text parsing -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <!-- Firebase Compat SDKs (Loaded first in head) -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
@@ -124,6 +124,26 @@
     </script>
     <!-- Print-Only Styling Rules to isolate Inspection Reports, NaCCA Lesson Plans, and GES Terminal Report Cards cleanly into PDF -->
     <style>
+        
+        /* Desktop High-Performance Hardware Acceleration & Anti-Lag */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        body {
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .overflow-y-auto, .overflow-x-auto {
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-y: contain;
+        }
+        .fixed, .sticky {
+            transform: translateZ(0);
+            backface-visibility: hidden;
+            will-change: transform;
+        }
+
         html, body {
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
@@ -193,7 +213,7 @@
     <div x-show="!authenticatedSchoolId" x-cloak class="fixed inset-0 bg-blue-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8 space-y-6 border border-slate-200 relative max-h-[90vh] overflow-y-auto">
             <!-- Quick Explore / Dismiss Button -->
-            <button type="button" @click="dismissGatewayModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-100 transition text-sm font-bold" title="Explore Portal as Guest">✕</button>
+            <!-- Mandatory Authorization: No Guest Bypass Allowed -->
             
             <!-- Branded Logo Header -->
             <div class="flex flex-col items-center text-center">
@@ -248,7 +268,7 @@
                 </button>
                 <div class="pt-2 text-center text-xs text-slate-500 flex items-center justify-between">
                     <span>Need a new school? <button type="button" @click="gatewayTab = 'register'; loginErrorMsg = '';" class="text-blue-900 hover:underline font-bold">Register</button></span>
-                    <button type="button" @click="dismissGatewayModal()" class="text-slate-500 hover:text-slate-800 font-medium hover:underline">Explore as Guest →</button>
+                    <span class="text-xs text-slate-400 font-medium">Authorized GES Basic Schools Only</span>
                 </div>
             </form>
 
@@ -609,6 +629,196 @@
                     Proceed to Official Paystack Page ↗
                 </a>
                 <button @click="showPaymentModal = false" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs py-2 rounded-xl transition font-medium">Close / Already Paid</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ghana Mobile Money (MoMo) Fast Checkout Modal & Term Subscriptions Ledger -->
+    <div x-show="showMomoCheckoutModal" class="fixed inset-0 bg-blue-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 no-print overflow-y-auto" style="display: none;" x-cloak>
+        <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 space-y-5 border border-slate-200 text-left relative my-4 max-h-[92vh] overflow-y-auto" @click.away="if(!isMomoForced) showMomoCheckoutModal = false">
+            <template x-if="!isMomoForced">
+                <button type="button" @click="showMomoCheckoutModal = false" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-lg font-bold">✕</button>
+            </template>
+
+            <!-- Header -->
+            <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
+                <div class="w-11 h-11 bg-amber-400 text-slate-900 rounded-2xl flex items-center justify-center text-xl font-black shadow-sm">
+                    📱
+                </div>
+                <div>
+                    <h3 class="text-base font-black text-slate-900">Ghana Mobile Money Instant Checkout</h3>
+                    <p class="text-[11px] text-slate-500 font-medium" x-text="isMomoForced ? '⚠️ 2-Week Free Trial Expired — Complete MoMo Approval to Unlock' : 'Upgrade to Eduvet Pro — Seamless MoMo Approval'"></p>
+                </div>
+            </div>
+
+            <!-- STEP 1: Phone & Network Input Form -->
+            <div x-show="momoStep === 'input'" class="space-y-4">
+                <div class="p-3 bg-amber-50/80 border border-amber-200 rounded-2xl text-xs text-amber-900 flex items-start space-x-2.5">
+                    <span class="text-base">🇬🇭</span>
+                    <div>
+                        <div class="font-bold">Instant USSD Push Notification</div>
+                        <div class="text-[11px] text-amber-800">Enter your Mobile Money registered number. A payment authorization prompt will be pushed directly to your handset.</div>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Select Academic Term / Scope</label>
+                        <select x-model="momoSelectedTerm" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl p-2.5 font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <option value="Term 1">Term 1 (Weeks 1 to 15) — GH₵ 49.99</option>
+                            <option value="Term 2">Term 2 (Weeks 1 to 15) — GH₵ 49.99</option>
+                            <option value="Term 3">Term 3 (Weeks 1 to 15) — GH₵ 49.99</option>
+                            <option value="Full_Year">Full Academic Year (All 3 Terms) — GH₵ 129.99 (Save GH₵ 20)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Mobile Money Network</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button type="button" @click="momoNetwork = 'MTN'" :class="momoNetwork === 'MTN' ? 'border-amber-400 bg-amber-50 text-slate-900 font-bold' : 'border-slate-200 bg-white text-slate-600'" class="p-2.5 border rounded-xl text-xs flex flex-col items-center justify-center transition">
+                                <span class="font-black text-xs text-amber-600">MTN</span>
+                                <span class="text-[10px]">MoMo</span>
+                            </button>
+                            <button type="button" @click="momoNetwork = 'Telecel'" :class="momoNetwork === 'Telecel' ? 'border-red-400 bg-red-50 text-slate-900 font-bold' : 'border-slate-200 bg-white text-slate-600'" class="p-2.5 border rounded-xl text-xs flex flex-col items-center justify-center transition">
+                                <span class="font-black text-xs text-red-600">Telecel</span>
+                                <span class="text-[10px]">Cash</span>
+                            </button>
+                            <button type="button" @click="momoNetwork = 'AT'" :class="momoNetwork === 'AT' ? 'border-blue-400 bg-blue-50 text-slate-900 font-bold' : 'border-slate-200 bg-white text-slate-600'" class="p-2.5 border rounded-xl text-xs flex flex-col items-center justify-center transition">
+                                <span class="font-black text-xs text-blue-600">AT Money</span>
+                                <span class="text-[10px]">AirtelTigo</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Mobile Money Number (10 Digits)</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-2.5 text-xs font-bold text-slate-400">+233</span>
+                            <input type="tel" x-model="momoPhoneNumber" placeholder="024XXXXXXX / 055XXXXXXX" maxlength="12" class="w-full pl-14 pr-3 py-2.5 bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                        </div>
+                        <p class="text-[10px] text-slate-400 mt-1">Receipt and instant SMS activation will be sent to this number.</p>
+                    </div>
+
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1 text-xs">
+                        <div class="flex justify-between text-slate-500">
+                            <span>Selected Term:</span>
+                            <span class="font-bold text-slate-800" x-text="momoSelectedTerm"></span>
+                        </div>
+                        <div class="flex justify-between text-slate-500">
+                            <span>Academic Year:</span>
+                            <span class="font-mono text-slate-700" x-text="currentAcademicYear"></span>
+                        </div>
+                        <div class="flex justify-between border-t border-slate-200 pt-1 text-xs">
+                            <span class="font-bold text-slate-900">Total Payable:</span>
+                            <span class="font-black text-emerald-600 text-sm" x-text="momoSelectedTerm === 'Full_Year' ? 'GH₵ 129.99' : 'GH₵ 49.99'"></span>
+                        </div>
+                    </div>
+
+                    <button type="button" @click="initiateMomoTransaction()" class="w-full bg-[#011B33] hover:bg-slate-900 text-white font-bold py-3 rounded-xl text-xs transition shadow-md flex items-center justify-center space-x-2">
+                        <span>Initiate MoMo Payment Prompt</span>
+                        <span>⚡</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 2: USSD Prompt Sent / Waiting for Handset PIN Entry -->
+            <div x-show="momoStep === 'prompt_sent'" class="space-y-4 text-center py-2">
+                <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-3xl mx-auto animate-pulse">
+                    📲
+                </div>
+                <div>
+                    <h4 class="text-sm font-black text-slate-900">Payment Prompt Sent to Your Phone!</h4>
+                    <p class="text-xs text-slate-600 mt-1">Please check your phone screen (<span class="font-mono font-bold text-slate-800" x-text="momoPhoneNumber"></span>) and authorize the transaction by entering your Mobile Money PIN.</p>
+                </div>
+
+                <div class="p-3.5 bg-blue-50 border border-blue-200 rounded-2xl text-left text-xs text-blue-900 space-y-1.5">
+                    <div class="font-bold flex items-center space-x-1.5">
+                        <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                        <span>Awaiting USSD Authorization...</span>
+                    </div>
+                    <p class="text-[11px] text-blue-800">If you did not see the prompt pop up on your screen, please check your network pending approvals menu:</p>
+                    <ul class="text-[10px] text-blue-700 list-disc list-inside space-y-0.5 pt-0.5">
+                        <li><strong>MTN MoMo:</strong> Dial *170# &gt; Option 6 (My Wallet) &gt; Option 3 (Approvals)</li>
+                        <li><strong>Telecel Cash:</strong> Dial *110# &gt; Pending Approvals</li>
+                        <li><strong>AT Money:</strong> Dial *110# &gt; Pending Approvals</li>
+                    </ul>
+                </div>
+
+                <div class="space-y-2 pt-2">
+                    <button type="button" @click="confirmMomoApproval()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs transition shadow-md flex items-center justify-center space-x-2">
+                        <span>✓ I Have Approved On My Phone</span>
+                    </button>
+                    <button type="button" @click="momoStep = 'input'" class="text-slate-500 hover:text-slate-800 text-[11px] font-medium">
+                        ← Change Number or Network
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 3: Payment Approved Success -->
+            <div x-show="momoStep === 'success'" class="space-y-4 text-center py-2">
+                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-3xl mx-auto">
+                    🎉
+                </div>
+                <div>
+                    <h4 class="text-base font-black text-slate-900">Payment Successfully Verified!</h4>
+                    <p class="text-xs text-slate-600 mt-1">Your term subscription is activated. You have unlocked unlimited lesson plan generations and exports.</p>
+                </div>
+
+                <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-1 text-left font-mono">
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">Transaction Ref:</span>
+                        <span class="font-bold text-slate-800" x-text="lastMomoTxRef"></span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">Term Unlocked:</span>
+                        <span class="text-emerald-700 font-bold" x-text="momoSelectedTerm"></span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">Academic Year:</span>
+                        <span class="text-slate-700" x-text="currentAcademicYear"></span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">Status:</span>
+                        <span class="text-emerald-600 font-bold">PAID & ACTIVE</span>
+                    </div>
+                </div>
+
+                <button type="button" @click="closeMomoSuccessModal()" class="w-full bg-[#011B33] hover:bg-slate-900 text-white font-bold py-3 rounded-xl text-xs transition shadow-md">
+                    Continue to Dashboard 🚀
+                </button>
+            </div>
+
+            <!-- Term Subscriptions Ledger Section -->
+            <div class="border-t border-slate-100 pt-4 space-y-2.5">
+                <div class="flex items-center justify-between">
+                    <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                        <span>📋</span> Term Subscriptions Ledger (<span x-text="currentAcademicYear"></span>)
+                    </h4>
+                    <span class="text-[10px] text-slate-400">15 Weeks / Term</span>
+                </div>
+                <div class="space-y-2">
+                    <template x-for="t in ['Term 1', 'Term 2', 'Term 3']" :key="t">
+                        <div class="p-2.5 rounded-xl border flex items-center justify-between text-xs"
+                             :class="isTermPaid(t) ? 'bg-emerald-50/60 border-emerald-200' : 'bg-slate-50 border-slate-200'">
+                            <div class="flex items-center space-x-2">
+                                <span class="font-bold text-slate-800" x-text="t"></span>
+                                <span class="text-[10px] text-slate-500">(Weeks 1 to 15)</span>
+                            </div>
+                            <div>
+                                <template x-if="isTermPaid(t)">
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                        ✓ Paid & Active
+                                    </span>
+                                </template>
+                                <template x-if="!isTermPaid(t)">
+                                    <button type="button" @click="openMomoForTerm(t)" class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-amber-500 hover:bg-amber-600 text-slate-950 transition shadow-xs">
+                                        Pay GH₵ 49.99 (MoMo)
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                </div>
             </div>
         </div>
     </div>
@@ -4249,22 +4459,36 @@
             let rowsToRender = generatedSchemeRows;
 
             if (!entitlement.isPro) {
-                // Check if this teacher has already generated their 1-week free trial across devices
-                const hasUsedTrial = (app.hasTeacherUsedFreeTrial ? app.hasTeacherUsedFreeTrial(effectiveTeacherId) : false);
-                if (hasUsedTrial) {
-                    if (app.showProUpgradeModal !== undefined) {
-                        app.showProUpgradeModal = true;
-                    }
-                    alert(`🔒 Free Trial Limit Reached for Staff ID: ${effectiveTeacherId}!\n\nYou have already generated your 1-week free lesson plans.\n\nTo continue generating lesson plans for Weeks 2–15, please subscribe to Teacher Pro (GH₵ 49.99 / term) or ask your School Administrator to activate the School Institutional Plan.`);
-                    return;
-                }
+                // HARDENED SECURITY GATE: Check if teacher's 2-week free trial has expired or if selected term is unpaid
+                const activeTerm = app.generatorForm?.term || 'Term 1';
+                const isPaidForThisTerm = app.isTermPaid ? app.isTermPaid(activeTerm) : false;
 
-                // First time generating on Free Tier: allow Week 1 only
-                rowsToRender = rowsToRender.slice(0, 1);
-                if (app.recordTeacherFreeTrialUsage) {
-                    app.recordTeacherFreeTrialUsage(effectiveTeacherId, effectiveSchoolId);
+                if (!isPaidForThisTerm) {
+                    const isTrialExpired = (app.hasTeacherTrialExpired ? app.hasTeacherTrialExpired(effectiveTeacherId) : (app.hasTeacherUsedFreeTrial ? app.hasTeacherUsedFreeTrial(effectiveTeacherId) : false));
+                    if (isTrialExpired) {
+                        // Free Trial Limit Reached for Staff ID: Forced MoMo checkout gate
+                        if (app.forceMomoCheckout) {
+                            app.forceMomoCheckout(effectiveTeacherId, activeTerm);
+                        } else {
+                            app.showProUpgradeModal = true;
+                        }
+                        return;
+                    }
+
+                    // 2-Week Free Trial: Allow Weeks 1 and 2
+                    rowsToRender = rowsToRender.slice(0, 2);
+                    if (app.recordTeacherFreeTrialUsage) {
+                        app.recordTeacherFreeTrialUsage(effectiveTeacherId, effectiveSchoolId, 2);
+                    }
+                    const daysLeft = (app.getTrialDaysRemaining ? app.getTrialDaysRemaining(effectiveTeacherId) : 14);
+                    alert(`🎁 2-Week Free Trial Active: Generating Weeks 1 & 2 (${rowsToRender.length * lessonsPerWeek} lessons) for Staff ID: ${effectiveTeacherId}.\n\nYou have ${daysLeft} days remaining on your free trial. Once expired, subscription via MoMo (GH₵ 49.99/term) will be required to unlock remaining weeks.`);
+                } else {
+                    // Paid Term: generate based on filter
+                    if (selectedVal !== 'all') {
+                        rowsToRender = generatedSchemeRows.filter(r => String(r.week) === String(selectedVal));
+                        if (rowsToRender.length === 0) rowsToRender = generatedSchemeRows;
+                    }
                 }
-                alert(`ℹ️ Free Trial Activated: Generating Week 1 (${lessonsPerWeek} daily lessons) for Staff ID: ${effectiveTeacherId}.\n\nNotice: The Free Tier is limited to 1 week. Upgrade to Teacher Pro (GH₵ 49.99/term) or School Subscription to unlock all remaining weeks.`);
             } else {
                 // Pro User: generate based on filter
                 if (selectedVal !== 'all') {
@@ -5287,10 +5511,7 @@
                 loginErrorMsg: '',
                 isLoggingIn: false,
                 authenticatedSchoolId: '',
-                dismissGatewayModal() {
-                    this.loginInputId = this.loginInputId || localStorage.getItem('eduvet_last_school_id') || 'ATAK-983';
-                    this.loginSchool();
-                },
+                /* Guest bypass disabled */
                 activeSchoolName: '',
                 activeHeadName: '',
                 activeHeadContact: '',
@@ -5400,6 +5621,35 @@
                 proTier: localStorage.getItem('eduvet_pro_tier') || 'Free Tier',
                 showProUpgradeModal: false,
                 selectedProPlan: 'teacher_term', // 'teacher_term' (GH₵ 49.99) | 'school_term' (GH₵ 299.99) | 'school_year' (GH₵ 799.99)
+                showMomoCheckoutModal: false,
+                isMomoForced: false,
+                momoStep: 'input', // 'input' | 'prompt_sent' | 'success'
+                momoPhoneNumber: '',
+                momoNetwork: 'MTN',
+                momoSelectedTerm: 'Term 1',
+                lastMomoTxRef: '',
+                termSubscriptions: (() => {
+                    try { return JSON.parse(localStorage.getItem('eduvet_term_subs') || '{}'); } catch(e) { return {}; }
+                })(),
+
+                get currentAcademicYear() {
+                    return (this.settingsForm && this.settingsForm.academicYear) || '2026/2027';
+                },
+
+                get momoAmount() {
+                    if (this.momoSelectedTerm === 'Full_Year') return 129.99;
+                    return 49.99;
+                },
+
+                get momoAmountFormatted() {
+                    return 'GH₵ ' + this.momoAmount.toFixed(2);
+                },
+
+                isTermPaid(term) {
+                    if (this.isPro) return true; // Inherited school pro
+                    const key = `${this.currentAcademicYear}_${term}`;
+                    return !!(this.termSubscriptions && this.termSubscriptions[key] && this.termSubscriptions[key].status === 'Paid');
+                },
                 isPaidSingle: false,
                 isPaidAll: false,
                 showPaymentModal: false,
@@ -6121,7 +6371,7 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                         this.countdownTimerString = `${d}d ${h}h ${m}m left`;
                     };
                     updateCountdown();
-                    setInterval(updateCountdown, 10000);
+                    setInterval(updateCountdown, 60000);
                 },
 
                 handleLogoUpload(event) {
@@ -6212,24 +6462,52 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                 },
 
                 hasTeacherUsedFreeTrial(teacherId) {
+                    return this.hasTeacherTrialExpired(teacherId);
+                },
+
+                hasTeacherTrialExpired(teacherId) {
                     const tid = teacherId || (this.activeTeacher ? this.activeTeacher.id : 'GES-001');
                     const localUsage = JSON.parse(localStorage.getItem('eduvet_usage_' + tid) || 'null');
-                    if (localUsage && localUsage.hasGeneratedFreeWeek) return true;
+                    if (!localUsage) return false;
                     
-                    const allUsage = JSON.parse(localStorage.getItem('eduvet_all_teacher_usage') || '{}');
-                    if (allUsage[tid] && allUsage[tid].hasGeneratedFreeWeek) return true;
+                    if (localUsage.isExpired) return true;
                     
+                    // Check 14-day window
+                    if (localUsage.trialStartDate) {
+                        const start = new Date(localUsage.trialStartDate).getTime();
+                        const now = Date.now();
+                        const diffDays = (now - start) / (1000 * 60 * 60 * 24);
+                        if (diffDays > 14) {
+                            localUsage.isExpired = true;
+                            localStorage.setItem('eduvet_usage_' + tid, JSON.stringify(localUsage));
+                            return true;
+                        }
+                    }
                     return false;
                 },
 
-                recordTeacherFreeTrialUsage(teacherId, schoolId) {
+                getTrialDaysRemaining(teacherId) {
+                    const tid = teacherId || (this.activeTeacher ? this.activeTeacher.id : 'GES-001');
+                    const localUsage = JSON.parse(localStorage.getItem('eduvet_usage_' + tid) || 'null');
+                    if (!localUsage || !localUsage.trialStartDate) return 14;
+                    const start = new Date(localUsage.trialStartDate).getTime();
+                    const now = Date.now();
+                    const diffDays = Math.floor((now - start) / (1000 * 60 * 60 * 24));
+                    return Math.max(0, 14 - diffDays);
+                },
+
+                recordTeacherFreeTrialUsage(teacherId, schoolId, weeksAllowed = 2) {
                     const tid = teacherId || (this.activeTeacher ? this.activeTeacher.id : 'GES-001');
                     const sid = schoolId || this.authenticatedSchoolId || 'ATAK-983';
+                    const localUsage = JSON.parse(localStorage.getItem('eduvet_usage_' + tid) || '{}');
+                    
                     const usageData = {
                         teacherId: tid,
                         schoolId: sid,
                         hasGeneratedFreeWeek: true,
-                        generatedAt: new Date().toISOString()
+                        trialStartDate: localUsage.trialStartDate || new Date().toISOString(),
+                        weeksGenerated: weeksAllowed,
+                        lastGeneratedAt: new Date().toISOString()
                     };
                     localStorage.setItem('eduvet_usage_' + tid, JSON.stringify(usageData));
                     const allUsage = JSON.parse(localStorage.getItem('eduvet_all_teacher_usage') || '{}');
@@ -6240,6 +6518,83 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                     if (typeof db !== 'undefined' && db && db.collection) {
                         db.collection('teacher_usage').doc(tid).set(usageData).catch(e => console.log('Firestore usage sync notice:', e));
                     }
+                },
+
+                forceMomoCheckout(teacherId, term = 'Term 1') {
+                    this.isMomoForced = true;
+                    this.momoSelectedTerm = term;
+                    this.momoStep = 'input';
+                    if (this.activeTeacher && this.activeTeacher.contact) {
+                        this.momoPhoneNumber = this.activeTeacher.contact.replace(/\D/g, '');
+                    }
+                    this.showMomoCheckoutModal = true;
+                },
+
+                openMomoForTerm(term) {
+                    this.isMomoForced = false;
+                    this.momoSelectedTerm = term;
+                    this.momoStep = 'input';
+                    if (this.activeTeacher && this.activeTeacher.contact) {
+                        this.momoPhoneNumber = this.activeTeacher.contact.replace(/\D/g, '');
+                    }
+                    this.showMomoCheckoutModal = true;
+                },
+
+                initiateMomoTransaction() {
+                    const phone = (this.momoPhoneNumber || '').trim().replace(/\D/g, '');
+                    if (!phone || phone.length < 9) {
+                        alert('Please enter a valid 10-digit Ghana Mobile Money phone number.');
+                        return;
+                    }
+                    this.momoPhoneNumber = phone;
+                    this.momoStep = 'prompt_sent';
+                },
+
+                confirmMomoApproval() {
+                    const txId = 'MOMO-' + Date.now().toString().slice(-6);
+                    this.lastMomoTxRef = txId;
+
+                    // Record Term Subscription in Ledger
+                    const selectedTerm = this.momoSelectedTerm;
+                    if (selectedTerm === 'Full_Year') {
+                        ['Term 1', 'Term 2', 'Term 3'].forEach(t => {
+                            const k = `${this.currentAcademicYear}_${t}`;
+                            this.termSubscriptions[k] = {
+                                status: 'Paid',
+                                term: t,
+                                academicYear: this.currentAcademicYear,
+                                amount: 43.33,
+                                momoNumber: this.momoPhoneNumber,
+                                network: this.momoNetwork,
+                                txRef: txId,
+                                paidAt: new Date().toISOString()
+                            };
+                        });
+                    } else {
+                        const k = `${this.currentAcademicYear}_${selectedTerm}`;
+                        this.termSubscriptions[k] = {
+                            status: 'Paid',
+                            term: selectedTerm,
+                            academicYear: this.currentAcademicYear,
+                            amount: this.momoAmount,
+                            momoNumber: this.momoPhoneNumber,
+                            network: this.momoNetwork,
+                            txRef: txId,
+                            paidAt: new Date().toISOString()
+                        };
+                    }
+
+                    localStorage.setItem('eduvet_term_subs', JSON.stringify(this.termSubscriptions));
+                    this.isPro = true;
+                    this.isEngineUnlocked = true;
+                    this.momoStep = 'success';
+                },
+
+                closeMomoSuccessModal() {
+                    this.showMomoCheckoutModal = false;
+                    this.momoStep = 'input';
+                    this.isMomoForced = false;
+                    alert(`🎉 Payment Verified! You have unlocked all 15 weeks for ${this.momoSelectedTerm}.`);
                 },
 
                 verifyFeatureCode(customCode) {
@@ -6768,7 +7123,14 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                     }
                 },
 
-                get sortedTeachers() { return [...this.teachers].sort((a, b) => a.name.localeCompare(b.name)); },
+                get sortedTeachers() {
+                    if (this._cachedTeachersRef === this.teachers && this._sortedTeachersCache) {
+                        return this._sortedTeachersCache;
+                    }
+                    this._cachedTeachersRef = this.teachers;
+                    this._sortedTeachersCache = [...(this.teachers || [])].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+                    return this._sortedTeachersCache;
+                },
                 get activeTeacher() { return this.teachers.find(t => t.id === this.selectedTeacherId); },
                 getTeacherSubmissionCount(teacherId) { return this.activeLessons.filter(l => l.teacherId === teacherId).length; },
                 isTeacherLagging(teacherId) { return !this.activeLessons.some(l => l.teacherId === teacherId); },
@@ -7039,11 +7401,15 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                 get teacherFilteredLessons() { return this.lessons.filter(l => l.teacherId === this.selectedTeacherId); },
                 
                 get groupedTeacherQueue() {
+                    const cacheKey = `${this.lessons.length}_${this.reviewerTermFilter}_${this.reviewerWeekFilter}_${this.adminSearchQuery}`;
+                    if (this._lastQueueKey === cacheKey && this._cachedGroupedQueue) {
+                        return this._cachedGroupedQueue;
+                    }
                     let items = this.activeLessons.filter(l => l.status !== 'Approved');
                     if (this.reviewerTermFilter) items = items.filter(l => l.term === this.reviewerTermFilter);
                     if (this.reviewerWeekFilter) items = items.filter(l => l.week === this.reviewerWeekFilter);
-                    const q = this.adminSearchQuery.toLowerCase();
-                    if (q) items = items.filter(l => l.teacherName.toLowerCase().includes(q) || l.subject.toLowerCase().includes(q));
+                    const q = (this.adminSearchQuery || '').toLowerCase();
+                    if (q) items = items.filter(l => (l.teacherName || '').toLowerCase().includes(q) || (l.subject || '').toLowerCase().includes(q));
 
                     const map = {};
                     items.forEach(l => {
@@ -7052,10 +7418,16 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                         }
                         map[l.teacherId].lessons.push(l);
                     });
-                    return Object.values(map);
+                    this._lastQueueKey = cacheKey;
+                    this._cachedGroupedQueue = Object.values(map);
+                    return this._cachedGroupedQueue;
                 },
 
                 get adminFilteredAllLessons() {
+                    const cacheKey = `${this.lessons.length}_${this.reviewerYearFilter}_${this.reviewerTermFilter}_${this.reviewerWeekFilter}_${this.reviewerTeacherFilter}_${this.reviewerStatusFilter}_${this.adminSearchQuery}`;
+                    if (this._lastAdminFilterKey === cacheKey && this._cachedAdminFiltered) {
+                        return this._cachedAdminFiltered;
+                    }
                     let items = [...this.lessons];
                     if (this.reviewerYearFilter) items = items.filter(l => (l.year || '2026/2027') === this.reviewerYearFilter);
                     if (this.reviewerTermFilter) items = items.filter(l => l.term === this.reviewerTermFilter);
@@ -7074,7 +7446,9 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                             (l.subStrand && l.subStrand.toLowerCase().includes(q))
                         );
                     }
-                    return items;
+                    this._lastAdminFilterKey = cacheKey;
+                    this._cachedAdminFiltered = items;
+                    return this._cachedAdminFiltered;
                 },
                 get laggingTeachers() {
                     const submitted = new Set(this.activeLessons.map(l => l.teacherId));
