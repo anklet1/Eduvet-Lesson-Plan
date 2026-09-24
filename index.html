@@ -702,15 +702,15 @@
     </div>
 
     
-    <!-- Hardened Educator Identity Verification Modal (Staff ID Required) -->
+    <!-- Hardened Educator Identity Verification Modal (3 Trials Lock & Contact Notice) -->
     <div x-show="showTeacherAuthModal" class="fixed inset-0 bg-blue-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print" style="display: none;" x-cloak>
         <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 space-y-4 border border-slate-200" @click.away="cancelTeacherAuth()">
             <div class="text-center">
-                <div class="w-12 h-12 bg-blue-100 text-blue-900 rounded-2xl flex items-center justify-center text-xl mx-auto mb-2 font-bold shadow-sm">
-                    <i class="fa fa-id-card-clip"></i>
+                <div class="w-12 h-12 bg-blue-100 text-blue-900 rounded-2xl flex items-center justify-center text-xl mx-auto mb-2 font-bold shadow-sm" :class="isCurrentTeacherLocked ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-900'">
+                    <i class="fa" :class="isCurrentTeacherLocked ? 'fa-user-lock' : 'fa-id-card-clip'"></i>
                 </div>
-                <h3 class="text-base font-black text-slate-900">Staff Identity Verification</h3>
-                <p class="text-xs text-slate-500 mt-1">Please enter your Staff ID to authenticate profile</p>
+                <h3 class="text-base font-black text-slate-900" x-text="isCurrentTeacherLocked ? 'Verification Locked' : 'Staff Identity Verification'"></h3>
+                <p class="text-xs text-slate-500 mt-1" x-text="isCurrentTeacherLocked ? 'Maximum authentication trials exceeded' : 'Please enter your GES Staff ID to access this profile'"></p>
             </div>
 
             <!-- Target Teacher Summary Badge -->
@@ -727,16 +727,23 @@
                 </div>
             </template>
 
-            <!-- Error message alert -->
-            <div x-show="teacherAuthErrorMsg" class="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2" style="display: none;">
-                <span class="text-rose-600 font-bold">⚠️</span>
+            <!-- Trial Counter Badge (Active during trials 1 and 2) -->
+            <div x-show="!isCurrentTeacherLocked && currentTeacherAttempts > 0" class="flex justify-between items-center bg-amber-50 border border-amber-200 text-amber-900 px-3 py-1.5 rounded-xl text-xs font-semibold">
+                <span class="flex items-center gap-1.5"><i class="fa fa-triangle-exclamation text-amber-600"></i> Authentication Trials:</span>
+                <span class="font-mono font-bold bg-amber-200/80 px-2 py-0.5 rounded text-[11px]" x-text="currentTeacherAttempts + ' of 3 used'"></span>
+            </div>
+
+            <!-- Error message alert (Without suggesting the real ID) -->
+            <div x-show="!isCurrentTeacherLocked && teacherAuthErrorMsg" class="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2" style="display: none;">
+                <span class="text-rose-600 font-bold shrink-0">⚠️</span>
                 <span x-text="teacherAuthErrorMsg"></span>
             </div>
 
-            <form @submit.prevent="confirmTeacherAuth()" class="space-y-3">
+            <!-- ACTIVE AUTHENTICATION FORM (When trials remaining < 3) -->
+            <form x-show="!isCurrentTeacherLocked" @submit.prevent="confirmTeacherAuth()" class="space-y-3">
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Official Staff ID / Contact</label>
-                    <input type="text" x-model="enteredTeacherStaffId" placeholder="e.g. GES-001 or Staff ID" autofocus class="w-full text-center uppercase tracking-wider text-sm rounded-lg border-slate-300 border px-3 py-2.5 font-mono focus:outline-none focus:border-blue-900 font-bold" required>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Official GES Staff ID</label>
+                    <input type="text" x-model="enteredTeacherStaffId" placeholder="Enter your GES Staff ID" autofocus class="w-full text-center uppercase tracking-wider text-sm rounded-lg border-slate-300 border px-3 py-2.5 font-mono focus:outline-none focus:border-blue-900 font-bold" required>
                 </div>
                 <div class="flex gap-2 pt-1">
                     <button type="submit" class="flex-1 bg-blue-900 hover:bg-blue-800 text-white text-xs font-bold py-2.5 rounded-lg transition shadow-sm flex items-center justify-center gap-1.5">
@@ -746,6 +753,69 @@
                     <button type="button" @click="cancelTeacherAuth()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium py-2.5 rounded-lg transition">Cancel</button>
                 </div>
             </form>
+
+            <!-- LOCKED NOTICE (After 3 failed trials) -->
+            <div x-show="isCurrentTeacherLocked" class="space-y-3">
+                <div class="p-4 rounded-2xl bg-rose-50 border border-rose-300 text-rose-950 space-y-3 shadow-inner">
+                    <div class="flex items-center gap-2 text-rose-800 font-bold text-xs">
+                        <i class="fa fa-shield-halved text-rose-600 text-sm"></i>
+                        <span>Security Lockout Triggered</span>
+                    </div>
+                    
+                    <p class="text-xs text-rose-900 leading-relaxed">
+                        You have entered an incorrect ID <strong>3 consecutive times</strong> for this educator profile.
+                    </p>
+
+                    <!-- Notice: Contact Headteacher or Developer for ID -->
+                    <div class="p-3 bg-white/95 rounded-xl border border-rose-200 space-y-2 text-xs">
+                        <div class="font-bold text-slate-900 flex items-center gap-1.5">
+                            <i class="fa fa-circle-info text-blue-800"></i> Next Step:
+                        </div>
+                        <p class="text-slate-700 font-medium">
+                            Please contact your <strong>Headteacher</strong> or the <strong>System Developer</strong> to retrieve your valid Staff ID.
+                        </p>
+
+                        <!-- Contact Details -->
+                        <div class="pt-2 border-t border-slate-100 space-y-1.5 text-[11px] text-slate-700">
+                            <div x-show="activeHeadName" class="flex justify-between items-center">
+                                <span class="text-slate-500">Headteacher:</span>
+                                <span class="font-bold text-slate-900" x-text="activeHeadName"></span>
+                            </div>
+                            <div x-show="activeHeadContact" class="flex justify-between items-center">
+                                <span class="text-slate-500">Head Contact:</span>
+                                <a :href="'tel:' + activeHeadContact" class="font-mono font-bold text-blue-900 hover:underline" x-text="activeHeadContact"></a>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-500">Developer Support:</span>
+                                <a href="https://wa.me/233543521863" target="_blank" class="font-mono font-bold text-emerald-700 hover:underline flex items-center gap-1">
+                                    <i class="fa-brands fa-whatsapp"></i> +233 54 352 1863
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dismiss and Admin Unlock controls -->
+                <div class="flex gap-2">
+                    <button type="button" @click="cancelTeacherAuth()" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold py-2.5 rounded-xl transition shadow-sm">
+                        Close Notice
+                    </button>
+                    <button type="button" @click="showHeadUnlockPrompt = !showHeadUnlockPrompt" class="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition" title="Headteacher Direct Unlock">
+                        <i class="fa fa-key"></i>
+                    </button>
+                </div>
+
+                <!-- Collapsible Headteacher Direct Unlock Box -->
+                <div x-show="showHeadUnlockPrompt" class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs" style="display: none;">
+                    <span class="font-bold text-slate-800 block text-[11px]">Headteacher / Admin Unlock Key:</span>
+                    <div class="flex gap-2">
+                        <input type="password" x-model="headUnlockPin" placeholder="Enter Head PIN (0543)" class="flex-1 text-xs border rounded-lg px-2.5 py-1.5 text-center font-mono">
+                        <button type="button" @click="adminUnlockTeacher(pendingTeacher?.id)" class="bg-blue-900 text-white text-xs font-bold px-3 py-1.5 rounded-lg">
+                            Unlock
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -5114,6 +5184,24 @@
                 teacherAuthErrorMsg: '',
                 pendingTeacher: null,
                 authenticatedTeacherId: '',
+                teacherAuthFailures: (() => {
+                    try { return JSON.parse(sessionStorage.getItem('eduvet_teacher_fails') || '{}'); } catch(e) { return {}; }
+                })(),
+                showHeadUnlockPrompt: false,
+                headUnlockPin: '',
+
+                get currentTeacherAttempts() {
+                    if (!this.pendingTeacher) return 0;
+                    return (this.teacherAuthFailures && this.teacherAuthFailures[this.pendingTeacher.id]) || 0;
+                },
+
+                get isCurrentTeacherLocked() {
+                    return this.currentTeacherAttempts >= 3;
+                },
+
+                get remainingTeacherTrials() {
+                    return Math.max(0, 3 - this.currentTeacherAttempts);
+                },
                 enteredPin: '',
                 showTeacherPrefs: false,
                 broadsheetClassFilter: 'Basic 7',
@@ -6480,6 +6568,8 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                     this.pendingTeacher = targetTeacher;
                     this.enteredTeacherStaffId = '';
                     this.teacherAuthErrorMsg = '';
+                    this.showHeadUnlockPrompt = false;
+                    this.headUnlockPin = '';
                     this.showTeacherAuthModal = true;
                     // Keep selectedTeacherId as whatever was previously authenticated, or empty
                     this.selectedTeacherId = this.authenticatedTeacherId || '';
@@ -6517,6 +6607,12 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                 confirmTeacherAuth() {
                     if (!this.pendingTeacher) return;
                     const target = this.pendingTeacher;
+
+                    // If already locked after 3 trials, disallow submission
+                    if (this.isCurrentTeacherLocked) {
+                        return;
+                    }
+
                     const entered = (this.enteredTeacherStaffId || '').trim();
 
                     if (!entered) {
@@ -6525,6 +6621,11 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                     }
 
                     if (this.isStaffIdValidForTeacher(entered, target)) {
+                        // Success: clear failed trials for this educator
+                        if (this.teacherAuthFailures[target.id]) {
+                            delete this.teacherAuthFailures[target.id];
+                            try { sessionStorage.setItem('eduvet_teacher_fails', JSON.stringify(this.teacherAuthFailures)); } catch (e) {}
+                        }
                         this.selectedTeacherId = target.id;
                         this.authenticatedTeacherId = target.id;
                         localStorage.setItem('eduvet_active_teacher_' + this.authenticatedSchoolId, target.id);
@@ -6533,8 +6634,35 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                         this.teacherAuthErrorMsg = '';
                         this.pendingTeacher = null;
                     } else {
-                        this.teacherAuthErrorMsg = `Incorrect Staff ID for ${target.name}. Please enter your valid Staff ID (e.g. ${target.id}) or contact.`;
+                        // Increment failed trials WITHOUT suggesting the real ID
+                        const currentFails = (this.teacherAuthFailures[target.id] || 0) + 1;
+                        this.teacherAuthFailures[target.id] = currentFails;
+                        try { sessionStorage.setItem('eduvet_teacher_fails', JSON.stringify(this.teacherAuthFailures)); } catch (e) {}
+
                         this.enteredTeacherStaffId = '';
+
+                        if (currentFails >= 3) {
+                            this.teacherAuthErrorMsg = '';
+                        } else {
+                            const remaining = 3 - currentFails;
+                            this.teacherAuthErrorMsg = `Incorrect Staff ID. You have ${remaining} ${remaining === 1 ? 'trial' : 'trials'} remaining.`;
+                        }
+                    }
+                },
+
+                adminUnlockTeacher(teacherId) {
+                    if (!teacherId) return;
+                    const pin = (this.headUnlockPin || '').trim().toUpperCase();
+                    if (pin === '0543' || pin === (this.authenticatedSchoolId || '').toUpperCase()) {
+                        delete this.teacherAuthFailures[teacherId];
+                        try { sessionStorage.setItem('eduvet_teacher_fails', JSON.stringify(this.teacherAuthFailures)); } catch (e) {}
+                        this.headUnlockPin = '';
+                        this.showHeadUnlockPrompt = false;
+                        this.teacherAuthErrorMsg = '';
+                        alert('✓ Profile unlocked successfully by Headteacher.');
+                    } else {
+                        alert('Incorrect Headteacher / Reviewer PIN.');
+                        this.headUnlockPin = '';
                     }
                 },
 
@@ -6542,6 +6670,8 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                     this.showTeacherAuthModal = false;
                     this.enteredTeacherStaffId = '';
                     this.teacherAuthErrorMsg = '';
+                    this.showHeadUnlockPrompt = false;
+                    this.headUnlockPin = '';
                     this.pendingTeacher = null;
                     this.selectedTeacherId = this.authenticatedTeacherId || '';
                 },
