@@ -163,56 +163,57 @@
             </form>
         </div>
     </div>
+
     <!-- Interactive Lesson Plan Threaded Comments Modal -->
-<div x-show="showCommentModal" class="fixed inset-0 bg-blue-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print" style="display: none;">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 border border-slate-200 flex flex-col max-h-[85vh]" @click.away="showCommentModal = false">
-        
-        <!-- Header -->
-        <div class="flex justify-between items-center border-b pb-3">
-            <div>
-                <h3 class="text-sm font-bold text-blue-950">💬 Revision & Feedback Thread</h3>
-                <p class="text-[11px] text-slate-500" x-text="activeCommentLesson ? (activeCommentLesson.subject + ' — ' + activeCommentLesson.week) : ''"></p>
-            </div>
-            <button @click="showCommentModal = false" class="text-slate-400 hover:text-slate-700 font-bold text-sm">✕</button>
-        </div> 
+    <div x-show="showCommentModal" class="fixed inset-0 bg-blue-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print" style="display: none;">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 border border-slate-200 flex flex-col max-h-[85vh]" @click.away="showCommentModal = false">
+            
+            <!-- Header -->
+            <div class="flex justify-between items-center border-b pb-3">
+                <div>
+                    <h3 class="text-sm font-bold text-blue-950">💬 Revision & Feedback Thread</h3>
+                    <p class="text-[11px] text-slate-500" x-text="activeCommentLesson ? (activeCommentLesson.subject + ' — ' + activeCommentLesson.week) : ''"></p>
+                </div>
+                <button @click="showCommentModal = false" class="text-slate-400 hover:text-slate-700 font-bold text-sm">✕</button>
+            </div> 
 
-        <!-- Scrollable Message History -->
-        <div class="flex-grow overflow-y-auto space-y-3 p-2 bg-slate-50 rounded-xl border border-slate-200 max-h-[350px]">
-            <template x-for="comment in (activeCommentLesson?.comments || [])">
-                <div class="flex flex-col p-3 rounded-xl text-xs space-y-1 shadow-sm"
-                     :class="comment.role === 'Reviewer' ? 'bg-blue-50 border border-blue-200 ml-4' : 'bg-white border border-slate-200 mr-4'">
-                    <div class="flex justify-between items-center text-[10px] text-slate-500">
-                        <span class="font-bold" :class="comment.role === 'Reviewer' ? 'text-blue-900' : 'text-emerald-700'" x-text="comment.sender"></span>
-                        <span x-text="comment.timestamp"></span>
+            <!-- Scrollable Message History -->
+            <div class="flex-grow overflow-y-auto space-y-3 p-2 bg-slate-50 rounded-xl border border-slate-200 max-h-[350px]">
+                <template x-for="comment in (activeCommentLesson?.comments || [])">
+                    <div class="flex flex-col p-3 rounded-xl text-xs space-y-1 shadow-sm"
+                         :class="comment.role === 'Reviewer' ? 'bg-blue-50 border border-blue-200 ml-4' : 'bg-white border border-slate-200 mr-4'">
+                        <div class="flex justify-between items-center text-[10px] text-slate-500">
+                            <span class="font-bold" :class="comment.role === 'Reviewer' ? 'text-blue-900' : 'text-emerald-700'" x-text="comment.sender"></span>
+                            <span x-text="comment.timestamp"></span>
+                        </div>
+                        <p class="text-slate-800 whitespace-pre-wrap font-medium" x-text="comment.text"></p>
                     </div>
-                    <p class="text-slate-800 whitespace-pre-wrap font-medium" x-text="comment.text"></p>
+                </template>
+                <div x-show="!activeCommentLesson?.comments || activeCommentLesson.comments.length === 0" class="text-center py-8 text-slate-400 text-xs">
+                    No conversation history yet. Start the discussion below.
                 </div>
-            </template>
-            <div x-show="!activeCommentLesson?.comments || activeCommentLesson.comments.length === 0" class="text-center py-8 text-slate-400 text-xs">
-                No conversation history yet. Start the discussion below.
             </div>
-        </div>
 
-        <!-- Reply Input Form -->
-        <form @submit.prevent="sendLessonComment()" class="space-y-3 pt-2 border-t">
-            <div>
-                <textarea x-model="newCommentText" rows="2" placeholder="Type your revision request or response here..." class="w-full rounded-xl border-slate-300 border p-2.5 text-xs focus:outline-none focus:border-blue-900" required></textarea>
-            </div>
-            <div class="flex justify-between items-center">
-                <select x-model="newCommentStatus" class="rounded-lg border-slate-300 border px-2 py-1.5 text-xs bg-white font-medium">
-                    <option value="Submitted">Keep as Submitted</option>
-                    <option value="Changes Requested">Request Changes</option>
-                    <option value="Approved">Approve Plan</option>
-                    <option value="Rejected">Reject Plan</option>
-                </select>
-                <div class="flex gap-2">
-                    <button type="submit" class="bg-blue-900 hover:bg-blue-800 text-white text-xs px-4 py-2 rounded-xl font-medium transition shadow-sm">Send Reply</button>
-                    <button type="button" @click="showCommentModal = false" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs px-3 py-2 rounded-xl">Close</button>
+            <!-- Reply Input Form -->
+            <form @submit.prevent="sendLessonComment()" class="space-y-3 pt-2 border-t">
+                <div>
+                    <textarea x-model="newCommentText" rows="2" placeholder="Type your revision request or response here..." class="w-full rounded-xl border-slate-300 border p-2.5 text-xs focus:outline-none focus:border-blue-900" required></textarea>
                 </div>
-            </div>
-        </form>
+                <div class="flex justify-between items-center">
+                    <select x-model="newCommentStatus" class="rounded-lg border-slate-300 border px-2 py-1.5 text-xs bg-white font-medium">
+                        <option value="Submitted">Keep as Submitted</option>
+                        <option value="Changes Requested">Request Changes</option>
+                        <option value="Approved">Approve Plan</option>
+                        <option value="Rejected">Reject Plan</option>
+                    </select>
+                    <div class="flex gap-2">
+                        <button type="submit" class="bg-blue-900 hover:bg-blue-800 text-white text-xs px-4 py-2 rounded-xl font-medium transition shadow-sm">Send Reply</button>
+                        <button type="button" @click="showCommentModal = false" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs px-3 py-2 rounded-xl">Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
     <!-- Paystack Storefront Checkout Modal -->
     <div x-show="showPaymentModal" class="fixed inset-0 bg-blue-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print" style="display: none;">
@@ -278,7 +279,7 @@
                     </select>
                 </div>
         
-                <button @click="logoutSchool()" class="bg-rose-600 px-2 py-1 rounded text-xs"></button>
+                <button @click="logoutSchool()" class="bg-rose-600 px-2 py-1 rounded text-xs">Logout</button>
             </div>
         </div>
         <!-- Mobile Quick Navigation Bar -->
@@ -325,7 +326,7 @@
 
                 <!-- Teacher Selector in Sidebar -->
                 <div x-show="portalMode === 'teacher'" class="space-y-1.5">
-                    <label class="block text-[11px] font-bold text-blue-200">Active  Profile:</label>
+                    <label class="block text-[11px] font-bold text-blue-200">Active Profile:</label>
                     <select x-model="selectedTeacherId" @change="verifyTeacherSession($event)" class="w-full bg-blue-950 text-white border border-blue-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-teal-400 shadow-sm">
                         <option value="">-- Select Your Name --</option>
                         <template x-for="t in sortedTeachers" :key="t.id">
@@ -379,9 +380,6 @@
 
         <!-- Main Content Area -->
         <main class="flex-grow p-4 sm:p-6 lg:p-8 space-y-6 max-w-6xl w-full relative">
-
-            <!-- Watermark for Print / Report Generation -->
-            
 
             <!-- ==================== CLEAN HEADER & ANNOUNCEMENT CARD ==================== -->
             <div class="space-y-4 no-print">
@@ -586,22 +584,21 @@
                                         </div>
 
                                         <div x-show="lesson.feedback" class="bg-rose-50 border border-rose-200 p-3 rounded-xl text-xs text-rose-900 mb-2">
-                                        <strong>Reviewer Feedback:</strong> <span x-text="lesson.feedback"></span>
+                                            <strong>Reviewer Feedback:</strong> <span x-text="lesson.feedback"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex justify-between items-center border-t border-slate-100 pt-3 text-xs">
+                                        <button @click="openCommentThread(lesson)" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-900 text-xs px-3 py-1.5 rounded-lg font-semibold transition flex items-center gap-1 border border-indigo-200 shadow-sm">
+                                            💬 Discussion (<span x-text="(lesson.comments || []).length"></span>)
+                                        </button>
+
+                                        <div class="space-x-3">
+                                            <button @click="editSubmission(lesson)" class="text-blue-900 hover:text-blue-700 font-semibold" x-show="lesson.status !== 'Approved'">Update File</button>
+                                            <button @click="deleteLesson(lesson.id)" class="text-rose-600 hover:text-rose-800 font-semibold">Delete</button>
+                                        </div>
                                     </div>
                                 </div>
-
-                                <div class="flex justify-between items-center border-t border-slate-100 pt-3 text-xs">
-                                    <!-- PUT THE DISCUSSION BUTTON HERE -->
-                                    <button @click="openCommentThread(lesson)" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-900 text-xs px-3 py-1.5 rounded-lg font-semibold transition flex items-center gap-1 border border-indigo-200 shadow-sm">
-                                        💬 Discussion (<span x-text="(lesson.comments || []).length"></span>)
-                                    </button>
-
-                                    <div class="space-x-3">
-                                        <button @click="editSubmission(lesson)" class="text-blue-900 hover:text-blue-700 font-semibold" x-show="lesson.status !== 'Approved'">Update File</button>
-                                        <button @click="deleteLesson(lesson.id)" class="text-rose-600 hover:text-rose-800 font-semibold">Delete</button>
-                                    </div>
-                                </div>
-                            </div>
                             </template>
 
                             <div x-show="teacherFilteredLessons.length === 0" class="text-center py-12 text-slate-400 text-sm">
@@ -739,9 +736,14 @@
             <!-- ==================== SETTINGS & BACKUP PORTAL (RESTRICTED TO REVIEWER/ADMIN) ==================== -->
             <div class="space-y-6" x-show="portalMode === 'settings'">
                 <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200 space-y-6">
-                    <div>
-                        <h2 class="text-lg font-bold text-blue-950">⚙️ Admin Settings: Term, Dates & Watermark</h2>
-                        <p class="text-xs text-slate-500 mt-0.5">Configure term dates, academic year, total weeks, and upload official school watermark logos (Reviewer / Admin Access Only).</p>
+                    <div class="flex justify-between items-center border-b pb-4">
+                        <div>
+                            <h2 class="text-lg font-bold text-blue-950">⚙️ Admin Settings: Term, Dates & Watermark</h2>
+                            <p class="text-xs text-slate-500 mt-0.5">Configure term dates, academic year, total weeks, and upload official school watermark logos (Reviewer / Admin Access Only).</p>
+                        </div>
+                        <button @click="adminSubTab = 'queue'; portalMode = 'reviewer'" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs px-4 py-2 rounded-xl font-semibold transition flex items-center gap-1.5 border border-slate-200 shadow-sm">
+                            <span>← Back to Vetting Queue</span>
+                        </button>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -876,37 +878,33 @@
                 <!-- Reviewer Navigation Sub-Tabs -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6 space-y-6">
                     
-                    <!-- Teachers Yet to Submit Color-Coded Alert Widget -->
-                    <div class="bg-amber-50 border border-amber-200 p-4 rounded-2xl space-y-2">
+                    <!-- Teachers Yet to Submit Color-Coded Alert Widget with Group Broadcast -->
+                    <div class="bg-amber-50 border border-amber-200 p-4 rounded-2xl space-y-3">
                         <div class="flex justify-between items-center">
                             <h4 class="text-xs font-bold uppercase tracking-wider text-amber-900">Teachers Yet to Submit (Pending Compliance)</h4>
-                            <span class="bg-amber-200 text-amber-900 font-bold px-2 py-0.5 rounded-full text-[11px]" x-text="laggingTeachers.length + ' Pending'"></span>
+                            <div class="flex items-center gap-2">
+                                <button @click="broadcastWhatsAppReminder()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] px-3 py-1.5 rounded-lg font-medium transition shadow-sm flex items-center gap-1.5">
+                                    <span>📢 Broadcast to Staff WhatsApp</span>
+                                </button>
+                                <span class="bg-amber-200 text-amber-900 font-bold px-2.5 py-0.5 rounded-full text-[11px]" x-text="laggingTeachers.length + ' Pending'"></span>
+                            </div>
                         </div>
-                        <div class="flex flex-wrap gap-2 pt-1">
-                            <!-- The loop that defines 'lt' -->
-<template x-for="lt in laggingTeachers" :key="lt.id">
-    <div class="flex items-center justify-between p-3 bg-amber-50/50 rounded-xl border border-amber-200 text-xs">
-        <div>
-            <span class="font-bold text-amber-950" x-text="lt.name"></span>
-            <span class="text-slate-500 block text-[11px]" x-text="'Contact: ' + (lt.contact || 'N/A')"></span>
-        </div>
-    </div>
-</template>
-                            <div x-show="laggingTeachers.length === 0" class="text-xs text-emerald-700 font-semibold py-1">
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                            <template x-for="lt in laggingTeachers" :key="lt.id">
+                                <div class="flex items-center justify-between p-3 bg-white rounded-xl border border-amber-200 text-xs shadow-sm">
+                                    <div>
+                                        <span class="font-bold text-amber-950" x-text="lt.name"></span>
+                                        <span class="text-slate-500 block text-[11px]" x-text="'Contact: ' + (lt.contact || 'N/A')"></span>
+                                    </div>
+                                    <button @click="sendWhatsAppReminder(lt)" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition shadow-sm flex items-center gap-1.5 shrink-0">
+                                        <span>💬 Reminder</span>
+                                    </button>
+                                </div>
+                            </template>
+                            <div x-show="laggingTeachers.length === 0" class="text-xs text-emerald-700 font-semibold py-1 sm:col-span-2 text-center">
                                 🎉 All onboarded teachers have successfully submitted their lesson plans!
                             </div>
-                            <!-- Lagging Teacher Card / Row Action -->
-    <div class="flex items-center justify-between p-3 bg-amber-50/50 rounded-xl border border-amber-200 text-xs">
-    <div>
-        <span class="font-bold text-amber-950" x-text="lt.name"></span>
-        <span class="text-slate-500 block text-[11px]" x-text="'Contact: ' + (lt.contact || 'N/A')"></span>
-    </div>
-    
-    <!-- WhatsApp Reminder Button -->
-    <button @click="sendWhatsAppReminder(lt)" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition shadow-sm flex items-center gap-1.5">
-        <span>💬 WhatsApp Reminder</span>
-    </button>
-</div>
                         </div>
                     </div>
 
@@ -1265,7 +1263,6 @@
 
         function schoolApp() {
             return {
-                // --- ADDED COMMENT THREAD STATE VARIABLES HERE ---
                 showCommentModal: false,
                 activeCommentLesson: null,
                 newCommentText: '',
@@ -1408,9 +1405,6 @@ Please complete and submit your lesson plans on the portal at your earliest conv
                     window.open(waUrl, '_blank');
                 },
 
-
-                // ... rest of your existing init() and other methods follow here ...
-
                 init() {
                     setTimeout(() => updateEngineSubjects(), 200);
                     window.addEventListener('online', () => { this.isOnline = true; this.syncOfflineQueue(); });
@@ -1423,7 +1417,7 @@ Please complete and submit your lesson plans on the portal at your earliest conv
                     let inactivityTimeout;
                     const resetTimer = () => {
                         clearTimeout(inactivityTimeout);
-                        // 5 minutes inactivity timeout (300,000 ms)
+                        // Debounced 5 minutes inactivity timeout (300,000 ms)
                         inactivityTimeout = setTimeout(() => {
                             if (this.authenticatedSchoolId) {
                                 alert('🔒 Session expired due to inactivity. Please log back in.');
@@ -1432,10 +1426,10 @@ Please complete and submit your lesson plans on the portal at your earliest conv
                         }, 300000);
                     };
 
-                    window.addEventListener('mousemove', resetTimer);
-                    window.addEventListener('keypress', resetTimer);
-                    window.addEventListener('touchstart', resetTimer);
-                    window.addEventListener('click', resetTimer);
+                    window.addEventListener('mousemove', resetTimer, { passive: true });
+                    window.addEventListener('keypress', resetTimer, { passive: true });
+                    window.addEventListener('touchstart', resetTimer, { passive: true });
+                    window.addEventListener('click', resetTimer, { passive: true });
                 },
 
                 startDeadlineCountdown() {
@@ -1604,7 +1598,7 @@ Please complete and submit your lesson plans on the portal at your earliest conv
                         this.teachers = snapshot.docs.map(doc => ({ ...doc.data() }));
                     });
 
-                    // Add .limit(50) to prevent desktop lagging from heavy dataset rendering
+                    // Optimized with .limit(50) to prevent desktop lagging from heavy dataset rendering
                     db.collection('lessons').where('schoolId', '==', this.authenticatedSchoolId).limit(50).onSnapshot((snapshot) => {
                         this.lessons = snapshot.docs.map(doc => ({ ...doc.data() }));
                     });
@@ -1705,7 +1699,6 @@ Please complete and submit your lesson plans on the portal at your earliest conv
                 },
 
                 editSubmission(lesson) { this.editingId = lesson.id; this.form = { ...lesson }; },
-                
                 deleteLesson(id) { if (confirm('Delete?')) db.collection('lessons').doc(id).delete(); },
                 
                 reviewAction(lesson, newStatus) {
