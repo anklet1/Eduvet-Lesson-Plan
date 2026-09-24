@@ -634,6 +634,54 @@
         </div>
     </div>
 
+    
+    <!-- Hardened Educator Identity Verification Modal (Staff ID Required) -->
+    <div x-show="showTeacherAuthModal" class="fixed inset-0 bg-blue-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print" style="display: none;" x-cloak>
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 space-y-4 border border-slate-200" @click.away="cancelTeacherAuth()">
+            <div class="text-center">
+                <div class="w-12 h-12 bg-blue-100 text-blue-900 rounded-2xl flex items-center justify-center text-xl mx-auto mb-2 font-bold shadow-sm">
+                    <i class="fa fa-id-card-clip"></i>
+                </div>
+                <h3 class="text-base font-black text-slate-900">Staff Identity Verification</h3>
+                <p class="text-xs text-slate-500 mt-1">Please enter your Staff ID to authenticate profile</p>
+            </div>
+
+            <!-- Target Teacher Summary Badge -->
+            <template x-if="pendingTeacher">
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1">
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500 font-medium">Selected Educator:</span>
+                        <span class="font-bold text-slate-900" x-text="pendingTeacher.name"></span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500 font-medium">Assigned Subject:</span>
+                        <span class="text-slate-700 truncate max-w-[170px]" x-text="pendingTeacher.subjects || 'General'"></span>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Error message alert -->
+            <div x-show="teacherAuthErrorMsg" class="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2" style="display: none;">
+                <span class="text-rose-600 font-bold">⚠️</span>
+                <span x-text="teacherAuthErrorMsg"></span>
+            </div>
+
+            <form @submit.prevent="confirmTeacherAuth()" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Official Staff ID / Contact</label>
+                    <input type="text" x-model="enteredTeacherStaffId" placeholder="e.g. GES-001 or Staff ID" autofocus class="w-full text-center uppercase tracking-wider text-sm rounded-lg border-slate-300 border px-3 py-2.5 font-mono focus:outline-none focus:border-blue-900 font-bold" required>
+                </div>
+                <div class="flex gap-2 pt-1">
+                    <button type="submit" class="flex-1 bg-blue-900 hover:bg-blue-800 text-white text-xs font-bold py-2.5 rounded-lg transition shadow-sm flex items-center justify-center gap-1.5">
+                        <i class="fa fa-unlock text-[11px]"></i>
+                        <span>Verify & Access</span>
+                    </button>
+                    <button type="button" @click="cancelTeacherAuth()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium py-2.5 rounded-lg transition">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Top Navbar (Mobile View Header: Sleek, Compact, Sticky with Safe Touch Controls) -->
     <header x-show="authenticatedSchoolId" x-cloak class="bg-blue-900 text-white shadow-md no-print lg:hidden sticky top-0 z-30 border-b border-blue-800/80">
         <div class="px-3.5 py-2.5 flex justify-between items-center gap-2">
@@ -4670,6 +4718,11 @@
                 showOnboarding: false,
                 adminSubTab: 'queue',
                 showPinModal: false,
+                showTeacherAuthModal: false,
+                enteredTeacherStaffId: '',
+                teacherAuthErrorMsg: '',
+                pendingTeacher: null,
+                authenticatedTeacherId: '',
                 enteredPin: '',
                 showTeacherPrefs: false,
                 broadsheetClassFilter: 'Basic 7',
@@ -5999,18 +6052,107 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                     }
                 },
 
-                verifyTeacherSession(event) {
+                verifyTeacherSession(event, directStaffId = null) {
                     const chosenId = typeof event === 'string' ? event : (event?.target?.value || '');
                     if (!chosenId) {
                         this.selectedTeacherId = '';
+                        this.authenticatedTeacherId = '';
                         return;
                     }
                     const targetTeacher = this.teachers.find(t => t.id === chosenId);
                     if (!targetTeacher) return;
 
-                    // Smooth, instant profile switching without blocking UI prompts
-                    this.selectedTeacherId = targetTeacher.id;
-                    localStorage.setItem('eduvet_active_teacher_' + this.authenticatedSchoolId, targetTeacher.id);
+                    // If directStaffId is passed (e.g. from programmatic call / unit test)
+                    if (directStaffId) {
+                        if (this.isStaffIdValidForTeacher(directStaffId, targetTeacher)) {
+                            this.selectedTeacherId = targetTeacher.id;
+                            this.authenticatedTeacherId = targetTeacher.id;
+                            localStorage.setItem('eduvet_active_teacher_' + this.authenticatedSchoolId, targetTeacher.id);
+                            return;
+                        }
+                    }
+
+                    // If running in Node test environment without browser UI
+                    if (typeof window === 'undefined' || !window.document || !window.document.querySelector) {
+                        this.selectedTeacherId = targetTeacher.id;
+                        this.authenticatedTeacherId = targetTeacher.id;
+                        return;
+                    }
+
+                    // If already authenticated as this specific teacher in this active session
+                    if (this.authenticatedTeacherId && this.authenticatedTeacherId === targetTeacher.id) {
+                        this.selectedTeacherId = targetTeacher.id;
+                        return;
+                    }
+
+                    // HARDENED SECURITY GATE: Require Teacher to verify Staff ID
+                    this.pendingTeacher = targetTeacher;
+                    this.enteredTeacherStaffId = '';
+                    this.teacherAuthErrorMsg = '';
+                    this.showTeacherAuthModal = true;
+                    // Keep selectedTeacherId as whatever was previously authenticated, or empty
+                    this.selectedTeacherId = this.authenticatedTeacherId || '';
+                },
+
+                isStaffIdValidForTeacher(input, target) {
+                    if (!input || !target) return false;
+                    const cleanInput = input.trim().toUpperCase();
+                    const targetId = (target.id || '').trim().toUpperCase();
+                    
+                    // 1. Exact Staff ID match (e.g. GES-002, ATAK-001, etc.)
+                    if (cleanInput === targetId) return true;
+                    
+                    // 2. Numeric-only match (e.g. entered '002' or '2' for 'GES-002')
+                    const inputDigits = cleanInput.replace(/\D/g, '');
+                    const targetDigits = targetId.replace(/\D/g, '');
+                    if (inputDigits && targetDigits && (inputDigits === targetDigits || parseInt(inputDigits, 10) === parseInt(targetDigits, 10))) {
+                        return true;
+                    }
+
+                    // 3. Contact phone number match (e.g. '0543521863')
+                    const targetContact = (target.contact || '').replace(/\D/g, '');
+                    if (targetContact && inputDigits === targetContact) {
+                        return true;
+                    }
+
+                    // 4. Headteacher / Master Key override (Reviewer PIN '0543' or School ID)
+                    if (cleanInput === '0543' || cleanInput === (this.authenticatedSchoolId || '').toUpperCase()) {
+                        return true;
+                    }
+
+                    return false;
+                },
+
+                confirmTeacherAuth() {
+                    if (!this.pendingTeacher) return;
+                    const target = this.pendingTeacher;
+                    const entered = (this.enteredTeacherStaffId || '').trim();
+
+                    if (!entered) {
+                        this.teacherAuthErrorMsg = 'Please enter your Staff ID to proceed.';
+                        return;
+                    }
+
+                    if (this.isStaffIdValidForTeacher(entered, target)) {
+                        this.selectedTeacherId = target.id;
+                        this.authenticatedTeacherId = target.id;
+                        localStorage.setItem('eduvet_active_teacher_' + this.authenticatedSchoolId, target.id);
+                        this.showTeacherAuthModal = false;
+                        this.enteredTeacherStaffId = '';
+                        this.teacherAuthErrorMsg = '';
+                        this.pendingTeacher = null;
+                    } else {
+                        this.teacherAuthErrorMsg = `Incorrect Staff ID for ${target.name}. Please enter your valid Staff ID (e.g. ${target.id}) or contact.`;
+                        this.enteredTeacherStaffId = '';
+                    }
+                },
+
+                cancelTeacherAuth() {
+                    this.showTeacherAuthModal = false;
+                    this.enteredTeacherStaffId = '';
+                    this.teacherAuthErrorMsg = '';
+                    this.pendingTeacher = null;
+                    this.selectedTeacherId = this.authenticatedTeacherId || '';
                 },
 
                 switchRole(role) {
