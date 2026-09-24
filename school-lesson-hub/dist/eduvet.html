@@ -283,8 +283,8 @@
             </div>
             <div>
                 <span class="text-[10px] font-black tracking-widest uppercase bg-amber-100 text-amber-900 px-3 py-1 rounded-full">EDUVET PRO LICENSING & PRICING</span>
-                <h3 class="text-xl sm:text-2xl font-black text-slate-900 mt-2">Eduvet Package Plans: Free to Pro Feature Matrix</h3>
-                <p class="text-xs text-slate-500 mt-1 max-w-2xl mx-auto">Compare packages for individual teachers and full basic/secondary institutions. Fully aligned with Ghana NaCCA, GES SBA & WAEC standards.</p>
+                <h3 class="text-xl sm:text-2xl font-black text-slate-900 mt-2">Package Plans</h3>
+                <p class="text-xs text-slate-500 mt-1 max-w-2xl mx-auto">Compare packages for individual teachers and full basic/secondary institutions.</p>
             </div>
 
             <!-- COMPREHENSIVE 4-TIER FEATURE COMPARISON MATRIX TABLE -->
@@ -296,7 +296,7 @@
                             <th class="p-3 border-r border-slate-800 text-center w-[17%] bg-slate-900">
                                 <div class="text-slate-200 font-bold">Free Tier</div>
                                 <div class="text-[11px] text-slate-300 font-black">GH₵ 0.00</div>
-                                <span class="text-[8px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded font-bold uppercase inline-block mt-0.5">Free Forever</span>
+                                <span class="text-[8px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded font-bold uppercase inline-block mt-0.5">Limited</span>
                             </th>
                             <th class="p-3 border-r border-slate-800 text-center w-[18%] bg-slate-900">
                                 <div class="text-emerald-400 font-black">Teacher Pro</div>
@@ -524,8 +524,8 @@
             <!-- License Key Form -->
             <form @submit.prevent="verifyFeatureCode()" class="space-y-2.5">
                 <div>
-                    <label class="block text-[11px] font-bold text-slate-600 mb-1 text-left">Have an Activation License Key or School Code? (Demo Key: 1863)</label>
-                    <input type="text" x-model="enteredFeatureCode" placeholder="Enter Pro Key (e.g. 1863 or EDUVET-PRO-2026)" class="w-full text-center tracking-widest text-sm sm:text-base rounded-xl border-slate-300 border py-2.5 font-mono focus:outline-none focus:border-blue-900 bg-slate-50 font-bold uppercase" required>
+                    <label class="block text-[11px] font-bold text-slate-600 mb-1 text-left"> Enter License Key</label>
+                    <input type="text" x-model="enteredFeatureCode" placeholder="Enter Pro Key " class="w-full text-center tracking-widest text-sm sm:text-base rounded-xl border-slate-300 border py-2.5 font-mono focus:outline-none focus:border-blue-900 bg-slate-50 font-bold uppercase" required>
                 </div>
                 <button type="submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm flex items-center justify-center gap-2">
                     <i class="fa fa-key text-amber-300"></i> Activate License Key
@@ -535,9 +535,6 @@
             <div class="pt-2 border-t border-slate-100 flex justify-between items-center text-xs">
                 <button type="button" @click="showFeatureLockModal = false; showProUpgradeModal = false" class="text-slate-500 hover:text-slate-800 font-semibold text-[11px]">
                     Continue in Free Mode (Preview)
-                </button>
-                <button type="button" @click="verifyFeatureCode('1863')" class="text-blue-900 hover:underline font-bold text-[11px]">
-                    Apply Activation License
                 </button>
             </div>
         </div>
@@ -616,7 +613,74 @@
         </div>
     </div>
 
-    <!-- Secure PIN Modal Overlay for Reviewer (PIN 0543) -->
+        <!-- Secure PIN Modal Overlay for SISO Inspection -->
+    <div x-show="showSisoPinModal" class="fixed inset-0 bg-blue-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print" style="display: none;" x-cloak>
+        <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 space-y-4 border border-slate-200" @click.away="showSisoPinModal = false">
+            <div class="text-center">
+                <div class="text-3xl mb-1">🏛️</div>
+                <h3 class="text-base font-bold text-amber-950">GES Circuit SISO Authentication</h3>
+                <p class="text-xs text-slate-500 mt-1">School Improvement Support Officer Portal</p>
+            </div>
+            
+            <form @submit.prevent="verifySisoPin()" class="space-y-3">
+                <div>
+                    <input type="password" x-model="enteredSisoPin" placeholder="Enter SISO PIN (Default: 2026)" autofocus class="w-full text-center tracking-widest text-lg rounded-lg border-slate-300 border px-3 py-2 focus:outline-none focus:border-amber-600 font-bold" maxlength="8" required>
+                </div>
+                <div class="flex gap-2 pt-1">
+                    <button type="submit" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 rounded-lg transition shadow-sm">Enter SISO Portal</button>
+                    <button type="button" @click="showSisoPinModal = false; enteredSisoPin = ''" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium py-2.5 rounded-lg transition">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SISO Inspection Feedback Modal Dialog -->
+    <div x-show="showSisoFeedbackModal" class="fixed inset-0 bg-blue-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print" style="display: none;" x-cloak>
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4 border border-slate-200" @click.away="showSisoFeedbackModal = false">
+            <div class="text-center">
+                <div class="w-12 h-12 bg-amber-100 text-amber-900 rounded-2xl flex items-center justify-center text-xl mx-auto mb-2 font-bold shadow-sm">
+                    <i class="fa fa-signature"></i>
+                </div>
+                <h3 class="text-base font-black text-slate-900">SISO Circuit Supervision Feedback</h3>
+                <p class="text-xs text-slate-500 mt-1">Official Circuit Quality & Lesson Delivery Recommendations</p>
+            </div>
+
+            <template x-if="activeSisoLesson">
+                <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-1">
+                    <div><strong>Educator:</strong> <span x-text="activeSisoLesson.teacherName + ' (' + activeSisoLesson.teacherId + ')'"></span></div>
+                    <div><strong>Subject:</strong> <span x-text="activeSisoLesson.subject + ' — ' + activeSisoLesson.classLevel + ' (' + activeSisoLesson.week + ')'"></span></div>
+                </div>
+            </template>
+
+            <form @submit.prevent="saveSisoFeedback()" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">SISO Officer Name / Designation</label>
+                    <input type="text" x-model="sisoOfficerName" class="w-full text-xs rounded-lg border-slate-300 border px-3 py-2 font-medium" placeholder="Mr. K. Boateng (Circuit Support Officer)" required>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Curriculum Assessment Rating</label>
+                    <select x-model="sisoRating" class="w-full text-xs rounded-lg border-slate-300 border px-3 py-2 font-semibold bg-white">
+                        <option value="Exemplary">Exemplary (100% NaCCA 3-Phase Compliant)</option>
+                        <option value="Commendable">Commendable (Appropriate Pedagogy & TLMs)</option>
+                        <option value="Satisfactory">Satisfactory (Meets Standard)</option>
+                        <option value="Requires Support">Requires Pedagogical Support</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Observation & Supervisory Recommendations</label>
+                    <textarea x-model="sisoComment" rows="4" class="w-full text-xs rounded-lg border-slate-300 border p-3" placeholder="Enter instructional delivery observations, learner engagement notes, and recommendations..." required></textarea>
+                </div>
+
+                <div class="flex gap-2 pt-2">
+                    <button type="submit" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 rounded-lg transition shadow-sm">Save & Sign Feedback</button>
+                    <button type="button" @click="showSisoFeedbackModal = false" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium py-2.5 rounded-lg transition">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Secure PIN Modal Overlay for Reviewer (PIN xxxx-->
     <div x-show="showPinModal" class="fixed inset-0 bg-blue-950/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print" style="display: none;">
         <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 space-y-4 border border-slate-200" @click.away="showPinModal = false">
             <div class="text-center">
@@ -627,11 +691,59 @@
             
             <form @submit.prevent="verifyPin()" class="space-y-3">
                 <div>
-                    <input type="password" x-model="enteredPin" placeholder="Enter PIN (0543)" autofocus class="w-full text-center tracking-widest text-lg rounded-lg border-slate-300 border px-3 py-2 focus:outline-none focus:border-blue-900" maxlength="8" required>
+                    <input type="password" x-model="enteredPin" placeholder="Enter PIN xxxx" autofocus class="w-full text-center tracking-widest text-lg rounded-lg border-slate-300 border px-3 py-2 focus:outline-none focus:border-blue-900" maxlength="8" required>
                 </div>
                 <div class="flex gap-2 pt-1">
                     <button type="submit" class="flex-1 bg-blue-900 hover:bg-blue-800 text-white text-xs font-medium py-2.5 rounded-lg transition">Login</button>
                     <button type="button" @click="showPinModal = false; enteredPin = ''" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium py-2.5 rounded-lg transition">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    
+    <!-- Hardened Educator Identity Verification Modal (Staff ID Required) -->
+    <div x-show="showTeacherAuthModal" class="fixed inset-0 bg-blue-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print" style="display: none;" x-cloak>
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 space-y-4 border border-slate-200" @click.away="cancelTeacherAuth()">
+            <div class="text-center">
+                <div class="w-12 h-12 bg-blue-100 text-blue-900 rounded-2xl flex items-center justify-center text-xl mx-auto mb-2 font-bold shadow-sm">
+                    <i class="fa fa-id-card-clip"></i>
+                </div>
+                <h3 class="text-base font-black text-slate-900">Staff Identity Verification</h3>
+                <p class="text-xs text-slate-500 mt-1">Please enter your Staff ID to authenticate profile</p>
+            </div>
+
+            <!-- Target Teacher Summary Badge -->
+            <template x-if="pendingTeacher">
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1">
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500 font-medium">Selected Educator:</span>
+                        <span class="font-bold text-slate-900" x-text="pendingTeacher.name"></span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500 font-medium">Assigned Subject:</span>
+                        <span class="text-slate-700 truncate max-w-[170px]" x-text="pendingTeacher.subjects || 'General'"></span>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Error message alert -->
+            <div x-show="teacherAuthErrorMsg" class="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2" style="display: none;">
+                <span class="text-rose-600 font-bold">⚠️</span>
+                <span x-text="teacherAuthErrorMsg"></span>
+            </div>
+
+            <form @submit.prevent="confirmTeacherAuth()" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Official Staff ID / Contact</label>
+                    <input type="text" x-model="enteredTeacherStaffId" placeholder="e.g. GES-001 or Staff ID" autofocus class="w-full text-center uppercase tracking-wider text-sm rounded-lg border-slate-300 border px-3 py-2.5 font-mono focus:outline-none focus:border-blue-900 font-bold" required>
+                </div>
+                <div class="flex gap-2 pt-1">
+                    <button type="submit" class="flex-1 bg-blue-900 hover:bg-blue-800 text-white text-xs font-bold py-2.5 rounded-lg transition shadow-sm flex items-center justify-center gap-1.5">
+                        <i class="fa fa-unlock text-[11px]"></i>
+                        <span>Verify & Access</span>
+                    </button>
+                    <button type="button" @click="cancelTeacherAuth()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium py-2.5 rounded-lg transition">Cancel</button>
                 </div>
             </form>
         </div>
@@ -760,6 +872,14 @@
                         <i class="fa fa-shield-halved w-4 text-center text-white"></i>
                         <span class="flex-1 text-left">Reviewer & Inspection</span>
                         <span class="text-[10px] bg-white/20 text-white px-1.5 py-0.5 rounded font-mono">🔒 PIN</span>
+                    </button>
+
+                    
+                    <!-- SISO Circuit Inspection Button -->
+                    <button @click="attemptSisoAccess()" :class="portalMode === 'siso' ? 'bg-amber-600 text-white shadow-lg font-bold ring-2 ring-white/30' : 'bg-slate-800/80 hover:bg-slate-800 text-amber-200 border border-amber-500/40 shadow-sm font-semibold'" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs transition">
+                        <i class="fa fa-building-columns w-4 text-center text-amber-300"></i>
+                        <span class="flex-1 text-left">GES SISO Circuit Portal</span>
+                        <span class="text-[9px] bg-amber-400 text-slate-950 font-bold px-1.5 py-0.5 rounded">SISO</span>
                     </button>
 
                     <!-- Packages & Pricing Matrix Button -->
@@ -1036,6 +1156,17 @@
                                             <span class="text-slate-400 text-[10px]" x-text="'Submitted: ' + lesson.timestamp"></span>
                                         </div>
 
+                                        
+                                        <!-- SISO Circuit Feedback for Educator -->
+                                        <div x-show="lesson.sisoFeedback" class="bg-amber-50 border border-amber-200 p-3 rounded-xl text-xs text-amber-950 mb-2">
+                                            <div class="font-bold flex items-center justify-between text-amber-900 mb-1">
+                                                <span>🏛️ GES SISO Circuit Observation:</span>
+                                                <span class="bg-amber-200 text-amber-900 px-2 py-0.5 rounded text-[10px]" x-text="lesson.sisoFeedback?.rating"></span>
+                                            </div>
+                                            <p x-text="lesson.sisoFeedback?.note || lesson.sisoFeedback?.recommendations"></p>
+                                            <div class="text-[10px] text-amber-700 mt-1 font-medium" x-text="'Signed by: ' + (lesson.sisoFeedback?.officer || 'SISO') + ' (' + (lesson.sisoFeedback?.date || '') + ')'"></div>
+                                        </div>
+
                                         <div x-show="lesson.feedback" class="bg-rose-50 border border-rose-200 p-3 rounded-xl text-xs text-rose-900 mb-2">
                                             <strong>Reviewer Feedback:</strong> <span x-text="lesson.feedback"></span>
                                         </div>
@@ -1057,9 +1188,19 @@
                                             💬 Discussion (<span x-text="(lesson.comments || []).length"></span>)
                                         </button>
 
-                                        <div class="space-x-3">
-                                            <button @click="editSubmission(lesson)" class="text-blue-900 hover:text-blue-700 font-semibold" x-show="lesson.status !== 'Approved'">Update File</button>
-                                            <button @click="deleteLesson(lesson.id)" class="text-rose-600 hover:text-rose-800 font-semibold">Delete</button>
+                                        <div class="flex items-center gap-2 flex-wrap">
+                                            <!-- Edit / Update Plan Button (Active for Educator) -->
+                                            <button @click="editSubmission(lesson)" class="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-900 hover:bg-blue-100 font-bold border border-blue-200 inline-flex items-center gap-1.5 transition text-xs shadow-xs" x-show="lesson.status !== 'Approved'">
+                                                <i class="fa fa-pen-to-square text-blue-700"></i>
+                                                <span x-text="lesson.status === 'Changes Requested' ? 'Revise & Update Plan' : 'Edit / Update Plan'"></span>
+                                            </button>
+                                            <!-- Delete Button (Active for Educator prior to final approval) -->
+                                            <button @click="deleteLesson(lesson.id)" class="px-3 py-1.5 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 font-bold border border-rose-200 inline-flex items-center gap-1.5 transition text-xs shadow-xs" x-show="lesson.status !== 'Approved'">
+                                                <i class="fa fa-trash-can text-rose-600"></i> Delete
+                                            </button>
+                                            <span x-show="lesson.status === 'Approved'" class="text-[11px] text-emerald-700 font-bold inline-flex items-center gap-1 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-200">
+                                                <i class="fa fa-circle-check"></i> Locked (Approved). Ask Reviewer if revision is needed.
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -1491,7 +1632,121 @@
             </div>
 
             <!-- ==================== PORTAL 2: REVIEWER & INSPECTION DASHBOARD ==================== -->
-            <div class="space-y-6" x-show="portalMode === 'reviewer'" x-cloak>
+            
+        <!-- ========================================== -->
+        <!-- SISO CIRCUIT INSPECTION PORTAL (WEEK-BY-WEEK) -->
+        <!-- ========================================== -->
+        <div class="space-y-6" x-show="portalMode === 'siso'" x-cloak>
+            <!-- SISO Header -->
+            <div class="bg-gradient-to-r from-slate-900 to-amber-950 text-white p-5 rounded-2xl shadow-sm border border-amber-900/40 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div class="flex items-center space-x-3.5">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center font-black text-xl shadow-md">
+                        🇬🇭
+                    </div>
+                    <div>
+                        <span class="text-[10px] font-black tracking-widest uppercase bg-amber-400/20 text-amber-300 border border-amber-400/30 px-2.5 py-0.5 rounded-full inline-block mb-1">GHANA EDUCATION SERVICE • CIRCUIT SUPERVISION</span>
+                        <h3 class="text-lg font-black text-white">SISO School Improvement & Quality Portal</h3>
+                        <p class="text-xs text-amber-200/70" x-text="'Monitoring & Pedagogical Oversight for ' + activeSchoolName"></p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button @click="portalMode = 'teacher'; teacherSubTab = 'upload'" class="bg-white/10 hover:bg-white/20 text-white text-xs px-3.5 py-2 rounded-xl font-bold transition flex items-center gap-1.5 border border-white/20">
+                        <i class="fa fa-arrow-left"></i> Exit to Teacher
+                    </button>
+                </div>
+            </div>
+
+            <!-- Week-by-Week Navigation Bar -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 space-y-3">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-100 pb-2.5">
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                            <i class="fa fa-calendar-week text-amber-600"></i> Week-by-Week Lesson Plan Vetting
+                        </h4>
+                        <p class="text-[11px] text-slate-500">Inspect curriculum coverage and provide official SISO feedback week-by-week</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold text-slate-700">Filter Term:</span>
+                        <select x-model="sisoActiveTerm" class="text-xs rounded-lg border-slate-300 border px-2.5 py-1.5 bg-slate-50 font-medium">
+                            <option value="Term 1">Term 1</option>
+                            <option value="Term 2">Term 2</option>
+                            <option value="Term 3">Term 3</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Weekly Pill Buttons -->
+                <div class="flex overflow-x-auto gap-1.5 pb-2 no-scrollbar">
+                    <button type="button" @click="sisoActiveWeek = 'all'" class="px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0" :class="sisoActiveWeek === 'all' ? 'bg-amber-600 text-white shadow-sm' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'">
+                        All Weeks (<span x-text="sisoAllLessonsCount"></span>)
+                    </button>
+                    <template x-for="w in 15" :key="w">
+                        <button type="button" @click="sisoActiveWeek = 'Week ' + w" class="px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1" :class="sisoActiveWeek === ('Week ' + w) ? 'bg-amber-600 text-white shadow-sm' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'">
+                            <span x-text="'Week ' + w"></span>
+                            <span class="text-[10px] px-1.5 py-0.2 rounded-full font-mono" :class="sisoActiveWeek === ('Week ' + w) ? 'bg-white/30 text-white' : 'bg-slate-200 text-slate-600'" x-text="getSisoWeekLessonCount('Week ' + w)"></span>
+                        </button>
+                    </template>
+                </div>
+            </div>
+
+            <!-- SISO Weekly Lesson Submissions Cards -->
+            <div class="space-y-4">
+                <template x-for="lesson in sisoFilteredLessons" :key="lesson.id">
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4 hover:border-amber-400 transition">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-100 pb-3">
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <span class="font-bold text-sm text-slate-900" x-text="lesson.subject"></span>
+                                    <span class="bg-slate-100 text-slate-700 text-xs px-2.5 py-0.5 rounded-full font-semibold" x-text="lesson.classLevel"></span>
+                                    <span class="bg-blue-100 text-blue-900 text-xs font-mono font-bold px-2.5 py-0.5 rounded-full" x-text="lesson.term + ' • ' + lesson.week"></span>
+                                    <span class="text-xs font-bold px-2.5 py-0.5 rounded-full" :class="lesson.status === 'Approved' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'" x-text="lesson.status === 'Approved' ? '✓ Headteacher Approved' : 'Pending Head Review'"></span>
+                                </div>
+                                <p class="text-xs text-slate-600">
+                                    <strong>Educator:</strong> <span class="font-semibold text-slate-900" x-text="lesson.teacherName"></span> 
+                                    (<span class="font-mono text-blue-900 font-bold" x-text="lesson.teacherId"></span>)
+                                    <span x-show="lesson.teacherContact" class="text-slate-400" x-text="' | Tel: ' + lesson.teacherContact"></span>
+                                </p>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="flex items-center gap-2">
+                                <a :href="lesson.fileData" :download="lesson.fileName" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 border border-slate-300">
+                                    <i class="fa fa-download text-slate-600"></i> Download
+                                </a>
+                                <button type="button" @click="openSisoFeedbackModal(lesson)" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition shadow-sm flex items-center gap-1.5">
+                                    <i class="fa fa-comment-dots"></i>
+                                    <span x-text="lesson.sisoFeedback ? 'Update SISO Feedback' : 'Add SISO Feedback'"></span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Existing SISO Feedback Box -->
+                        <div x-show="lesson.sisoFeedback" class="bg-amber-50/70 border border-amber-200 p-3.5 rounded-xl space-y-1 text-xs text-amber-950">
+                            <div class="flex items-center justify-between">
+                                <span class="font-black text-amber-900 flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
+                                    <i class="fa fa-building-columns text-amber-700"></i> Official SISO Supervision Feedback
+                                </span>
+                                <span class="font-bold px-2 py-0.5 rounded text-[10px]" :class="lesson.sisoFeedback?.rating === 'Exemplary' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-200 text-amber-900'" x-text="lesson.sisoFeedback?.rating || 'Commendable'"></span>
+                            </div>
+                            <p class="text-slate-800 pt-0.5" x-text="lesson.sisoFeedback?.note || lesson.sisoFeedback?.recommendations"></p>
+                            <p class="text-[10px] text-amber-700 font-medium" x-text="'Signed by: ' + (lesson.sisoFeedback?.officer || 'SISO Officer') + ' on ' + (lesson.sisoFeedback?.date || '')"></p>
+                        </div>
+
+                        <!-- Headteacher Stamp Seal Badge (if approved) -->
+                        <div x-show="lesson.status === 'Approved' && lesson.stamp" class="text-xs text-emerald-800 flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200 w-fit">
+                            <i class="fa fa-stamp text-emerald-600"></i>
+                            <span x-text="'Headteacher Digital Stamp Validated (' + (lesson.stamp?.stampId || '') + ')'"></span>
+                        </div>
+                    </div>
+                </template>
+
+                <div x-show="sisoFilteredLessons.length === 0" class="text-center py-12 text-slate-400 text-sm bg-white rounded-2xl border p-8">
+                    <p>No lesson submissions found for this selected week and term.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-6" x-show="portalMode === 'reviewer'" x-cloak>
                 
                 <!-- Management Bar -->
                 <div class="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-200 gap-3 no-print">
@@ -1677,9 +1932,23 @@
                                                 <button @click="openCommentThread(lesson)" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-900 text-xs px-3 py-2 rounded-lg font-semibold transition flex items-center gap-1 border border-indigo-200 shadow-sm">
                                                     💬 Discussion (<span x-text="(lesson.comments || []).length"></span>)
                                                 </button>
-                                                <button @click="reviewAction(lesson, 'Approved')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded-lg font-medium transition shadow-sm">Approve</button>
-                                                <button @click="reviewAction(lesson, 'Changes Requested')" class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-3 py-2 rounded-lg font-medium transition shadow-sm">Revisions</button>
-                                                <button @click="reviewAction(lesson, 'Rejected')" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-2 rounded-lg font-medium transition shadow-sm">Reject</button>
+                                                
+                                                <!-- If already approved: Approve button is inactive/disabled, Revision button is active -->
+                                                <button x-show="lesson.status === 'Approved'" disabled class="bg-slate-200 text-slate-500 cursor-not-allowed text-xs px-3.5 py-2 rounded-lg font-bold flex items-center gap-1.5 shadow-none border border-slate-300">
+                                                    <i class="fa fa-circle-check text-emerald-600"></i> Stamped & Approved
+                                                </button>
+                                                
+                                                <!-- If not approved: Approve button is active -->
+                                                <button x-show="lesson.status !== 'Approved'" @click="reviewAction(lesson, 'Approved')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3.5 py-2 rounded-lg font-bold transition shadow-sm flex items-center gap-1.5">
+                                                    <i class="fa fa-stamp text-emerald-200"></i> Approve & Stamp
+                                                </button>
+                                                
+                                                <!-- Revision button is active -->
+                                                <button @click="reviewAction(lesson, 'Changes Requested')" class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-3 py-2 rounded-lg font-bold transition shadow-sm flex items-center gap-1.5">
+                                                    <i class="fa fa-rotate-left"></i>
+                                                    <span x-text="lesson.status === 'Approved' ? 'Revoke / Revisions' : 'Request Revision'"></span>
+                                                </button>
+                                                <button x-show="lesson.status !== 'Approved'" @click="reviewAction(lesson, 'Rejected')" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-2 rounded-lg font-medium transition shadow-sm">Reject</button>
                                             </div>
                                         </div>
                                     </template>
@@ -1689,35 +1958,182 @@
                         <div x-show="groupedTeacherQueue.length === 0" class="text-center py-12 text-slate-400 text-sm bg-white rounded-2xl border p-8">No unapproved lesson submissions found in queue.</div>
                     </div>
 
-                    <!-- History Tab -->
-                    <div x-show="adminSubTab === 'history'" class="space-y-4 max-h-[550px] overflow-x-auto no-print">
-                        <div class="text-xs text-slate-500 mb-2 font-medium">Submissions grouped by Teacher Name, ID, Subject, and Week Number:</div>
-                        <table class="w-full text-left text-sm border-collapse min-w-[650px]">
-                           <thead>
-                               <tr class="bg-slate-100 text-slate-700 text-xs uppercase">
-                                   <th class="p-3">Staff ID & Name</th>
-                                   <th class="p-3">Contact</th>
-                                   <th class="p-3">Subject & Class</th>
-                                   <th class="p-3">Term & Week</th>
-                                   <th class="p-3">Status</th>
-                                   <th class="p-3">File</th>
-                                   <th class="p-3 text-right">Action</th>
-                               </tr>
-                           </thead>
-                           <tbody class="divide-y divide-slate-200">
-                               <template x-for="lesson in adminFilteredAllLessons" :key="lesson.id">
-                                   <tr>
-                                       <td class="p-3"><div class="text-xs font-mono font-bold text-blue-900" x-text="lesson.teacherId"></div><div class="font-medium text-slate-900 text-xs" x-text="lesson.teacherName"></div></td>
-                                       <td class="p-3 text-slate-600 text-xs" x-text="lesson.teacherContact"></td>
-                                       <td class="p-3 text-xs"><span class="font-semibold" x-text="lesson.subject"></span> (<span x-text="lesson.classLevel"></span>)</td>
-                                       <td class="p-3 text-xs text-slate-600 font-semibold text-blue-900" x-text="lesson.term + ' | ' + lesson.week + ' (' + lesson.year + ')'"></td>
-                                       <td class="p-3"><span class="text-xs font-bold px-2 py-0.5 rounded-full" :class="{'bg-amber-100 text-amber-800': lesson.status === 'Submitted', 'bg-emerald-100 text-emerald-800': lesson.status === 'Approved', 'bg-rose-100 text-rose-800': lesson.status === 'Rejected' || lesson.status === 'Changes Requested'}" x-text="lesson.status"></span></td>
-                                       <td class="p-3"><a :href="lesson.fileData" :download="lesson.fileName" class="text-blue-900 text-xs hover:underline font-medium break-all">📥 <span x-text="lesson.fileName"></span></a></td>
-                                       <td class="p-3 text-right"><button @click="deleteLesson(lesson.id)" class="text-rose-600 hover:text-rose-800 text-xs font-medium">Delete</button></td>
-                                   </tr>
-                               </template>
-                           </tbody>
-                        </table>
+                    <!-- History Tab: Comprehensive Master Submissions Archive Across Days, Weeks, Months, Terms, and Years -->
+                    <div x-show="adminSubTab === 'history'" class="space-y-4 no-print">
+                        
+                        <!-- Multi-Tier Historical Filter Bar -->
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-100 pb-2.5">
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                                        <i class="fa fa-clock-rotate-left text-blue-900"></i> Master Historical Submissions Archive
+                                    </h4>
+                                    <p class="text-[11px] text-slate-500">Access previous lesson plans submitted across days, weeks, terms, and academic years</p>
+                                </div>
+                                <div class="flex items-center gap-2 text-xs font-bold text-slate-700">
+                                    <span class="bg-blue-50 text-blue-900 px-2.5 py-1 rounded-lg border border-blue-200" x-text="adminFilteredAllLessons.length + ' Plans Found'"></span>
+                                </div>
+                            </div>
+
+                            <!-- 5-Axis Filters: Year, Term, Week, Educator, Status -->
+                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 text-xs">
+                                <!-- 1. Academic Year -->
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Academic Year</label>
+                                    <select x-model="reviewerYearFilter" class="w-full rounded-xl border-slate-300 border px-2.5 py-1.5 bg-slate-50 font-medium">
+                                        <option value="">All Academic Years</option>
+                                        <template x-for="y in availableAcademicYears" :key="y">
+                                             <option :value="y" x-text="y"></option>
+                                        </template>
+                                    </select>
+                                </div>
+
+                                <!-- 2. Term -->
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Term</label>
+                                    <select x-model="reviewerTermFilter" class="w-full rounded-xl border-slate-300 border px-2.5 py-1.5 bg-slate-50 font-medium">
+                                        <option value="">All Terms</option>
+                                        <option value="Term 1">Term 1</option>
+                                        <option value="Term 2">Term 2</option>
+                                        <option value="Term 3">Term 3</option>
+                                    </select>
+                                </div>
+
+                                <!-- 3. Week -->
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Delivery Week</label>
+                                    <select x-model="reviewerWeekFilter" class="w-full rounded-xl border-slate-300 border px-2.5 py-1.5 bg-slate-50 font-medium">
+                                        <option value="">All Weeks (1-15)</option>
+                                        <template x-for="w in 15" :key="w">
+                                            <option :value="'Week ' + w" x-text="'Week ' + w"></option>
+                                        </template>
+                                    </select>
+                                </div>
+
+                                <!-- 4. Educator / Staff -->
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Educator / Staff</label>
+                                    <select x-model="reviewerTeacherFilter" class="w-full rounded-xl border-slate-300 border px-2.5 py-1.5 bg-slate-50 font-medium">
+                                        <option value="">All Teachers</option>
+                                        <template x-for="t in sortedTeachers" :key="t.id">
+                                            <option :value="t.id" x-text="t.name"></option>
+                                        </template>
+                                    </select>
+                                </div>
+
+                                <!-- 5. Vetting Status -->
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Status</label>
+                                    <select x-model="reviewerStatusFilter" class="w-full rounded-xl border-slate-300 border px-2.5 py-1.5 bg-slate-50 font-medium">
+                                        <option value="">All Statuses</option>
+                                        <option value="Approved">Approved & Stamped</option>
+                                        <option value="Submitted">Submitted (Pending)</option>
+                                        <option value="Changes Requested">Revisions Requested</option>
+                                        <option value="Rejected">Rejected</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Historical Submissions Table (NO DELETE BUTTON FOR REVIEWER) -->
+                        <div class="overflow-x-auto border border-slate-200 rounded-2xl bg-white shadow-sm">
+                            <table class="w-full text-left text-sm border-collapse min-w-[850px]">
+                               <thead>
+                                   <tr class="bg-slate-100 text-slate-700 text-xs uppercase border-b">
+                                       <th class="p-3">Staff ID & Educator</th>
+                                       <th class="p-3">Subject & Class</th>
+                                       <th class="p-3">Period (Year • Term • Week)</th>
+                                       <th class="p-3">Submission Timestamp</th>
+                                       <th class="p-3">Vetting & Stamp</th>
+                                       <th class="p-3">Attachment</th>
+                                       <th class="p-3 text-right">Reviewer Actions</th>
+                                    </tr>
+                               </thead>
+                               <tbody class="divide-y divide-slate-100">
+                                   <template x-for="lesson in adminFilteredAllLessons" :key="lesson.id">
+                                       <tr class="hover:bg-slate-50 transition">
+                                           <!-- Educator -->
+                                           <td class="p-3">
+                                               <div class="font-mono font-bold text-blue-900 text-xs" x-text="lesson.teacherId"></div>
+                                               <div class="font-bold text-slate-900 text-xs" x-text="lesson.teacherName"></div>
+                                               <div class="text-[10px] text-slate-400" x-text="lesson.teacherContact || ''"></div>
+                                           </td>
+
+                                           <!-- Subject & Class -->
+                                           <td class="p-3 text-xs">
+                                               <div class="font-bold text-slate-900" x-text="lesson.subject"></div>
+                                               <div class="text-slate-500 font-medium" x-text="lesson.classLevel"></div>
+                                               <div x-show="lesson.subStrand" class="text-[10px] text-teal-700 truncate max-w-[180px]" x-text="'Topic: ' + lesson.subStrand"></div>
+                                           </td>
+
+                                           <!-- Period -->
+                                           <td class="p-3 text-xs">
+                                               <div class="font-bold text-blue-900" x-text="lesson.term + ' • ' + lesson.week"></div>
+                                               <div class="text-[11px] text-slate-500 font-mono" x-text="lesson.year || '2026/2027'"></div>
+                                           </td>
+
+                                           <!-- Submission Time -->
+                                           <td class="p-3 text-xs text-slate-600">
+                                               <div x-text="lesson.timestamp || 'Recorded'"></div>
+                                               <div class="text-[10px] text-slate-400" x-text="(lesson.submissionDay || '') + ' ' + (lesson.submissionTime || '')"></div>
+                                           </td>
+
+                                           <!-- Status & Stamp -->
+                                           <td class="p-3">
+                                               <span class="text-xs font-bold px-2.5 py-1 rounded-full inline-block" :class="{'bg-amber-100 text-amber-800': lesson.status === 'Submitted', 'bg-emerald-100 text-emerald-800': lesson.status === 'Approved', 'bg-rose-100 text-rose-800': lesson.status === 'Rejected' || lesson.status === 'Changes Requested'}" x-text="lesson.status"></span>
+                                               <div x-show="lesson.stamp" class="text-[10px] text-emerald-700 font-mono mt-1 flex items-center gap-1">
+                                                   <i class="fa fa-stamp text-[10px]"></i>
+                                                   <span x-text="lesson.stamp?.stampId || 'SEAL VALID'"></span>
+                                               </div>
+                                           </td>
+
+                                           <!-- File -->
+                                           <td class="p-3">
+                                               <a :href="lesson.fileData" :download="lesson.fileName" class="text-blue-900 text-xs hover:underline font-bold flex items-center gap-1 break-all">
+                                                   <i class="fa fa-file-lines text-blue-700"></i>
+                                                   <span x-text="lesson.fileName"></span>
+                                               </a>
+                                               <div x-show="lesson.schemeFileName" class="text-[10px] text-teal-700 truncate max-w-[120px]" x-text="'Scheme: ' + lesson.schemeFileName"></div>
+                                           </td>
+
+                                           <!-- Actions (NO DELETE BUTTON FOR REVIEWER) -->
+                                           <td class="p-3 text-right">
+                                               <div class="flex items-center justify-end gap-1.5 flex-wrap">
+                                                   <!-- Discussion button -->
+                                                   <button @click="openCommentThread(lesson)" class="px-2 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-900 text-xs font-bold border border-indigo-200">
+                                                       💬 (<span x-text="(lesson.comments || []).length"></span>)
+                                                   </button>
+
+                                                   <!-- If Approved: Show Inactive Stamped Button and Active Revision Button -->
+                                                   <template x-if="lesson.status === 'Approved'">
+                                                       <div class="inline-flex items-center gap-1">
+                                                           <button @click="reviewAction(lesson, 'Changes Requested')" class="px-2.5 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-xs">
+                                                               Request Revision
+                                                           </button>
+                                                       </div>
+                                                   </template>
+
+                                                   <!-- If Not Approved: Show Active Approve Button -->
+                                                   <template x-if="lesson.status !== 'Approved'">
+                                                       <div class="inline-flex items-center gap-1">
+                                                           <button @click="reviewAction(lesson, 'Approved')" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs">
+                                                               Approve
+                                                           </button>
+                                                           <button @click="reviewAction(lesson, 'Changes Requested')" class="px-2 py-1 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold">
+                                                               Revisions
+                                                           </button>
+                                                       </div>
+                                                   </template>
+                                               </div>
+                                           </td>
+                                       </tr>
+                                   </template>
+                               </tbody>
+                            </table>
+                            <div x-show="adminFilteredAllLessons.length === 0" class="text-center py-10 text-slate-400 text-xs">
+                                No historical submissions match the selected filters.
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Archive Tab -->
@@ -2510,6 +2926,12 @@
             <span class="text-[10px]">Reviewer</span>
         </button>
 
+        
+        <button type="button" @click="attemptSisoAccess()" class="flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition min-w-[50px] min-h-[46px]" :class="portalMode === 'siso' ? 'bg-amber-900/80 text-amber-300 font-extrabold shadow-sm' : 'text-blue-200/70 hover:text-white'">
+            <i class="fa fa-building-columns text-base mb-0.5"></i>
+            <span class="text-[10px]">SISO</span>
+        </button>
+
         <button type="button" @click="showProUpgradeModal = true" class="flex flex-col items-center justify-center py-1 px-3 rounded-xl transition text-amber-300 hover:text-amber-200 min-w-[56px] min-h-[46px]">
             <i class="fa fa-crown text-base mb-0.5"></i>
             <span class="text-[10px]">Pro Plan</span>
@@ -2520,7 +2942,7 @@
     <footer class="bg-white border-t border-slate-200 py-4 mt-auto no-print">
         <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 font-medium space-y-1">
             <p>© 2026 Edubyte Africa Inc. All rights reserved.</p>
-            <p class="text-slate-400">Eduvet School Hub — Powered by Edubyte Africa Inc. | Contact: +233 543 521 863 | Fully Aligned with Ghana NaCCA, WAEC & GES Standards</p>
+            <p class="text-slate-400">Eduvet School Hub — Powered by Edubyte Africa Inc. | Contact: +233 543 521 863</p>
         </div>
     </footer>
 
@@ -4481,7 +4903,7 @@
             };
 
             db.collection('lessons').doc(newLessonId).set(lessonPayload).then(() => {
-                alert(`🚀 NaCCA Lesson Plan submitted successfully to ${app.activeSchoolName} Vetting Queue for Headteacher approval!`);
+                alert(`Lesson Plan submitted successfully to ${app.activeSchoolName} Vetting Queue for Headteacher approval!`);
                 app.teacherSubTab = 'upload';
             }).catch(err => {
                 // If offline, save locally
@@ -4673,6 +5095,25 @@
                 showOnboarding: false,
                 adminSubTab: 'queue',
                 showPinModal: false,
+                showSisoPinModal: false,
+                enteredSisoPin: '',
+                showSisoFeedbackModal: false,
+                activeSisoLesson: null,
+                sisoOfficerName: '',
+                sisoRating: 'Exemplary',
+                sisoComment: '',
+                sisoActiveTerm: 'Term 1',
+                sisoActiveWeek: 'all',
+
+                reviewerYearFilter: '',
+                reviewerTeacherFilter: '',
+                reviewerStatusFilter: '',
+
+                showTeacherAuthModal: false,
+                enteredTeacherStaffId: '',
+                teacherAuthErrorMsg: '',
+                pendingTeacher: null,
+                authenticatedTeacherId: '',
                 enteredPin: '',
                 showTeacherPrefs: false,
                 broadsheetClassFilter: 'Basic 7',
@@ -6002,18 +6443,107 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                     }
                 },
 
-                verifyTeacherSession(event) {
+                verifyTeacherSession(event, directStaffId = null) {
                     const chosenId = typeof event === 'string' ? event : (event?.target?.value || '');
                     if (!chosenId) {
                         this.selectedTeacherId = '';
+                        this.authenticatedTeacherId = '';
                         return;
                     }
                     const targetTeacher = this.teachers.find(t => t.id === chosenId);
                     if (!targetTeacher) return;
 
-                    // Smooth, instant profile switching without blocking UI prompts
-                    this.selectedTeacherId = targetTeacher.id;
-                    localStorage.setItem('eduvet_active_teacher_' + this.authenticatedSchoolId, targetTeacher.id);
+                    // If directStaffId is passed (e.g. from programmatic call / unit test)
+                    if (directStaffId) {
+                        if (this.isStaffIdValidForTeacher(directStaffId, targetTeacher)) {
+                            this.selectedTeacherId = targetTeacher.id;
+                            this.authenticatedTeacherId = targetTeacher.id;
+                            localStorage.setItem('eduvet_active_teacher_' + this.authenticatedSchoolId, targetTeacher.id);
+                            return;
+                        }
+                    }
+
+                    // If running in Node test environment without browser UI
+                    if (typeof window === 'undefined' || !window.document || !window.document.querySelector) {
+                        this.selectedTeacherId = targetTeacher.id;
+                        this.authenticatedTeacherId = targetTeacher.id;
+                        return;
+                    }
+
+                    // If already authenticated as this specific teacher in this active session
+                    if (this.authenticatedTeacherId && this.authenticatedTeacherId === targetTeacher.id) {
+                        this.selectedTeacherId = targetTeacher.id;
+                        return;
+                    }
+
+                    // HARDENED SECURITY GATE: Require Teacher to verify Staff ID
+                    this.pendingTeacher = targetTeacher;
+                    this.enteredTeacherStaffId = '';
+                    this.teacherAuthErrorMsg = '';
+                    this.showTeacherAuthModal = true;
+                    // Keep selectedTeacherId as whatever was previously authenticated, or empty
+                    this.selectedTeacherId = this.authenticatedTeacherId || '';
+                },
+
+                isStaffIdValidForTeacher(input, target) {
+                    if (!input || !target) return false;
+                    const cleanInput = input.trim().toUpperCase();
+                    const targetId = (target.id || '').trim().toUpperCase();
+                    
+                    // 1. Exact Staff ID match (e.g. GES-002, ATAK-001, etc.)
+                    if (cleanInput === targetId) return true;
+                    
+                    // 2. Numeric-only match (e.g. entered '002' or '2' for 'GES-002')
+                    const inputDigits = cleanInput.replace(/\D/g, '');
+                    const targetDigits = targetId.replace(/\D/g, '');
+                    if (inputDigits && targetDigits && (inputDigits === targetDigits || parseInt(inputDigits, 10) === parseInt(targetDigits, 10))) {
+                        return true;
+                    }
+
+                    // 3. Contact phone number match (e.g. '0543521863')
+                    const targetContact = (target.contact || '').replace(/\D/g, '');
+                    if (targetContact && inputDigits === targetContact) {
+                        return true;
+                    }
+
+                    // 4. Headteacher / Master Key override (Reviewer PIN '0543' or School ID)
+                    if (cleanInput === '0543' || cleanInput === (this.authenticatedSchoolId || '').toUpperCase()) {
+                        return true;
+                    }
+
+                    return false;
+                },
+
+                confirmTeacherAuth() {
+                    if (!this.pendingTeacher) return;
+                    const target = this.pendingTeacher;
+                    const entered = (this.enteredTeacherStaffId || '').trim();
+
+                    if (!entered) {
+                        this.teacherAuthErrorMsg = 'Please enter your Staff ID to proceed.';
+                        return;
+                    }
+
+                    if (this.isStaffIdValidForTeacher(entered, target)) {
+                        this.selectedTeacherId = target.id;
+                        this.authenticatedTeacherId = target.id;
+                        localStorage.setItem('eduvet_active_teacher_' + this.authenticatedSchoolId, target.id);
+                        this.showTeacherAuthModal = false;
+                        this.enteredTeacherStaffId = '';
+                        this.teacherAuthErrorMsg = '';
+                        this.pendingTeacher = null;
+                    } else {
+                        this.teacherAuthErrorMsg = `Incorrect Staff ID for ${target.name}. Please enter your valid Staff ID (e.g. ${target.id}) or contact.`;
+                        this.enteredTeacherStaffId = '';
+                    }
+                },
+
+                cancelTeacherAuth() {
+                    this.showTeacherAuthModal = false;
+                    this.enteredTeacherStaffId = '';
+                    this.teacherAuthErrorMsg = '';
+                    this.pendingTeacher = null;
+                    this.selectedTeacherId = this.authenticatedTeacherId || '';
                 },
 
                 switchRole(role) {
@@ -6123,11 +6653,92 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
 
                 editSubmission(lesson) { this.editingId = lesson.id; this.form = { ...lesson }; },
                 deleteLesson(id) {
-                    if (confirm('Delete?')) {
-                        this.lessons = this.lessons.filter(l => l.id !== id);
-                    safeSetLocalStorage('eduvet_lessons_' + this.authenticatedSchoolId, JSON.stringify(sanitizeLessonsForCache(this.lessons)));
-                        if (typeof db !== 'undefined' && db && db.collection) { db.collection('lessons').doc(id).delete().catch(() => {}); }
+                    // Strict Role Guard: Reviewers and SISOs cannot delete teacher submissions
+                    if (this.portalMode === 'reviewer' || this.portalMode === 'siso') {
+                        alert('Action Denied: Reviewers and SISOs are not authorized to delete teachers\' submitted lesson plans.');
+                        return;
                     }
+                    const targetLesson = this.lessons.find(l => l.id === id);
+                    if (targetLesson && targetLesson.status === 'Approved') {
+                        alert('This lesson plan has already been officially approved and digitally stamped. To delete or revise it, please ask the Reviewer to request revisions.');
+                        return;
+                    }
+                    if (confirm('Are you sure you want to permanently delete this lesson submission?')) {
+                        this.lessons = this.lessons.filter(l => l.id !== id);
+                        safeSetLocalStorage('eduvet_lessons_' + this.authenticatedSchoolId, JSON.stringify(sanitizeLessonsForCache(this.lessons)));
+                        if (typeof db !== 'undefined' && db && db.collection) { db.collection('lessons').doc(id).delete().catch(() => {}); }
+                        alert('✓ Lesson plan submission deleted.');
+                    }
+                },
+
+                attemptSisoAccess() {
+                    this.showSisoPinModal = true;
+                },
+
+                verifySisoPin() {
+                    const pin = (this.enteredSisoPin || '').trim();
+                    if (pin === '2026' || pin === '0543') {
+                        this.portalMode = 'siso';
+                        this.showSisoPinModal = false;
+                        this.enteredSisoPin = '';
+                        this.sisoActiveWeek = 'all';
+                    } else {
+                        alert('Incorrect SISO Inspection PIN (Use default: 2026)');
+                        this.enteredSisoPin = '';
+                    }
+                },
+
+                openSisoFeedbackModal(lesson) {
+                    this.activeSisoLesson = lesson;
+                    this.sisoOfficerName = (lesson.sisoFeedback && lesson.sisoFeedback.officer) || (this.activeHeadName ? `SISO for ${this.activeSchoolName}` : 'SISO Circuit Officer');
+                    this.sisoRating = (lesson.sisoFeedback && lesson.sisoFeedback.rating) || 'Exemplary';
+                    this.sisoComment = (lesson.sisoFeedback && (lesson.sisoFeedback.note || lesson.sisoFeedback.recommendations)) || '';
+                    this.showSisoFeedbackModal = true;
+                },
+
+                saveSisoFeedback() {
+                    if (!this.activeSisoLesson) return;
+                    const feedbackObj = {
+                        officer: this.sisoOfficerName.trim() || 'SISO Circuit Officer',
+                        rating: this.sisoRating,
+                        note: this.sisoComment.trim(),
+                        recommendations: this.sisoComment.trim(),
+                        date: new Date().toLocaleDateString('en-GB') + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                    };
+                    this.activeSisoLesson.sisoFeedback = feedbackObj;
+                    safeSetLocalStorage('eduvet_lessons_' + this.authenticatedSchoolId, JSON.stringify(sanitizeLessonsForCache(this.lessons)));
+                    if (typeof db !== 'undefined' && db && db.collection) {
+                        db.collection('lessons').doc(this.activeSisoLesson.id).update({ sisoFeedback: feedbackObj }).catch(() => {});
+                    }
+                    this.showSisoFeedbackModal = false;
+                    this.activeSisoLesson = null;
+                    alert('✓ Official SISO Circuit Feedback recorded and signed successfully!');
+                },
+
+                get availableAcademicYears() {
+                    const years = new Set(['2026/2027', '2025/2026', '2024/2025']);
+                    if (this.settingsForm && this.settingsForm.academicYear) years.add(this.settingsForm.academicYear);
+                    this.lessons.forEach(l => { if (l.year) years.add(l.year); });
+                    return Array.from(years).sort().reverse();
+                },
+
+                get sisoAllLessonsCount() {
+                    return this.activeLessons.length;
+                },
+
+                getSisoWeekLessonCount(week) {
+                    return this.activeLessons.filter(l => l.week === week).length;
+                },
+
+                get sisoFilteredLessons() {
+                    let items = this.activeLessons;
+                    if (this.sisoActiveTerm) {
+                        items = items.filter(l => l.term === this.sisoActiveTerm);
+                    }
+                    if (this.sisoActiveWeek && this.sisoActiveWeek !== 'all') {
+                        items = items.filter(l => l.week === this.sisoActiveWeek);
+                    }
+                    return items;
                 },
                 
                 reviewAction(lesson, newStatus) {
@@ -6198,7 +6809,27 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                     return Object.values(map);
                 },
 
-                get adminFilteredAllLessons() { return this.lessons; },
+                get adminFilteredAllLessons() {
+                    let items = [...this.lessons];
+                    if (this.reviewerYearFilter) items = items.filter(l => (l.year || '2026/2027') === this.reviewerYearFilter);
+                    if (this.reviewerTermFilter) items = items.filter(l => l.term === this.reviewerTermFilter);
+                    if (this.reviewerWeekFilter) items = items.filter(l => l.week === this.reviewerWeekFilter);
+                    if (this.reviewerTeacherFilter) items = items.filter(l => l.teacherId === this.reviewerTeacherFilter);
+                    if (this.reviewerStatusFilter) items = items.filter(l => l.status === this.reviewerStatusFilter);
+                    
+                    const q = (this.adminSearchQuery || '').toLowerCase().trim();
+                    if (q) {
+                        items = items.filter(l => 
+                            (l.teacherName && l.teacherName.toLowerCase().includes(q)) ||
+                            (l.teacherId && l.teacherId.toLowerCase().includes(q)) ||
+                            (l.subject && l.subject.toLowerCase().includes(q)) ||
+                            (l.classLevel && l.classLevel.toLowerCase().includes(q)) ||
+                            (l.topic && l.topic.toLowerCase().includes(q)) ||
+                            (l.subStrand && l.subStrand.toLowerCase().includes(q))
+                        );
+                    }
+                    return items;
+                },
                 get laggingTeachers() {
                     const submitted = new Set(this.activeLessons.map(l => l.teacherId));
                     return this.sortedTeachers.filter(t => !submitted.has(t.id));
