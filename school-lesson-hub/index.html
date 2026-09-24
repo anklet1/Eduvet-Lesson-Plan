@@ -552,10 +552,76 @@
                 </button>
             </form>
 
-            <div class="pt-2 border-t border-slate-100 flex justify-between items-center text-xs">
-                <button type="button" @click="showFeatureLockModal = false; showProUpgradeModal = false" class="text-slate-500 hover:text-slate-800 font-semibold text-[11px]">
+            <div class="pt-2 border-t border-slate-100 flex justify-between items-center text-xs pb-10 sm:pb-14">
+                <button type="button" @click="showFeatureLockModal = false; showProUpgradeModal = false" class="text-slate-500 hover:text-slate-800 font-semibold text-[11px] cursor-pointer">
                     Continue in Free Mode (Preview)
                 </button>
+            </div>
+
+            <!-- FLOATING STICKY ACTION MENU BAR (Floats at bottom of modal when scrolling for fast plan selection & checkout) -->
+            <div class="sticky bottom-0 bg-white/95 backdrop-blur-md border-t-2 border-slate-200 py-3 px-4 sm:px-6 shadow-[0_-10px_25px_rgba(0,0,0,0.15)] -mx-5 sm:-mx-7 -mb-5 sm:-mb-7 z-30 rounded-b-3xl space-y-2.5">
+                <!-- Floating Plan Switcher Pills -->
+                <div class="flex items-center justify-between gap-1.5 overflow-x-auto pb-1">
+                    <button type="button" @click="selectedProPlan = 'free'"
+                        class="px-2.5 sm:px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap cursor-pointer"
+                        :class="selectedProPlan === 'free' ? 'bg-slate-900 text-white shadow-sm ring-2 ring-slate-900/20' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'">
+                        <i class="fa fa-sparkles text-[10px]"></i>
+                        <span>Free Tier (GH₵ 0)</span>
+                    </button>
+                    <button type="button" @click="selectedProPlan = 'teacher_term'"
+                        class="px-2.5 sm:px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap cursor-pointer"
+                        :class="selectedProPlan === 'teacher_term' ? 'bg-emerald-600 text-white shadow-sm ring-2 ring-emerald-600/20' : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100'">
+                        <i class="fa fa-chalkboard-user text-[10px]"></i>
+                        <span>Teacher Pro (GH₵ 49.99)</span>
+                    </button>
+                    <button type="button" @click="selectedProPlan = 'school_term'"
+                        class="px-2.5 sm:px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap cursor-pointer"
+                        :class="selectedProPlan === 'school_term' ? 'bg-blue-700 text-white shadow-sm ring-2 ring-blue-700/20' : 'bg-blue-50 text-blue-900 hover:bg-blue-100'">
+                        <i class="fa fa-school text-[10px]"></i>
+                        <span>School Termly (GH₵ 199.99)</span>
+                    </button>
+                    <button type="button" @click="selectedProPlan = 'school_year'"
+                        class="px-2.5 sm:px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap cursor-pointer"
+                        :class="selectedProPlan === 'school_year' ? 'bg-amber-500 text-slate-950 font-black shadow-sm ring-2 ring-amber-500/20' : 'bg-amber-50 text-amber-900 hover:bg-amber-100'">
+                        <i class="fa fa-crown text-[10px]"></i>
+                        <span>School Yearly (GH₵ 399.99)</span>
+                    </button>
+                </div>
+
+                <!-- Floating Action Buttons Row -->
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-2.5 pt-1.5 border-t border-slate-100">
+                    <div class="text-left hidden sm:block">
+                        <div class="text-[11px] font-black text-slate-900">
+                            Selected: <span class="text-blue-900 font-extrabold" x-text="selectedProPlan === 'free' ? 'Free Tier (GH₵ 0.00)' : (selectedProPlan === 'teacher_term' ? 'Teacher Pro (GH₵ 49.99/term)' : (selectedProPlan === 'school_term' ? 'School Termly (GH₵ 199.99/term)' : 'School Yearly (GH₵ 399.99/yr)'))"></span>
+                        </div>
+                        <div class="text-[9px] text-slate-500">Instant MoMo (MTN / Telecel / AT Money) prompt or Card checkout</div>
+                    </div>
+
+                    <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                        <!-- Direct MoMo Button -->
+                        <button type="button" 
+                            x-show="selectedProPlan !== 'free'"
+                            @click="openMomoForTerm(settingsForm.activeTerm || 'Term 1')" 
+                            class="flex-1 sm:flex-initial bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-slate-950 font-black py-2.5 px-3.5 sm:px-4 rounded-xl text-xs transition shadow-sm flex items-center justify-center gap-2 cursor-pointer">
+                            <i class="fa fa-mobile-screen-button"></i>
+                            <span>Pay with MoMo</span>
+                            <span class="bg-black/15 text-[10px] px-1.5 py-0.5 rounded font-black" x-text="selectedProPlan === 'teacher_term' ? 'GH₵ 49.99' : (selectedProPlan === 'school_term' ? 'GH₵ 199.99' : 'GH₵ 399.99')"></span>
+                        </button>
+
+                        <!-- Paystack Checkout Button -->
+                        <a href="https://paystack.shop/pay/eduvet_edubyteafrica_com" target="_blank"
+                            class="flex-1 sm:flex-initial bg-[#011B33] hover:bg-slate-900 active:bg-black text-white font-black py-2.5 px-3.5 sm:px-4 rounded-xl text-xs transition shadow-sm flex items-center justify-center gap-2">
+                            <span>Paystack</span>
+                            <i class="fa fa-arrow-up-right-from-square text-teal-400 text-[10px]"></i>
+                        </a>
+
+                        <!-- Close / Dismiss Button -->
+                        <button type="button" @click="showFeatureLockModal = false; showProUpgradeModal = false"
+                            class="px-3 py-2.5 rounded-xl border border-slate-300 text-slate-600 hover:text-slate-900 hover:bg-slate-100 text-xs font-bold transition cursor-pointer">
+                            Close
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -4638,14 +4704,19 @@
             let rowsToRender = generatedSchemeRows;
 
             if (!entitlement.isPro) {
-                // HARDENED SECURITY GATE: Check if teacher's 2-week free trial has expired or if selected term is unpaid
+                // HARDENED SECURITY GATE: Check if teacher's 2-week free trial has expired, quota reached, or if selected term is unpaid
                 const activeTerm = app.generatorForm?.term || 'Term 1';
                 const isPaidForThisTerm = app.isTermPaid ? app.isTermPaid(activeTerm) : false;
 
                 if (!isPaidForThisTerm) {
-                    const isTrialExpired = (app.hasTeacherTrialExpired ? app.hasTeacherTrialExpired(effectiveTeacherId) : (app.hasTeacherUsedFreeTrial ? app.hasTeacherUsedFreeTrial(effectiveTeacherId) : false));
-                    if (isTrialExpired) {
-                        // Free Trial Limit Reached for Staff ID: Forced MoMo checkout gate
+                    // 1. HARD LOCK: Check if teacher has ALREADY generated their 2-week trial quota or if 14 days expired
+                    const trialCheck = (app.canTeacherGenerateFreeTrial ? app.canTeacherGenerateFreeTrial(effectiveTeacherId) : null);
+                    const isLocked = trialCheck ? !trialCheck.allowed : (app.hasTeacherUsedFreeTrial ? app.hasTeacherUsedFreeTrial(effectiveTeacherId) : false);
+
+                    if (isLocked) {
+                        const lockMessage = (trialCheck && trialCheck.message) ? trialCheck.message :
+                            `🔒 Free Trial Limit Reached: You have already generated your 2-Week Free Trial lesson notes for Staff ID: ${effectiveTeacherId}.\n\nTo unlock Week 3 through Week 15 (and generate additional lesson plans for all subjects), please approve your Mobile Money (MoMo) subscription of GH₵ 49.99/term.`;
+                        alert(lockMessage);
                         if (app.forceMomoCheckout) {
                             app.forceMomoCheckout(effectiveTeacherId, activeTerm);
                         } else {
@@ -4654,13 +4725,43 @@
                         return;
                     }
 
-                    // 2-Week Free Trial: Allow Weeks 1 and 2
-                    rowsToRender = rowsToRender.slice(0, 2);
-                    if (app.recordTeacherFreeTrialUsage) {
-                        app.recordTeacherFreeTrialUsage(effectiveTeacherId, effectiveSchoolId, 2);
+                    // 2. ANTI-EXPLOIT: Check if teacher selected a specific week beyond Week 2 (e.g. Week 3, 4, 5...)
+                    if (selectedVal !== 'all' && parseInt(selectedVal, 10) > 2) {
+                        alert(`🔒 Week ${selectedVal} is locked on the Free Trial.\n\nThe 2-Week Free Trial strictly permits Weeks 1 & 2. To generate Week ${selectedVal} and all subsequent weeks through Week 15, please approve your Mobile Money (MoMo) subscription of GH₵ 49.99/term.`);
+                        if (app.forceMomoCheckout) {
+                            app.forceMomoCheckout(effectiveTeacherId, activeTerm);
+                        } else {
+                            app.showProUpgradeModal = true;
+                        }
+                        return;
                     }
+
+                    // 3. STRICT FILTER: Under NO circumstances allow more than Weeks 1 and 2 (maximum 2 weeks, max 10 daily lessons total)
+                    rowsToRender = rowsToRender.filter(r => {
+                        const w = parseInt(r.week, 10);
+                        return !isNaN(w) && w <= 2;
+                    });
+                    if (rowsToRender.length === 0) {
+                        rowsToRender = generatedSchemeRows.slice(0, 2);
+                    } else if (rowsToRender.length > 2) {
+                        rowsToRender = rowsToRender.slice(0, 2);
+                    }
+
+                    // 4. Record immediate consumption of 2-week quota to lock any further trial generations
+                    const generatedLessonsCount = rowsToRender.length * lessonsPerWeek;
+                    if (app.recordTeacherFreeTrialUsage) {
+                        app.recordTeacherFreeTrialUsage(effectiveTeacherId, effectiveSchoolId, generatedLessonsCount, rowsToRender.length);
+                    }
+
                     const daysLeft = (app.getTrialDaysRemaining ? app.getTrialDaysRemaining(effectiveTeacherId) : 14);
-                    alert(`🎁 2-Week Free Trial Active: Generating Weeks 1 & 2 (${rowsToRender.length * lessonsPerWeek} lessons) for Staff ID: ${effectiveTeacherId}.\n\nYou have ${daysLeft} days remaining on your free trial. Once expired, subscription via MoMo (GH₵ 49.99/term) will be required to unlock remaining weeks.`);
+                    alert(`🎁 2-Week Free Trial Generated: Weeks 1 & 2 (${generatedLessonsCount} lessons) generated for Staff ID: ${effectiveTeacherId}.\n\n⚠️ Notice: This consumes your 2-week trial quota. Generating full term lessons (Weeks 3 to 15) requires an active Mobile Money subscription (GH₵ 49.99/term). You will now be prompted to approve your subscription.`);
+
+                    // Automatically trigger forced MoMo checkout so they approve subscription
+                    setTimeout(() => {
+                        if (app.forceMomoCheckout) {
+                            app.forceMomoCheckout(effectiveTeacherId, activeTerm);
+                        }
+                    }, 1000);
                 } else {
                     // Paid Term: generate based on filter
                     if (selectedVal !== 'all') {
@@ -5161,6 +5262,23 @@
             if (selectedVal !== 'all') {
                 lessonsToExport = window.generatedLessonPlansJson.filter(l => String(l.week) === String(selectedVal));
                 if (lessonsToExport.length === 0) lessonsToExport = window.generatedLessonPlansJson;
+            }
+
+            // HARDENED WORD EXPORT: Free trial teachers cannot export Weeks 3 to 15
+            const exportTeacherId = app.activeTeacher?.id || app.teacherPrefs?.teacherId || localStorage.getItem('eduvet_active_teacher_id') || 'GES-001';
+            const exportSchoolId = app.authenticatedSchoolId || 'ATAK-983';
+            const exportEntitlement = (app.isTeacherOrSchoolPro ? app.isTeacherOrSchoolPro(exportTeacherId, exportSchoolId) : { isPro: app.isPro });
+            const exportTerm = app.generatorForm?.term || 'Term 1';
+            const exportPaid = app.isTermPaid ? app.isTermPaid(exportTerm) : false;
+
+            if (!exportEntitlement.isPro && !exportPaid) {
+                if (lessonsToExport.some(l => parseInt(l.week, 10) > 2)) {
+                    alert('🔒 Full Term Word Export is locked on the Free Trial. Unrestricted Word export for Weeks 3–15 requires an active subscription. Please approve your Mobile Money subscription (GH₵ 49.99/term).');
+                    if (app.forceMomoCheckout) {
+                        app.forceMomoCheckout(exportTeacherId, exportTerm);
+                    }
+                    return;
+                }
             }
 
             const first = lessonsToExport[0];
@@ -5819,7 +5937,12 @@
                 },
 
                 get momoAmount() {
-                    if (this.momoSelectedTerm === 'Full_Year') return 129.99;
+                    if (this.selectedProPlan === 'school_year' || this.momoSelectedTerm === 'Full_Year') {
+                        return 399.99;
+                    }
+                    if (this.selectedProPlan === 'school_term') {
+                        return 199.99;
+                    }
                     return 49.99;
                 },
 
@@ -6643,13 +6766,51 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                     return { isPro: false, tier: 'free', inherited: false };
                 },
 
+                getTeacherUsage(teacherId) {
+                    const tid = teacherId || (this.activeTeacher ? this.activeTeacher.id : 'GES-001');
+                    try {
+                        return JSON.parse(localStorage.getItem('eduvet_usage_' + tid) || 'null');
+                    } catch(e) {
+                        return null;
+                    }
+                },
+
+                canTeacherGenerateFreeTrial(teacherId) {
+                    const tid = teacherId || (this.activeTeacher ? this.activeTeacher.id : 'GES-001');
+                    const localUsage = this.getTeacherUsage(tid);
+                    if (!localUsage) {
+                        return { allowed: true, maxWeeks: 2, weeksAllowed: [1, 2] };
+                    }
+
+                    // 1. Check if 14-day calendar window expired
+                    if (this.hasTeacherTrialExpired(tid)) {
+                        return {
+                            allowed: false,
+                            reason: 'trial_expired',
+                            message: `🔒 Your 14-Day Free Trial period has expired for Staff ID: ${tid}.\n\nTo continue generating lesson plans and accessing all features, please approve your Mobile Money (MoMo) subscription (GH₵ 49.99/term).`
+                        };
+                    }
+
+                    // 2. HARDENED ANTI-ABUSE: Check if teacher has ALREADY generated their maximum 2 free trial weeks
+                    if (localUsage.hasGeneratedFreeWeek || localUsage.isFreeTrialLocked || (localUsage.weeksGenerated && localUsage.weeksGenerated >= 2) || (localUsage.totalLessonsGenerated && localUsage.totalLessonsGenerated >= 10)) {
+                        return {
+                            allowed: false,
+                            reason: 'quota_exceeded',
+                            message: `🔒 2-Week Free Trial Limit Reached: You have already generated your maximum 2-Week Free Trial lessons (Weeks 1 & 2) for Staff ID: ${tid}.\n\nTo unlock Week 3 through Week 15 (and generate additional lesson plans for your classes), please approve your Mobile Money (MoMo) subscription of GH₵ 49.99/term.`
+                        };
+                    }
+
+                    return { allowed: true, maxWeeks: 2, weeksAllowed: [1, 2] };
+                },
+
                 hasTeacherUsedFreeTrial(teacherId) {
-                    return this.hasTeacherTrialExpired(teacherId);
+                    const check = this.canTeacherGenerateFreeTrial(teacherId);
+                    return !check.allowed;
                 },
 
                 hasTeacherTrialExpired(teacherId) {
                     const tid = teacherId || (this.activeTeacher ? this.activeTeacher.id : 'GES-001');
-                    const localUsage = JSON.parse(localStorage.getItem('eduvet_usage_' + tid) || 'null');
+                    const localUsage = this.getTeacherUsage(tid);
                     if (!localUsage) return false;
                     
                     if (localUsage.isExpired) return true;
@@ -6670,7 +6831,7 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
 
                 getTrialDaysRemaining(teacherId) {
                     const tid = teacherId || (this.activeTeacher ? this.activeTeacher.id : 'GES-001');
-                    const localUsage = JSON.parse(localStorage.getItem('eduvet_usage_' + tid) || 'null');
+                    const localUsage = this.getTeacherUsage(tid);
                     if (!localUsage || !localUsage.trialStartDate) return 14;
                     const start = new Date(localUsage.trialStartDate).getTime();
                     const now = Date.now();
@@ -6678,17 +6839,19 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                     return Math.max(0, 14 - diffDays);
                 },
 
-                recordTeacherFreeTrialUsage(teacherId, schoolId, weeksAllowed = 2) {
+                recordTeacherFreeTrialUsage(teacherId, schoolId, lessonsCount = 10, weeksCount = 2) {
                     const tid = teacherId || (this.activeTeacher ? this.activeTeacher.id : 'GES-001');
                     const sid = schoolId || this.authenticatedSchoolId || 'ATAK-983';
-                    const localUsage = JSON.parse(localStorage.getItem('eduvet_usage_' + tid) || '{}');
+                    const localUsage = this.getTeacherUsage(tid) || {};
                     
                     const usageData = {
                         teacherId: tid,
                         schoolId: sid,
                         hasGeneratedFreeWeek: true,
+                        isFreeTrialLocked: true, // Permanent lock on generating more free lessons
                         trialStartDate: localUsage.trialStartDate || new Date().toISOString(),
-                        weeksGenerated: weeksAllowed,
+                        weeksGenerated: (localUsage.weeksGenerated || 0) + weeksCount,
+                        totalLessonsGenerated: (localUsage.totalLessonsGenerated || 0) + lessonsCount,
                         lastGeneratedAt: new Date().toISOString()
                     };
                     localStorage.setItem('eduvet_usage_' + tid, JSON.stringify(usageData));
