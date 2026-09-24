@@ -111,9 +111,46 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- PDF.js CDN for in-browser PDF Scheme text parsing -->
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <!-- Firebase Compat SDKs (Loaded first in head) -->
-    <script defer src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script defer src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <!-- Firebase Compat SDKs (Loaded synchronously in head for instant cloud sync across all devices) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script>
+        window.firebaseConfig = {
+            apiKey: "AIzaSyBu0Kgn8luqI6ma9rkZ90F6Gy3sath64Jk",
+            authDomain: "eduvet-397d4.firebaseapp.com",
+            projectId: "eduvet-397d4",
+            storageBucket: "eduvet-397d4.firebasestorage.app",
+            messagingSenderId: "956448442609",
+            appId: "1:956448442609:web:7e625c7d3e5091c15c8150",
+            measurementId: "G-90YYJC66X3"
+        };
+        window.getDb = function() {
+            if (window.db) return window.db;
+            try {
+                if (typeof firebase !== 'undefined' && firebase && firebase.apps) {
+                    if (!firebase.apps.length) {
+                        firebase.initializeApp(window.firebaseConfig);
+                    }
+                    window.db = firebase.firestore();
+                    try {
+                        window.db.settings({
+                            experimentalAutoDetectLongPolling: true,
+                            merge: true
+                        });
+                    } catch(e) {}
+                    return window.db;
+                }
+            } catch(e) {
+                console.warn('Firebase init notice:', e.message);
+            }
+            return null;
+        };
+        try {
+            if (typeof firebase !== 'undefined') {
+                window.getDb();
+            }
+        } catch(e) {}
+    </script>
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
@@ -1146,11 +1183,11 @@
                     <span>SISO</span>
                 </div>
 
-                <!-- Pro Badge / Offers Button -->
-                <button x-show="portalMode !== 'siso'" @click="showProUpgradeModal = true" class="px-2 py-1 rounded-lg text-[10px] font-black uppercase flex items-center gap-1 transition shadow-xs" :class="isPro ? 'bg-amber-400 text-amber-950' : 'bg-amber-500/20 text-amber-300 border border-amber-400/40'">
+                <!-- Pro Status Indicator (Packages accessed via Plan Engine) -->
+                <div x-show="isPro" class="px-2 py-1 rounded-lg text-[10px] font-black uppercase flex items-center gap-1 bg-amber-400 text-amber-950 shadow-xs">
                     <i class="fa fa-crown text-[10px]"></i>
-                    <span x-text="isPro ? 'PRO' : 'PRO'"></span>
-                </button>
+                    <span>PRO</span>
+                </div>
 
                 <!-- Logout Button -->
                 <button @click="logoutSchool()" class="w-7 h-7 bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white rounded-lg flex items-center justify-center text-xs transition shadow-sm" title="Exit School Portal">
@@ -1238,12 +1275,7 @@
                             <span class="text-[9px] bg-amber-400 text-slate-950 font-bold px-1.5 py-0.5 rounded">SISO</span>
                         </button>
 
-                        <!-- Packages & Pricing Matrix Button (Hidden in SISO mode) -->
-                        <button @click="showProUpgradeModal = true" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs transition bg-amber-500/10 hover:bg-amber-500/20 text-amber-200 border border-amber-400/30">
-                            <i class="fa fa-gem w-4 text-center text-amber-300"></i>
-                            <span class="flex-1 text-left font-bold">Package Plans & Offers</span>
-                            <span class="text-[9px] bg-amber-400 text-slate-950 font-black px-1.5 py-0.5 rounded">PRICING</span>
-                        </button>
+
                     </div>
 
                     <!-- Dedicated SISO Navigation Menu: Only relevant circuit inspection features shown -->
@@ -1331,10 +1363,7 @@
                             <span>PRO ACTIVE</span>
                             <span class="text-[9px] bg-amber-900/10 px-1.5 py-0.5 rounded font-bold uppercase" x-text="proTier"></span>
                         </div>
-                        <button x-show="!isPro" @click="showProUpgradeModal = true" class="bg-amber-400 hover:bg-amber-300 active:bg-amber-500 text-slate-950 font-black px-3.5 py-2 rounded-xl text-xs transition shadow-2xs flex items-center gap-1.5 border border-amber-400">
-                            <i class="fa fa-bolt text-slate-950"></i>
-                            <span>UPGRADE TO PRO</span>
-                        </button>
+
                         <div class="bg-blue-50/80 border border-blue-200/80 px-3.5 py-1.5 rounded-xl text-right text-xs shadow-2xs">
                             <div class="text-[10px] text-blue-900 uppercase tracking-wider font-extrabold">GES Wednesday Deadline</div>
                             <div class="font-mono font-black text-blue-950 text-xs sm:text-sm" x-text="countdownTimerString"></div>
@@ -1628,6 +1657,10 @@
                         </div>
 
                         <div class="flex items-center gap-2 text-xs">
+                            <button type="button" @click="showProUpgradeModal = true" class="px-2.5 py-1 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 font-black flex items-center gap-1 shadow-sm transition cursor-pointer">
+                                <i class="fa fa-crown text-[10px]"></i>
+                                <span>Packages & Pricing</span>
+                            </button>
                             <span class="px-2.5 py-1 rounded-lg bg-blue-800 font-bold text-teal-300">1. Upload Scheme</span>
                             <i class="fa fa-arrow-right text-[10px] text-blue-400"></i>
                             <span class="px-2.5 py-1 rounded-lg bg-blue-800 font-bold text-teal-300">2. Weekly Breakdown</span>
@@ -3525,10 +3558,7 @@
             <span class="text-[10px]">SISO</span>
         </button>
 
-        <button x-show="portalMode !== 'siso'" type="button" @click="showProUpgradeModal = true" class="flex flex-col items-center justify-center py-1 px-3 rounded-xl transition text-amber-300 hover:text-amber-200 min-w-[56px] min-h-[46px]">
-            <i class="fa fa-crown text-base mb-0.5"></i>
-            <span class="text-[10px]">Pro Plan</span>
-        </button>
+
     </nav>
 
     <!-- Footer generated by Edubyte Africa Inc. -->
@@ -5575,41 +5605,9 @@
         }
 
         // ==========================================
-        // FIREBASE CONFIGURATION & INITIALIZATION
+        // FIREBASE INSTANCE REFERENCE (INITIALIZED IN HEAD)
         // ==========================================
-        const firebaseConfig = {
-            apiKey: "AIzaSyBu0Kgn8luqI6ma9rkZ90F6Gy3sath64Jk",
-            authDomain: "eduvet-397d4.firebaseapp.com",
-            projectId: "eduvet-397d4",
-            storageBucket: "eduvet-397d4.firebasestorage.app",
-            messagingSenderId: "956448442609",
-            appId: "1:956448442609:web:7e625c7d3e5091c15c8150",
-            measurementId: "G-90YYJC66X3"
-        };
-
-        if (typeof firebase !== 'undefined' && firebase && firebase.apps) {
-            if (!firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
-            }
-            db = firebase.firestore();
-            try {
-                db.settings({
-                    experimentalAutoDetectLongPolling: true,
-                    merge: true
-                });
-            } catch (e) {}
-        }
-
-        // Enable Firestore Offline Persistence safely (Only when running under HTTP/S)
-        try {
-            if (typeof window !== 'undefined' && window.location && window.location.protocol && window.location.protocol.startsWith('http')) {
-                db.enablePersistence({ synchronizeTabs: true }).catch((err) => {
-                    console.log('Firestore offline cache note:', err.message);
-                });
-            }
-        } catch (e) {
-            console.log('Local persistence fallback active');
-        }
+        var db = (typeof window !== 'undefined' && window.getDb) ? window.getDb() : null;
 
         
         // ==========================================
@@ -7091,92 +7089,134 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                     }
                 },
 
-                loginSchool() {
+                async loginSchool() {
                     const inputId = (this.loginInputId || '').trim().toUpperCase();
                     this.loginErrorMsg = '';
                     if (!inputId) {
-                        this.loginErrorMsg = 'Please enter your official School ID (e.g. ATAK-983).';
+                        this.loginErrorMsg = 'Please enter your official School ID (e.g. ATAK-983, ATAK-495, ATAK-120).';
                         return;
                     }
 
+                    this.isLoggingIn = true;
+                    const firestore = (typeof window.getDb === 'function' ? window.getDb() : (typeof db !== 'undefined' ? db : null));
+
+                    // 1. CLOUD-FIRST FETCH: Query Firestore for existing School ID & Onboarded Faculty
+                    if (firestore && navigator.onLine !== false) {
+                        try {
+                            const schoolDoc = await firestore.collection('registered_schools').doc(inputId).get();
+
+                            if (schoolDoc && schoolDoc.exists) {
+                                const schData = schoolDoc.data();
+                                this.authenticatedSchoolId = schData.id || inputId;
+                                this.activeSchoolName = schData.name || `School (${inputId})`;
+                                this.activeHeadName = schData.headName || '';
+                                this.activeHeadContact = schData.headContact || schData.contact || '';
+                                this.schoolNotification = schData.notification || '';
+                                if (schData.activeTerm) this.settingsForm.activeTerm = schData.activeTerm;
+                                if (schData.academicYear) this.settingsForm.academicYear = schData.academicYear;
+                                if (schData.termStartDate) this.settingsForm.termStartDate = schData.termStartDate;
+                                if (schData.totalWeeks) this.settingsForm.totalWeeks = schData.totalWeeks;
+
+                                // Fetch Onboarded Teachers Tied to this School ID
+                                try {
+                                    const teachersSnap = await firestore.collection('teachers').where('schoolId', '==', inputId).get();
+                                    if (teachersSnap && !teachersSnap.empty) {
+                                        this.teachers = teachersSnap.docs.map(doc => ({ ...doc.data() }));
+                                    } else {
+                                        this.teachers = [];
+                                    }
+                                } catch(te) {
+                                    console.warn('Teachers fetch warning:', te.message);
+                                }
+
+                                // Fetch Submitted Lessons Tied to this School ID
+                                try {
+                                    const lessonsSnap = await firestore.collection('lessons').where('schoolId', '==', inputId).limit(100).get();
+                                    if (lessonsSnap && !lessonsSnap.empty) {
+                                        this.lessons = lessonsSnap.docs.map(doc => ({ ...doc.data() }));
+                                    } else {
+                                        this.lessons = [];
+                                    }
+                                } catch(le) {
+                                    console.warn('Lessons fetch warning:', le.message);
+                                }
+
+                                // Persist retrieved data locally so offline access works seamlessly
+                                localStorage.setItem('eduvet_last_school_id', inputId);
+                                localStorage.setItem('eduvet_active_school_id', inputId);
+                                localStorage.setItem('eduvet_school_' + inputId, JSON.stringify(schData));
+                                safeSetLocalStorage('eduvet_teachers_' + inputId, JSON.stringify(this.teachers));
+                                safeSetLocalStorage('eduvet_lessons_' + inputId, JSON.stringify(sanitizeLessonsForCache(this.lessons)));
+                                if (typeof sessionStorage !== 'undefined') { sessionStorage.setItem('eduvet_session_school_id', inputId); }
+
+                                this.isLoggingIn = false;
+                                this.loadSchoolData();
+                                return;
+                            } else if (inputId === 'ATAK-983') {
+                                // Default seed school if not yet created in Firestore
+                                const defaultSeed = {
+                                    id: 'ATAK-983',
+                                    name: 'Atakora D/A Junior High School',
+                                    headName: 'Mr. Felix Fleku',
+                                    headContact: '0543521863',
+                                    location: 'Kwahu Afram Plains North / Eastern Region',
+                                    notification: 'Official Notice: Welcome to Eduvet School Portal. Please submit lesson notes every Friday.',
+                                    activeTerm: 'Term 1',
+                                    academicYear: '2026/2027',
+                                    termStartDate: '2026-09-07',
+                                    totalWeeks: 15
+                                };
+                                this.authenticatedSchoolId = defaultSeed.id;
+                                this.activeSchoolName = defaultSeed.name;
+                                this.activeHeadName = defaultSeed.headName;
+                                this.activeHeadContact = defaultSeed.headContact;
+                                this.schoolNotification = defaultSeed.notification;
+                                localStorage.setItem('eduvet_last_school_id', defaultSeed.id);
+                                localStorage.setItem('eduvet_active_school_id', defaultSeed.id);
+                                localStorage.setItem('eduvet_school_' + defaultSeed.id, JSON.stringify(defaultSeed));
+                                this.isLoggingIn = false;
+                                this.loadSchoolData();
+                                return;
+                            } else {
+                                this.isLoggingIn = false;
+                                this.loginErrorMsg = `School ID "${inputId}" was not found in the Eduvet Registry. Please verify your ID or click Register New School.`;
+                                return;
+                            }
+                        } catch (err) {
+                            console.warn('Cloud sync lookup warning:', err.message);
+                            // Fall through to offline cache check below
+                        }
+                    }
+
+                    // 2. OFFLINE CACHE FALLBACK (Only when offline or network fails)
                     const localRegistered = JSON.parse(localStorage.getItem('eduvet_registered_schools') || '{}');
                     const localSchoolRecord = JSON.parse(localStorage.getItem('eduvet_school_' + inputId) || 'null');
 
-                    // Check local registered schools, cached school data, or default seed school ATAK-983
-                    if (inputId === 'ATAK-983' || localRegistered[inputId] || localSchoolRecord) {
+                    if (localSchoolRecord || localRegistered[inputId] || inputId === 'ATAK-983') {
                         const sch = localSchoolRecord || localRegistered[inputId] || {
                             id: 'ATAK-983',
                             name: 'Atakora D/A Junior High School',
                             headName: 'Mr. Felix Fleku',
                             headContact: '0543521863',
                             location: 'Kwahu Afram Plains North / Eastern Region',
-                            notification: 'Official Notice: Welcome to Eduvet School Portal. Please submit lesson notes every Friday.',
-                            activeTerm: 'Term 1',
-                            academicYear: '2026/2027',
-                            termStartDate: '2026-09-07',
-                            totalWeeks: 15
+                            notification: 'Official Notice: Welcome to Eduvet School Portal. Please submit lesson notes every Friday.'
                         };
                         this.authenticatedSchoolId = sch.id;
                         this.activeSchoolName = sch.name;
-                        this.activeHeadName = sch.headName || 'Mr. Felix Fleku';
-                        this.activeHeadContact = sch.headContact || '0543521863';
+                        this.activeHeadName = sch.headName || '';
+                        this.activeHeadContact = sch.headContact || '';
                         this.schoolNotification = sch.notification || '';
                         if (sch.activeTerm) this.settingsForm.activeTerm = sch.activeTerm;
                         if (sch.academicYear) this.settingsForm.academicYear = sch.academicYear;
-                        if (sch.termStartDate) this.settingsForm.termStartDate = sch.termStartDate;
-                        if (sch.totalWeeks) this.settingsForm.totalWeeks = sch.totalWeeks;
-                        if (typeof sessionStorage !== 'undefined') { sessionStorage.setItem('eduvet_session_school_id', sch.id); }
                         localStorage.setItem('eduvet_last_school_id', sch.id);
+                        localStorage.setItem('eduvet_active_school_id', sch.id);
                         this.isLoggingIn = false;
                         this.loadSchoolData();
                         return;
                     }
 
-                    // Query Firestore with responsive timeout and graceful offline fallback
-                    if (typeof db !== 'undefined' && db && db.collection) {
-                        this.isLoggingIn = true;
-                        const firestorePromise = db.collection('registered_schools').doc(inputId).get();
-                        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 2500));
-
-                        Promise.race([firestorePromise, timeoutPromise]).then((doc) => {
-                            this.isLoggingIn = false;
-                            if (doc && doc.exists) {
-                                const data = doc.data();
-                                this.authenticatedSchoolId = data.id;
-                                this.activeSchoolName = data.name;
-                                this.activeHeadName = data.headName || '';
-                                this.activeHeadContact = data.headContact || '';
-                                this.schoolNotification = data.notification || '';
-                                if (data.activeTerm) this.settingsForm.activeTerm = data.activeTerm;
-                                if (data.academicYear) this.settingsForm.academicYear = data.academicYear;
-                                if (data.termStartDate) this.settingsForm.termStartDate = data.termStartDate;
-                                if (data.totalWeeks) this.settingsForm.totalWeeks = data.totalWeeks;
-                                
-                                if (typeof sessionStorage !== 'undefined') { sessionStorage.setItem('eduvet_session_school_id', data.id); }
-                                localStorage.setItem('eduvet_last_school_id', data.id);
-                                localStorage.setItem('eduvet_school_' + data.id, JSON.stringify(data));
-                                this.loadSchoolData();
-                            } else {
-                                this.loginErrorMsg = `School ID "${inputId}" was not found in the Eduvet Registry. Please verify your ID or click Register New School.`;
-                            }
-                        }).catch((err) => {
-                            this.isLoggingIn = false;
-                            console.warn('School Firestore lookup notice:', err.message);
-                            // Seamless offline fallback: proceed without freezing the page
-                            this.authenticatedSchoolId = inputId;
-                            this.activeSchoolName = `School (${inputId})`;
-                            if (typeof sessionStorage !== 'undefined') { sessionStorage.setItem('eduvet_session_school_id', inputId); }
-                            localStorage.setItem('eduvet_last_school_id', inputId);
-                            this.loadSchoolData();
-                        });
-                    } else {
-                        // Offline environment: establish offline session
-                        this.authenticatedSchoolId = inputId;
-                        this.activeSchoolName = `School (${inputId})`;
-                        if (typeof sessionStorage !== 'undefined') { sessionStorage.setItem('eduvet_session_school_id', inputId); }
-                        localStorage.setItem('eduvet_last_school_id', inputId);
-                        this.loadSchoolData();
-                    }
+                    this.isLoggingIn = false;
+                    this.loginErrorMsg = `School ID "${inputId}" could not be reached. Please check your internet connection or verify your ID.`;
                 },
 
                 logoutSchool() {
@@ -7205,7 +7245,7 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                     if (this._teachersUnsub) { try { this._teachersUnsub(); } catch(e){} this._teachersUnsub = null; }
                     if (this._lessonsUnsub) { try { this._lessonsUnsub(); } catch(e){} this._lessonsUnsub = null; }
 
-                    // 1. INSTANT LOCAL DUAL-LAYER HYDRATION (Instant UI rendering, zero blank screens)
+                    // 1. LOCAL DATA HYDRATION (If not already populated from loginSchool)
                     const localSchool = JSON.parse(localStorage.getItem('eduvet_school_' + sid) || 'null');
                     if (localSchool) {
                         if (localSchool.name) this.activeSchoolName = localSchool.name;
@@ -7216,44 +7256,33 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                         if (localSchool.academicYear) this.settingsForm.academicYear = localSchool.academicYear;
                     }
 
-                    // Hydrate Teachers
+                    // Hydrate Teachers if not already loaded from cloud
                     const localTeachers = JSON.parse(localStorage.getItem('eduvet_teachers_' + sid) || '[]');
-                    if (localTeachers.length > 0) {
+                    if (this.teachers.length === 0 && localTeachers.length > 0) {
                         this.teachers = localTeachers;
-                    } else {
-                        // Seed default faculty if none cached yet for this school
-                        const prefix = sid.split('-')[0] || 'GES';
-                        this.teachers = [
-                            { id: `${prefix}-001`, name: this.activeHeadName || 'Abena Ansomma Effah', contact: this.activeHeadContact || '0244192831', subjects: 'English Language, Basic 1', schoolId: sid },
-                            { id: `${prefix}-002`, name: 'Felix Fleku', contact: '0543521863', subjects: 'Computing / ICT, Mathematics', schoolId: sid },
-                            { id: `${prefix}-003`, name: 'Grace Boakye', contact: '0244192831', subjects: 'Integrated Science, Career Technology', schoolId: sid },
-                            { id: `${prefix}-004`, name: 'Kwaku Mensah', contact: '0501928374', subjects: 'English Language, Social Studies', schoolId: sid },
-                            { id: `${prefix}-005`, name: 'Abigail Appiah', contact: '0559182736', subjects: 'Creative Arts & Design, RME', schoolId: sid }
-                        ];
-                        safeSetLocalStorage('eduvet_teachers_' + sid, JSON.stringify(this.teachers));
                     }
 
-                    // Keep educator profile unselected until teacher explicitly chooses their name from the dropdown
-                    this.selectedTeacherId = '';
-
-                    // Hydrate Lessons
+                    // Hydrate Lessons if not already loaded from cloud
                     const localLessons = JSON.parse(localStorage.getItem('eduvet_lessons_' + sid) || '[]');
-                    if (localLessons.length > 0) {
+                    if (this.lessons.length === 0 && localLessons.length > 0) {
                         this.lessons = localLessons;
                     }
 
-                    // Configure Rubber Stamp top text if still default
-                    if (this.activeSchoolName && (!this.stampConfig.topText || this.stampConfig.topText === 'ATAKORA D/A JUNIOR HIGH SCHOOL')) {
+                    this.selectedTeacherId = '';
+
+                    // Configure Rubber Stamp top text
+                    if (this.activeSchoolName) {
                         this.stampConfig.topText = this.activeSchoolName.toUpperCase();
                     }
-                    if (this.activeHeadName && (!this.stampConfig.officerName || this.stampConfig.officerName === 'MR. FELIX FLEKU')) {
+                    if (this.activeHeadName) {
                         this.stampConfig.officerName = this.activeHeadName.toUpperCase();
                     }
 
-                    // 2. REAL-TIME CLOUD FIRESTORE SYNCHRONIZATION
-                    if (typeof db !== 'undefined' && db && db.collection) {
+                    // 2. REAL-TIME CLOUD FIRESTORE SYNCHRONIZATION LISTENERS
+                    const firestore = (typeof window.getDb === 'function' ? window.getDb() : (typeof db !== 'undefined' ? db : null));
+                    if (firestore) {
                         try {
-                            this._schoolUnsub = db.collection('registered_schools').doc(sid).onSnapshot((doc) => {
+                            this._schoolUnsub = firestore.collection('registered_schools').doc(sid).onSnapshot((doc) => {
                                 if (doc && doc.exists) {
                                     const data = doc.data();
                                     if (data.name) this.activeSchoolName = data.name;
@@ -7262,9 +7291,9 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                                     if (data.notification) this.schoolNotification = data.notification;
                                     localStorage.setItem('eduvet_school_' + sid, JSON.stringify(data));
                                 }
-                            }, (err) => console.log('[Eduvet Offline Sync] Using local storage for school profile'));
+                            }, (err) => console.log('[Eduvet Offline Sync] School profile snapshot notice'));
 
-                            this._teachersUnsub = db.collection('teachers').where('schoolId', '==', sid).onSnapshot((snapshot) => {
+                            this._teachersUnsub = firestore.collection('teachers').where('schoolId', '==', sid).onSnapshot((snapshot) => {
                                 if (snapshot && !snapshot.empty) {
                                     const cloudTeachers = snapshot.docs.map(doc => ({ ...doc.data() }));
                                     this.teachers = cloudTeachers;
@@ -7273,17 +7302,17 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                                         this.selectedTeacherId = '';
                                     }
                                 }
-                            }, (err) => console.log('[Eduvet Offline Sync] Using local storage for teachers'));
+                            }, (err) => console.log('[Eduvet Offline Sync] Teachers snapshot notice'));
 
-                            this._lessonsUnsub = db.collection('lessons').where('schoolId', '==', sid).limit(100).onSnapshot((snapshot) => {
+                            this._lessonsUnsub = firestore.collection('lessons').where('schoolId', '==', sid).limit(100).onSnapshot((snapshot) => {
                                 if (snapshot && !snapshot.empty) {
                                     const cloudLessons = snapshot.docs.map(doc => ({ ...doc.data() }));
                                     this.lessons = cloudLessons;
                                     safeSetLocalStorage('eduvet_lessons_' + sid, JSON.stringify(sanitizeLessonsForCache(cloudLessons)));
                                 }
-                            }, (err) => console.log('[Eduvet Offline Sync] Using local storage for lesson plans'));
+                            }, (err) => console.log('[Eduvet Offline Sync] Lessons snapshot notice'));
                         } catch (e) {
-                            console.log('Using local offline cache for school data');
+                            console.log('Realtime sync setup notice:', e.message);
                         }
                     }
                 },
@@ -7500,17 +7529,20 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
 
                 saveTeacherRecord() {
                     const id = this.teacherForm.id.trim().toUpperCase();
-                    const newT = { ...this.teacherForm, id, schoolId: this.authenticatedSchoolId };
+                    const sid = this.authenticatedSchoolId;
+                    const newT = { ...this.teacherForm, id, schoolId: sid };
                     this.teachers = this.teachers.filter(t => t.id !== id);
-                    localStorage.setItem('eduvet_teachers_' + this.authenticatedSchoolId, JSON.stringify(this.teachers));
                     this.teachers.push(newT);
-                    localStorage.setItem('eduvet_teachers_' + this.authenticatedSchoolId, JSON.stringify(this.teachers));
-                    if (typeof db !== 'undefined' && db && db.collection) {
-                        db.collection('teachers').doc(id).set(newT).then(() => {
-                            alert('Teacher saved!');
+                    safeSetLocalStorage('eduvet_teachers_' + sid, JSON.stringify(this.teachers));
+                    
+                    const firestore = (typeof window.getDb === 'function' ? window.getDb() : (typeof db !== 'undefined' ? db : null));
+                    if (firestore) {
+                        firestore.collection('teachers').doc(id).set(newT).then(() => {
+                            alert('🎉 Teacher profile successfully saved and synced across all school devices!');
                             this.resetTeacherForm();
-                        }).catch(() => {
-                            alert('Teacher saved locally!');
+                        }).catch((err) => {
+                            console.warn('Teacher cloud sync error:', err.message);
+                            alert('Teacher saved locally! Will sync to cloud when connected.');
                             this.resetTeacherForm();
                         });
                     } else {
@@ -7522,9 +7554,13 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                 editTeacher(teacher) { this.editingTeacherId = teacher.id; this.teacherForm = { ...teacher }; },
                 resetTeacherForm() { this.editingTeacherId = null; this.teacherForm = { name: '', id: '', contact: '', subjects: '' }; },
                 deleteTeacher(id) {
-                    if (confirm('Remove teacher?')) {
+                    if (confirm('Remove teacher profile from school?')) {
                         this.teachers = this.teachers.filter(t => t.id !== id);
-                        if (typeof db !== 'undefined' && db && db.collection) { db.collection('teachers').doc(id).delete().catch(() => {}); }
+                        safeSetLocalStorage('eduvet_teachers_' + this.authenticatedSchoolId, JSON.stringify(this.teachers));
+                        const firestore = (typeof window.getDb === 'function' ? window.getDb() : (typeof db !== 'undefined' ? db : null));
+                        if (firestore) {
+                            firestore.collection('teachers').doc(id).delete().catch(() => {});
+                        }
                     }
                 },
 
