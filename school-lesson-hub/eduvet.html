@@ -1849,76 +1849,74 @@
                         </div>
                     </div>
                 </div>
-
-                </div>
             </div>
 
-            <!-- ==================== PORTAL 2: REVIEWER & INSPECTION DASHBOARD ==================== -->
-            
         <!-- ========================================== -->
         <!-- SISO CIRCUIT INSPECTION PORTAL (TEACHER-BY-TEACHER & WEEK-BY-WEEK) -->
         <!-- =================================================================== -->
-        <div class="space-y-6" x-show="portalMode === 'siso'" x-cloak>
-            <!-- High-Contrast Executive Navy/Gold SISO Header -->
-            <div class="bg-[#011B33] text-white p-5 sm:p-6 rounded-2xl shadow-lg border-2 border-amber-400 space-y-4">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div class="space-y-3.5" x-show="portalMode === 'siso'" x-cloak>
+            <!-- Crisp White Card with Black & Blue Typography for SISO Circuit Portal -->
+            <div class="bg-white text-slate-900 p-4 sm:p-5 rounded-2xl shadow-xs border border-slate-200 space-y-3.5">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3.5">
                     <div class="flex items-center space-x-3.5">
-                        <div class="w-14 h-14 rounded-2xl bg-amber-400 text-slate-950 flex items-center justify-center font-black text-2xl shadow-md border-2 border-amber-300 shrink-0">
+                        <div class="w-12 h-12 bg-blue-50 border border-blue-200 rounded-xl flex items-center justify-center p-2 shadow-xs shrink-0 text-2xl font-black">
                             🇬🇭
                         </div>
                         <div>
                             <div class="flex items-center gap-2 flex-wrap mb-1">
-                                <span class="text-[11px] font-black tracking-widest uppercase bg-amber-400 text-slate-950 px-2.5 py-0.5 rounded-full inline-block shadow-sm">
+                                <span class="text-[10px] font-black tracking-widest uppercase bg-blue-100 text-blue-950 px-2.5 py-0.5 rounded-full inline-block shadow-2xs border border-blue-200">
                                     GHANA EDUCATION SERVICE • CIRCUIT SUPERVISION
                                 </span>
-                                <span class="text-[10px] font-mono font-bold bg-white/20 text-cyan-200 px-2 py-0.5 rounded-md border border-white/20">
+                                <span class="text-[10px] font-mono font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md border border-slate-200">
                                     OFFICIAL QUALITY ASSURANCE
                                 </span>
                             </div>
-                            <h3 class="text-xl sm:text-2xl font-black text-white tracking-tight">SISO School Improvement & Quality Portal</h3>
-                            <p class="text-xs sm:text-sm text-amber-300 font-semibold mt-0.5">Teacher-by-Teacher Curriculum Vetting, Subject Submissions & Pedagogical Oversight</p>
+                            <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-none">
+                                edu<span class="text-teal-600">vet</span> <span class="text-slate-300 font-light">•</span> <span class="text-blue-950">SISO Inspection Portal</span>
+                            </h2>
+                            <p class="text-xs text-slate-500 font-medium mt-1">Teacher-by-Teacher Curriculum Vetting, Subject Submissions & Pedagogical Oversight</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-2 shrink-0">
-                        <button @click="portalMode = 'teacher'; teacherSubTab = 'upload'" class="bg-white hover:bg-slate-100 text-slate-950 text-xs px-4 py-2.5 rounded-xl font-black transition flex items-center gap-1.5 shadow-md border border-slate-200 active:scale-95">
-                            <i class="fa fa-arrow-left text-amber-600"></i> Exit to Teacher
+                        <button @click="portalMode = 'teacher'; teacherSubTab = 'upload'" class="bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-900 text-xs px-3.5 py-2 rounded-xl font-bold transition flex items-center gap-1.5 border border-slate-300 shadow-2xs">
+                            <i class="fa fa-arrow-left text-blue-700"></i> Exit to Teacher
                         </button>
                     </div>
                 </div>
 
-                <!-- Assigned School Scoping Card (SISO only sees schools assigned to them via School ID) -->
-                <div class="bg-[#032952] border-2 border-amber-400/60 rounded-xl p-3.5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-xs shadow-inner">
+                <!-- Assigned School Scoping Card (Crisp White / Light-Blue card with Black & Blue text) -->
+                <div class="bg-blue-50/80 border border-blue-200/80 rounded-xl p-3 sm:p-3.5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-xs shadow-2xs">
                     <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-sm shadow-sm shrink-0">
+                        <div class="w-9 h-9 rounded-xl bg-blue-100 text-blue-900 flex items-center justify-center font-bold text-sm shadow-2xs shrink-0">
                             <i class="fa fa-school-flag text-base"></i>
                         </div>
                         <div>
-                            <div class="text-slate-300 font-medium">Assigned Inspection School:</div>
+                            <div class="text-slate-600 font-medium">Assigned Inspection School:</div>
                             <div class="flex items-center gap-2 flex-wrap">
-                                <strong class="text-white font-extrabold text-sm sm:text-base tracking-tight" x-text="activeSchoolName"></strong>
-                                <span class="text-cyan-300 font-mono text-xs font-bold bg-blue-950/80 px-2 py-0.5 rounded border border-cyan-400/40" x-text="'[' + authenticatedSchoolId + ']'"></span>
+                                <strong class="text-blue-950 font-extrabold text-sm sm:text-base tracking-tight" x-text="activeSchoolName"></strong>
+                                <span class="text-blue-900 font-mono text-xs font-bold bg-white px-2 py-0.5 rounded border border-blue-200" x-text="'[' + authenticatedSchoolId + ']'"></span>
                             </div>
                         </div>
                     </div>
-                    <button type="button" @click="showSisoSchoolModal = true" class="bg-amber-400 hover:bg-amber-300 active:bg-amber-500 text-slate-950 px-3.5 py-2 rounded-xl font-black text-xs transition flex items-center gap-2 shadow-sm shrink-0">
-                        <i class="fa fa-arrows-rotate text-xs"></i> Switch Assigned School ID
+                    <button type="button" @click="showSisoPinModal = true" class="bg-blue-900 hover:bg-blue-800 active:bg-blue-950 text-white px-3.5 py-2 rounded-xl font-bold text-xs transition flex items-center gap-1.5 shadow-xs shrink-0">
+                        <i class="fa fa-arrows-rotate text-xs text-blue-200"></i> Switch Assigned School ID
                     </button>
                 </div>
             </div>
 
-            <!-- SISO Controls & Filters Toolbar -->
-            <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+            <!-- SISO Controls & Filters Toolbar (Crisp White Card) -->
+            <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-xs border border-slate-200 space-y-3.5">
                 <!-- Top Row: View Mode Switcher + Term Selector + Search -->
                 <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 border-b border-slate-100 pb-3.5">
                     <!-- Left: View Mode Toggle -->
                     <div class="flex items-center gap-2 flex-wrap">
                         <span class="text-xs font-black text-slate-700 uppercase tracking-wider">View Mode:</span>
                         <div class="inline-flex bg-slate-100 p-1 rounded-xl border border-slate-200">
-                            <button type="button" @click="sisoViewMode = 'teacher_grouped'" :class="sisoViewMode === 'teacher_grouped' ? 'bg-[#011B33] text-amber-400 shadow-sm font-black' : 'text-slate-700 hover:text-slate-900 font-semibold'" class="px-3 py-1.5 rounded-lg text-xs transition flex items-center gap-1.5">
+                            <button type="button" @click="sisoViewMode = 'teacher_grouped'" :class="sisoViewMode === 'teacher_grouped' ? 'bg-blue-900 text-white shadow-xs font-bold' : 'text-slate-700 hover:text-slate-900 font-semibold'" class="px-3 py-1.5 rounded-lg text-xs transition flex items-center gap-1.5">
                                 <i class="fa fa-user-group text-xs"></i>
                                 <span>Teacher-by-Teacher</span>
                             </button>
-                            <button type="button" @click="sisoViewMode = 'list'" :class="sisoViewMode === 'list' ? 'bg-[#011B33] text-amber-400 shadow-sm font-black' : 'text-slate-700 hover:text-slate-900 font-semibold'" class="px-3 py-1.5 rounded-lg text-xs transition flex items-center gap-1.5">
+                            <button type="button" @click="sisoViewMode = 'list'" :class="sisoViewMode === 'list' ? 'bg-blue-900 text-white shadow-xs font-bold' : 'text-slate-700 hover:text-slate-900 font-semibold'" class="px-3 py-1.5 rounded-lg text-xs transition flex items-center gap-1.5">
                                 <i class="fa fa-list-check text-xs"></i>
                                 <span>All Submissions Stream</span>
                             </button>
@@ -1930,7 +1928,7 @@
                         <!-- Term Filter -->
                         <div class="flex items-center gap-1.5">
                             <span class="text-xs font-bold text-slate-600">Term:</span>
-                            <select x-model="sisoActiveTerm" class="text-xs rounded-xl border-slate-300 border px-2.5 py-1.5 bg-slate-50 font-semibold text-slate-800 focus:ring-1 focus:ring-amber-500">
+                            <select x-model="sisoActiveTerm" class="text-xs rounded-xl border-slate-300 border px-2.5 py-1.5 bg-slate-50 font-semibold text-slate-800 focus:ring-1 focus:ring-blue-600">
                                 <option value="">All Terms</option>
                                 <option value="Term 1">Term 1</option>
                                 <option value="Term 2">Term 2</option>
@@ -1941,7 +1939,7 @@
                         <!-- Teacher Filter -->
                         <div class="flex items-center gap-1.5">
                             <span class="text-xs font-bold text-slate-600">Teacher:</span>
-                            <select x-model="sisoTeacherFilter" class="text-xs rounded-xl border-slate-300 border px-2.5 py-1.5 bg-slate-50 font-semibold text-slate-800 max-w-[150px] truncate focus:ring-1 focus:ring-amber-500">
+                            <select x-model="sisoTeacherFilter" class="text-xs rounded-xl border-slate-300 border px-2.5 py-1.5 bg-slate-50 font-semibold text-slate-800 max-w-[150px] truncate focus:ring-1 focus:ring-blue-600">
                                 <option value="all">All Teachers</option>
                                 <template x-for="t in sisoTeachersList" :key="t.id">
                                     <option :value="t.id" x-text="t.name + ' (' + t.id + ')'"></option>
@@ -1952,7 +1950,7 @@
                         <!-- Sort Filter -->
                         <div class="flex items-center gap-1.5">
                             <span class="text-xs font-bold text-slate-600">Sort:</span>
-                            <select x-model="sisoSortBy" class="text-xs rounded-xl border-slate-300 border px-2.5 py-1.5 bg-slate-50 font-semibold text-slate-800 focus:ring-1 focus:ring-amber-500">
+                            <select x-model="sisoSortBy" class="text-xs rounded-xl border-slate-300 border px-2.5 py-1.5 bg-slate-50 font-semibold text-slate-800 focus:ring-1 focus:ring-blue-600">
                                 <option value="teacher">Teacher (A-Z)</option>
                                 <option value="subject">Subject</option>
                                 <option value="week">Week</option>
@@ -1964,7 +1962,7 @@
                         <!-- Keyword Search Input -->
                         <div class="relative flex-grow sm:flex-grow-0 sm:w-48">
                             <i class="fa fa-magnifying-glass absolute left-3 top-2.5 text-xs text-slate-400"></i>
-                            <input type="text" x-model="sisoSearchQuery" placeholder="Search teacher, ID, subject..." class="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-amber-500">
+                            <input type="text" x-model="sisoSearchQuery" placeholder="Search teacher, ID, subject..." class="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-600">
                         </div>
                     </div>
                 </div>
@@ -1973,20 +1971,20 @@
                 <div class="space-y-1.5">
                     <div class="flex items-center justify-between text-xs">
                         <span class="font-bold text-slate-700 flex items-center gap-1.5">
-                            <i class="fa fa-calendar-week text-amber-600"></i> Filter by Curriculum Week:
+                            <i class="fa fa-calendar-week text-blue-700"></i> Filter by Curriculum Week:
                         </span>
                         <span class="text-slate-500 text-[11px]" x-text="'Showing ' + sisoFilteredLessons.length + ' Lesson Submission(s)'"></span>
                     </div>
 
                     <!-- Weekly Pill Buttons -->
                     <div class="flex overflow-x-auto gap-1.5 pb-2 no-scrollbar">
-                        <button type="button" @click="sisoActiveWeek = 'all'" class="px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0" :class="sisoActiveWeek === 'all' ? 'bg-[#011B33] text-amber-400 shadow-sm font-black' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'">
+                        <button type="button" @click="sisoActiveWeek = 'all'" class="px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0" :class="sisoActiveWeek === 'all' ? 'bg-blue-900 text-white shadow-xs font-bold' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium'">
                             All Weeks (<span x-text="sisoAllLessonsCount"></span>)
                         </button>
                         <template x-for="w in 15" :key="w">
-                            <button type="button" @click="sisoActiveWeek = 'Week ' + w" class="px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1" :class="sisoActiveWeek === ('Week ' + w) ? 'bg-[#011B33] text-amber-400 shadow-sm font-black' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'">
+                            <button type="button" @click="sisoActiveWeek = 'Week ' + w" class="px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1" :class="sisoActiveWeek === ('Week ' + w) ? 'bg-blue-900 text-white shadow-xs font-bold' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium'">
                                 <span x-text="'Week ' + w"></span>
-                                <span class="text-[10px] px-1.5 py-0.2 rounded-full font-mono font-bold" :class="sisoActiveWeek === ('Week ' + w) ? 'bg-amber-400/20 text-amber-300' : 'bg-slate-200 text-slate-600'" x-text="getSisoWeekLessonCount('Week ' + w)"></span>
+                                <span class="text-[10px] px-1.5 py-0.2 rounded-full font-mono font-bold" :class="sisoActiveWeek === ('Week ' + w) ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-600'" x-text="getSisoWeekLessonCount('Week ' + w)"></span>
                             </button>
                         </template>
                     </div>
@@ -1994,18 +1992,18 @@
             </div>
 
             <!-- VIEW MODE 1: TEACHER-BY-TEACHER GROUPED VIEW -->
-            <div x-show="sisoViewMode === 'teacher_grouped'" class="space-y-6">
+            <div x-show="sisoViewMode === 'teacher_grouped'" class="space-y-4">
                 <template x-for="group in sisoGroupedByTeacher" :key="group.teacherId">
-                    <div class="bg-white border-2 border-slate-200 hover:border-amber-400/80 rounded-2xl p-5 shadow-sm space-y-4 transition">
+                    <div class="bg-white border border-slate-200 hover:border-blue-400/80 rounded-2xl p-4 sm:p-5 shadow-xs space-y-3.5 transition">
                         <!-- Teacher Profile Banner Header (Staff ID tied directly to Teacher) -->
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 pb-3.5">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 pb-3">
                             <div class="flex items-center space-x-3.5">
-                                <div class="w-12 h-12 rounded-2xl bg-[#011B33] text-amber-400 font-mono font-black flex items-center justify-center text-sm uppercase shadow-sm border border-amber-400/30 shrink-0" x-text="group.teacherName ? group.teacherName.substring(0,2) : 'ED'"></div>
+                                <div class="w-11 h-11 rounded-xl bg-blue-50 text-blue-950 font-mono font-black flex items-center justify-center text-sm uppercase shadow-2xs border border-blue-200 shrink-0" x-text="group.teacherName ? group.teacherName.substring(0,2) : 'ED'"></div>
                                 <div>
                                     <div class="flex items-center gap-2 flex-wrap">
                                         <h4 class="text-base font-extrabold text-slate-900" x-text="group.teacherName"></h4>
                                         <!-- Teacher ID Badge Tied to Educator -->
-                                        <span class="font-mono text-xs font-black bg-blue-100 text-blue-900 px-2.5 py-0.5 rounded-lg border border-blue-300 shadow-2xs flex items-center gap-1">
+                                        <span class="font-mono text-xs font-bold bg-blue-50 text-blue-950 px-2.5 py-0.5 rounded-lg border border-blue-200 shadow-2xs flex items-center gap-1">
                                             <i class="fa fa-id-badge text-blue-700 text-[10px]"></i>
                                             <span x-text="'Staff ID: ' + group.teacherId"></span>
                                         </span>
@@ -2026,12 +2024,12 @@
                         </div>
 
                         <!-- Lessons List Tied to this Teacher and Subjects -->
-                        <div class="space-y-3">
+                        <div class="space-y-2.5">
                             <template x-for="lesson in group.lessons" :key="lesson.id">
-                                <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/70 hover:bg-amber-50/20 hover:border-amber-300 transition space-y-3">
+                                <div class="border border-slate-200 rounded-xl p-3.5 sm:p-4 bg-slate-50/70 hover:bg-blue-50/30 hover:border-blue-200 transition space-y-2.5">
                                     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
                                         <!-- Left: Subject, Class, Week, and Teacher ID tie -->
-                                        <div class="space-y-1.5">
+                                        <div class="space-y-1">
                                             <div class="flex items-center gap-2 flex-wrap">
                                                 <span class="font-black text-sm text-slate-900" x-text="lesson.subject"></span>
                                                 <!-- Teacher ID explicitly tied to subject submission -->
@@ -2050,35 +2048,35 @@
                                         <!-- Right: Actions (Download, Scheme, Discussion, SISO Feedback) -->
                                         <div class="flex items-center gap-2 flex-wrap shrink-0">
                                             <!-- Download Lesson Plan -->
-                                            <a :href="lesson.fileData" :download="lesson.fileName" class="bg-white hover:bg-slate-100 text-slate-800 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 border border-slate-300 shadow-2xs">
+                                            <a :href="lesson.fileData" :download="lesson.fileName" class="bg-white hover:bg-slate-100 text-slate-800 text-xs font-bold px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 border border-slate-300 shadow-2xs">
                                                 <i class="fa fa-download text-blue-700"></i> Download
                                             </a>
                                             <!-- Download Scheme if available -->
-                                            <a x-show="lesson.schemeFileName" :href="lesson.schemeFileData" :download="lesson.schemeFileName" class="bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 border border-teal-200">
+                                            <a x-show="lesson.schemeFileName" :href="lesson.schemeFileData" :download="lesson.schemeFileName" class="bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-bold px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 border border-teal-200">
                                                 <i class="fa fa-file-excel text-teal-600"></i> Scheme
                                             </a>
                                             <!-- Discussion Thread -->
-                                            <button type="button" @click="openCommentThread(lesson)" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-900 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 border border-indigo-200 shadow-2xs">
+                                            <button type="button" @click="openCommentThread(lesson)" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-900 text-xs font-bold px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 border border-indigo-200 shadow-2xs">
                                                 <i class="fa fa-comments text-indigo-600"></i> Discussion (<span x-text="(lesson.comments || []).length"></span>)
                                             </button>
                                             <!-- Official SISO Supervision Feedback Button -->
-                                            <button type="button" @click="openSisoFeedbackModal(lesson)" class="bg-[#011B33] hover:bg-blue-900 text-amber-400 text-xs font-black px-3.5 py-2 rounded-xl transition shadow-sm flex items-center gap-1.5 border border-amber-400/40">
-                                                <i class="fa fa-signature text-amber-300"></i>
+                                            <button type="button" @click="openSisoFeedbackModal(lesson)" class="bg-blue-900 hover:bg-blue-800 active:bg-blue-950 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl transition shadow-xs flex items-center gap-1.5">
+                                                <i class="fa fa-signature text-teal-300"></i>
                                                 <span x-text="lesson.sisoFeedback ? 'Update SISO Feedback' : 'Add SISO Feedback'"></span>
                                             </button>
                                         </div>
                                     </div>
 
-                                    <!-- Existing SISO Feedback Box -->
-                                    <div x-show="lesson.sisoFeedback" class="bg-amber-50/80 border border-amber-300 p-3.5 rounded-xl space-y-1 text-xs text-amber-950">
+                                    <!-- Existing SISO Feedback Box (Black and Blue on crisp light background) -->
+                                    <div x-show="lesson.sisoFeedback" class="bg-blue-50/70 border border-blue-200 p-3.5 rounded-xl space-y-1 text-xs text-blue-950">
                                         <div class="flex items-center justify-between">
-                                            <span class="font-black text-amber-950 flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
-                                                <i class="fa fa-building-columns text-amber-700"></i> Official SISO Supervision Feedback
+                                            <span class="font-black text-blue-950 flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
+                                                <i class="fa fa-building-columns text-blue-700"></i> Official SISO Supervision Feedback
                                             </span>
-                                            <span class="font-bold px-2 py-0.5 rounded text-[10px]" :class="lesson.sisoFeedback?.rating === 'Exemplary' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-amber-200 text-amber-900 border border-amber-300'" x-text="lesson.sisoFeedback?.rating || 'Commendable'"></span>
+                                            <span class="font-bold px-2 py-0.5 rounded text-[10px]" :class="lesson.sisoFeedback?.rating === 'Exemplary' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-blue-100 text-blue-900 border border-blue-200'" x-text="lesson.sisoFeedback?.rating || 'Commendable'"></span>
                                         </div>
                                         <p class="text-slate-800 pt-0.5 font-medium" x-text="lesson.sisoFeedback?.note || lesson.sisoFeedback?.recommendations"></p>
-                                        <p class="text-[10px] text-amber-800 font-semibold" x-text="'Signed by: ' + (lesson.sisoFeedback?.officer || 'SISO Officer') + ' on ' + (lesson.sisoFeedback?.date || '')"></p>
+                                        <p class="text-[10px] text-blue-800 font-semibold" x-text="'Signed by: ' + (lesson.sisoFeedback?.officer || 'SISO Officer') + ' on ' + (lesson.sisoFeedback?.date || '')"></p>
                                     </div>
 
                                     <!-- Headteacher Digital Stamp Seal Badge (if approved) -->
@@ -2092,7 +2090,7 @@
                     </div>
                 </template>
 
-                <div x-show="sisoGroupedByTeacher.length === 0" class="text-center py-12 text-slate-400 text-sm bg-white rounded-2xl border p-8">
+                <div x-show="sisoGroupedByTeacher.length === 0" class="text-center py-12 text-slate-400 text-sm bg-white rounded-2xl border border-slate-200 p-8 shadow-xs">
                     <i class="fa fa-folder-open text-3xl text-slate-300 mb-2 block"></i>
                     <p class="font-semibold text-slate-600">No lesson submissions found matching your filters.</p>
                     <p class="text-xs text-slate-400 mt-1">Try switching the week, term, teacher filter, or clearing your search keywords.</p>
@@ -2100,9 +2098,9 @@
             </div>
 
             <!-- VIEW MODE 2: ALL SUBMISSIONS STREAM VIEW -->
-            <div x-show="sisoViewMode === 'list'" class="space-y-4">
+            <div x-show="sisoViewMode === 'list'" class="space-y-3.5">
                 <template x-for="lesson in sisoFilteredLessons" :key="lesson.id">
-                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4 hover:border-amber-400 transition">
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs space-y-3.5 hover:border-blue-300 transition">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-100 pb-3">
                             <div class="space-y-1">
                                 <div class="flex items-center gap-2 flex-wrap">
@@ -2122,35 +2120,35 @@
                             <!-- Relevant SISO Actions: Comment, Download, and Feedback -->
                             <div class="flex items-center gap-2 flex-wrap">
                                 <!-- Download Lesson Plan -->
-                                <a :href="lesson.fileData" :download="lesson.fileName" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 border border-slate-300">
-                                    <i class="fa fa-download text-slate-600"></i> Download
+                                <a :href="lesson.fileData" :download="lesson.fileName" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 border border-slate-300">
+                                    <i class="fa fa-download text-blue-700"></i> Download
                                 </a>
                                 <!-- Download Scheme if available -->
-                                <a x-show="lesson.schemeFileName" :href="lesson.schemeFileData" :download="lesson.schemeFileName" class="bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 border border-teal-200">
+                                <a x-show="lesson.schemeFileName" :href="lesson.schemeFileData" :download="lesson.schemeFileName" class="bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-bold px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 border border-teal-200">
                                     <i class="fa fa-file-excel text-teal-600"></i> Scheme
                                 </a>
                                 <!-- Discussion / Comment Thread -->
-                                <button type="button" @click="openCommentThread(lesson)" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-900 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 border border-indigo-200 shadow-sm">
+                                <button type="button" @click="openCommentThread(lesson)" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-900 text-xs font-bold px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 border border-indigo-200 shadow-2xs">
                                     <i class="fa fa-comments text-indigo-600"></i> Discussion (<span x-text="(lesson.comments || []).length"></span>)
                                 </button>
                                 <!-- SISO Official Supervisory Feedback -->
-                                <button type="button" @click="openSisoFeedbackModal(lesson)" class="bg-[#011B33] hover:bg-blue-900 text-amber-400 text-xs font-black px-3.5 py-2 rounded-xl transition shadow-sm flex items-center gap-1.5 border border-amber-400/40">
-                                    <i class="fa fa-signature text-amber-300"></i>
+                                <button type="button" @click="openSisoFeedbackModal(lesson)" class="bg-blue-900 hover:bg-blue-800 active:bg-blue-950 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl transition shadow-xs flex items-center gap-1.5">
+                                    <i class="fa fa-signature text-teal-300"></i>
                                     <span x-text="lesson.sisoFeedback ? 'Update SISO Feedback' : 'Add SISO Feedback'"></span>
                                 </button>
                             </div>
                         </div>
 
                         <!-- Existing SISO Feedback Box -->
-                        <div x-show="lesson.sisoFeedback" class="bg-amber-50/80 border border-amber-300 p-3.5 rounded-xl space-y-1 text-xs text-amber-950">
+                        <div x-show="lesson.sisoFeedback" class="bg-blue-50/70 border border-blue-200 p-3.5 rounded-xl space-y-1 text-xs text-blue-950">
                             <div class="flex items-center justify-between">
-                                <span class="font-black text-amber-900 flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
-                                    <i class="fa fa-building-columns text-amber-700"></i> Official SISO Supervision Feedback
+                                <span class="font-black text-blue-950 flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
+                                    <i class="fa fa-building-columns text-blue-700"></i> Official SISO Supervision Feedback
                                 </span>
-                                <span class="font-bold px-2 py-0.5 rounded text-[10px]" :class="lesson.sisoFeedback?.rating === 'Exemplary' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-200 text-amber-900'" x-text="lesson.sisoFeedback?.rating || 'Commendable'"></span>
+                                <span class="font-bold px-2 py-0.5 rounded text-[10px]" :class="lesson.sisoFeedback?.rating === 'Exemplary' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-900'" x-text="lesson.sisoFeedback?.rating || 'Commendable'"></span>
                             </div>
-                            <p class="text-slate-800 pt-0.5" x-text="lesson.sisoFeedback?.note || lesson.sisoFeedback?.recommendations"></p>
-                            <p class="text-[10px] text-amber-700 font-medium" x-text="'Signed by: ' + (lesson.sisoFeedback?.officer || 'SISO Officer') + ' on ' + (lesson.sisoFeedback?.date || '')"></p>
+                            <p class="text-slate-800 pt-0.5 font-medium" x-text="lesson.sisoFeedback?.note || lesson.sisoFeedback?.recommendations"></p>
+                            <p class="text-[10px] text-blue-800 font-semibold" x-text="'Signed by: ' + (lesson.sisoFeedback?.officer || 'SISO Officer') + ' on ' + (lesson.sisoFeedback?.date || '')"></p>
                         </div>
 
                         <!-- Headteacher Stamp Seal Badge (if approved) -->
@@ -2161,7 +2159,7 @@
                     </div>
                 </template>
 
-                <div x-show="sisoFilteredLessons.length === 0" class="text-center py-12 text-slate-400 text-sm bg-white rounded-2xl border p-8">
+                <div x-show="sisoFilteredLessons.length === 0" class="text-center py-12 text-slate-400 text-sm bg-white rounded-2xl border border-slate-200 p-8 shadow-xs">
                     <p>No lesson submissions found for this selected week, term, and filter.</p>
                 </div>
             </div>
