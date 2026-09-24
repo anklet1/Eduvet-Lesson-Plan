@@ -10,6 +10,7 @@
     <!-- Tailwind CSS -->
     
     <script src="https://cdn.tailwindcss.com"></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- PDF.js CDN for in-browser PDF Scheme text parsing -->
@@ -1179,7 +1180,6 @@
     </footer>
 
     <!-- App Script Logic -->
-    <!-- App Script Logic -->
     <script>
         // ==========================================
         // GES / NACCA LEVEL-BASED SUBJECT MAPS
@@ -1590,8 +1590,8 @@ Please complete and submit your lesson plans on the portal at your earliest conv
                         this.teachers = snapshot.docs.map(doc => ({ ...doc.data() }));
                     });
 
-                    // Strict limit to prevent heavy DOM rendering lag on laptops
-                    db.collection('lessons').where('schoolId', '==', this.authenticatedSchoolId).limit(30).onSnapshot((snapshot) => {
+                    // Fixed: Removed .limit(30) so all uploaded documents for the school load and display properly
+                    db.collection('lessons').where('schoolId', '==', this.authenticatedSchoolId).onSnapshot((snapshot) => {
                         this.lessons = snapshot.docs.map(doc => ({ ...doc.data() }));
                     });
                 },
