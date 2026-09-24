@@ -1170,6 +1170,7 @@
     </footer>
 
     <!-- App Script Logic -->
+    <!-- App Script Logic -->
     <script>
         // ==========================================
         // GES / NACCA LEVEL-BASED SUBJECT MAPS
@@ -1252,13 +1253,8 @@
         }
         const db = firebase.firestore();
 
-        // Enable Firestore Offline Persistence
         db.enablePersistence().catch((err) => {
-            if (err.code == 'failed-precondition') {
-                console.log('Persistence failed: Multiple tabs open.');
-            } else if (err.code == 'unimplemented') {
-                console.log('Persistence not supported by browser.');
-            }
+            console.log('Persistence note:', err.code);
         });
 
         function schoolApp() {
@@ -1333,7 +1329,6 @@
                 isOnline: navigator.onLine,
                 countdownTimerString: 'Calculating...',
 
-                // --- METHODS ---
                 openCommentThread(lesson) {
                     this.activeCommentLesson = lesson;
                     this.newCommentStatus = lesson.status || 'Changes Requested';
@@ -1368,7 +1363,6 @@
                     }).catch(err => alert('Error sending comment: ' + err.message));
                 },
 
-                // Individual WhatsApp Reminder
                 sendWhatsAppReminder(teacher) {
                     let phone = (teacher.contact || '').trim().replace(/\D/g, ''); 
                     if (phone.startsWith('0')) {
@@ -1379,7 +1373,6 @@
                     window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
                 },
 
-                // Staff Group Broadcast Reminder
                 broadcastWhatsAppReminder() {
                     if (this.laggingTeachers.length === 0) {
                         alert('🎉 Great news! All teachers have submitted their lesson plans.');
@@ -1401,8 +1394,7 @@ ${laggingNames}
 Please complete and submit your lesson plans on the portal at your earliest convenience. Thank you for your dedication! 📚✨`
                     );
 
-                    const waUrl = `https://api.whatsapp.com/send?text=${message}`;
-                    window.open(waUrl, '_blank');
+                    window.open(`https://api.whatsapp.com/send?text=${message}`, '_blank');
                 },
 
                 init() {
@@ -1417,7 +1409,6 @@ Please complete and submit your lesson plans on the portal at your earliest conv
                     let inactivityTimeout;
                     const resetTimer = () => {
                         clearTimeout(inactivityTimeout);
-                        // Debounced 5 minutes inactivity timeout (300,000 ms)
                         inactivityTimeout = setTimeout(() => {
                             if (this.authenticatedSchoolId) {
                                 alert('🔒 Session expired due to inactivity. Please log back in.');
@@ -1514,14 +1505,6 @@ Please complete and submit your lesson plans on the portal at your earliest conv
                     localStorage.removeItem('eduvet_offline_queue');
                 },
 
-                getCurrentSystemWeekNumber() {
-                    const termStart = new Date(this.settingsForm.termStartDate || '2026-09-07');
-                    const diffDays = Math.floor((new Date() - termStart) / (1000 * 60 * 60 * 24));
-                    let currentWeek = Math.floor(diffDays / 7) + 1;
-                    const maxWeeks = parseInt(this.settingsForm.totalWeeks) || 18;
-                    return Math.max(1, Math.min(currentWeek, maxWeeks));
-                },
-
                 registerSchool() {
                     const cleanName = this.regForm.name.trim();
                     if (!cleanName) return;
@@ -1598,8 +1581,8 @@ Please complete and submit your lesson plans on the portal at your earliest conv
                         this.teachers = snapshot.docs.map(doc => ({ ...doc.data() }));
                     });
 
-                    // Optimized with .limit(50) to prevent desktop lagging from heavy dataset rendering
-                    db.collection('lessons').where('schoolId', '==', this.authenticatedSchoolId).limit(50).onSnapshot((snapshot) => {
+                    // Strict limit to prevent heavy DOM rendering lag on laptops
+                    db.collection('lessons').where('schoolId', '==', this.authenticatedSchoolId).limit(30).onSnapshot((snapshot) => {
                         this.lessons = snapshot.docs.map(doc => ({ ...doc.data() }));
                     });
                 },
@@ -1720,7 +1703,7 @@ Please complete and submit your lesson plans on the portal at your earliest conv
                     let items = this.activeLessons.filter(l => l.status !== 'Approved');
                     if (this.reviewerTermFilter) items = items.filter(l => l.term === this.reviewerTermFilter);
                     if (this.reviewerWeekFilter) items = items.filter(l => l.week === this.reviewerWeekFilter);
-                    const q = this.adminSearchQuery.toLowerCase();
+                    const q = (this.adminSearchQuery || '').toLowerCase();
                     if (q) items = items.filter(l => l.teacherName.toLowerCase().includes(q) || l.subject.toLowerCase().includes(q));
 
                     const map = {};
