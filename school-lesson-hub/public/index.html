@@ -111,6 +111,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- PDF.js CDN for in-browser PDF Scheme text parsing -->
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <!-- Firebase Compat SDKs (Loaded synchronously in head for instant cloud sync across all devices) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -333,11 +335,11 @@
     </div>
 
     <!-- Eduvet Pro License & Commercial Monetization Modal -->
-    <div x-show="showFeatureLockModal || showProUpgradeModal" class="fixed inset-0 bg-blue-950/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 no-print overflow-y-auto" style="display: none;">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-4xl w-full p-5 sm:p-7 space-y-4 border border-slate-200 text-center my-6 max-h-[92vh] overflow-y-auto relative" @click.away="showFeatureLockModal = false; showProUpgradeModal = false">
+    <div x-show="showFeatureLockModal || showProUpgradeModal" @keydown.escape.window="closePackagesModal()" class="fixed inset-0 bg-blue-950/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 no-print overflow-y-auto" style="display: none;">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-4xl w-full p-5 sm:p-7 space-y-4 border border-slate-200 text-center my-6 max-h-[92vh] overflow-y-auto relative" @click.away="closePackagesModal()">
             <!-- Top Sticky Navigation Bar with Clear Back Button -->
             <div class="flex items-center justify-between pb-3 border-b border-slate-200 sticky top-0 bg-white/95 backdrop-blur-sm z-20 -mt-2 pt-1">
-                <button type="button" @click="showFeatureLockModal = false; showProUpgradeModal = false" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition cursor-pointer shadow-xs">
+                <button type="button" @click="closePackagesModal()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition cursor-pointer shadow-xs">
                     <i class="fa fa-arrow-left text-slate-600"></i>
                     <span>Back to Main Page</span>
                 </button>
@@ -345,7 +347,7 @@
                     <span class="text-[11px] font-black tracking-wider uppercase text-blue-950 block">EDUVET PRO LICENSING</span>
                     <span class="text-[10px] text-slate-500">Ghana Education Service Standards</span>
                 </div>
-                <button type="button" @click="showFeatureLockModal = false; showProUpgradeModal = false" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 flex items-center justify-center font-bold text-sm transition cursor-pointer" title="Close Packages Page">
+                <button type="button" @click="closePackagesModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 flex items-center justify-center font-bold text-sm transition cursor-pointer" title="Close Packages Page">
                     ✕
                 </button>
             </div>
@@ -618,7 +620,7 @@
             </form>
 
             <div class="pt-2 border-t border-slate-100 flex justify-between items-center text-xs pb-10 sm:pb-14">
-                <button type="button" @click="showFeatureLockModal = false; showProUpgradeModal = false" class="text-slate-500 hover:text-slate-800 font-semibold text-[11px] cursor-pointer">
+                <button type="button" @click="closePackagesModal()" class="text-slate-500 hover:text-slate-800 font-semibold text-[11px] cursor-pointer">
                     Continue in Free Mode (Preview)
                 </button>
             </div>
@@ -681,7 +683,7 @@
                         </button>
 
                         <!-- Back to Main Page Button -->
-                        <button type="button" @click="showFeatureLockModal = false; showProUpgradeModal = false"
+                        <button type="button" @click="closePackagesModal()"
                             class="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 hover:text-slate-950 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs">
                             <i class="fa fa-arrow-left text-slate-600 text-[11px]"></i>
                             <span>Back to Main Page</span>
@@ -757,9 +759,9 @@
             </div>
 
             <div class="space-y-2 pt-2">
-                <a :href="paystackStoreUrl" target="_blank" @click="simulatePaystackSuccess()" class="block w-full bg-[#011B33] hover:bg-slate-900 text-white font-bold py-3 rounded-xl text-xs transition shadow-sm text-center">
+                <button type="button" @click="showPaymentModal = false; openPaystackInAppModal()" class="block w-full bg-[#011B33] hover:bg-slate-900 text-white font-bold py-3 rounded-xl text-xs transition shadow-sm text-center">
                     Proceed to Official Paystack Page ↗
-                </a>
+                </button>
                 <button @click="showPaymentModal = false" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs py-2 rounded-xl transition font-medium">Close / Already Paid</button>
             </div>
         </div>
@@ -1752,9 +1754,9 @@
                         <div x-show="schemeInputMode === 'upload'" class="space-y-3 bg-amber-50/50 p-3.5 rounded-xl border border-amber-200">
                             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-800 mb-1">Upload Your Termly Scheme Document (PDF, Word, TXT)</label>
-                                    <input type="file" id="engineSchemeFileInput" accept=".pdf,.txt,.doc,.docx" class="text-xs text-slate-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-amber-100 file:text-amber-950 file:font-bold hover:file:bg-amber-200" onchange="engineHandleSchemeUpload(event)">
-                                    <p id="engineUploadStatus" class="text-[11px] text-slate-500 mt-1">Upload your file, then click "Parse Uploaded Scheme".</p>
+                                    <label class="block text-xs font-bold text-slate-800 mb-1">Upload Prepared Scheme Document (Excel .xlsx/.xls, Word .docx, PDF, CSV, TXT)</label>
+                                    <input type="file" id="engineSchemeFileInput" accept=".pdf,.txt,.doc,.docx,.xlsx,.xls,.csv" class="text-xs text-slate-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-amber-100 file:text-amber-950 file:font-bold hover:file:bg-amber-200" onchange="engineHandleSchemeUpload(event)">
+                                    <p id="engineUploadStatus" class="text-[11px] text-slate-500 mt-1">Upload your prepared file (.xlsx, .docx, .pdf, .csv), then click "Parse Uploaded Scheme".</p>
                                 </div>
                                 <button onclick="engineTriggerFileUploadParse()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-sm transition flex items-center gap-1.5 shrink-0 self-end sm:self-center">
                                     <i class="fa fa-file-invoice text-white"></i> Parse Uploaded Scheme
@@ -1900,49 +1902,23 @@
                             </div>
                         </div>
 
-                        <!-- Gemini AI Engine Status & Key Configuration Bar -->
+                        <!-- Automated Headless Gemini AI & NaCCA Common Core Status Bar (Zero User Configuration Required) -->
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs bg-slate-50 border border-slate-200 px-3.5 py-2.5 rounded-xl">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <span class="font-bold text-slate-800 flex items-center gap-1.5">
-                                    <i class="fa fa-robot text-teal-600"></i> AI Generation Engine:
+                                    <i class="fa fa-wand-magic-sparkles text-amber-500"></i> AI Generation Engine:
                                 </span>
-                                <span class="px-2 py-0.5 rounded-full text-[11px] font-bold"
-                                      :class="hasGeminiApiKey ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-slate-200 text-slate-700 border border-slate-300'"
-                                      x-text="hasGeminiApiKey ? '✨ Gemini AI Active (Live GES Prompts)' : '⚡ NaCCA 360-Week Standard Database (Active)'">
+                                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1.5">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    <span>✨ Automated Gemini AI & NaCCA Common Core Engine (Active)</span>
                                 </span>
                             </div>
-                            <div class="flex items-center gap-3">
-                                <button type="button" @click="promptGeminiApiKey()" class="text-blue-900 font-bold hover:underline cursor-pointer flex items-center gap-1 text-[11px]">
-                                    <i class="fa fa-key text-amber-500"></i>
-                                    <span x-text="hasGeminiApiKey ? 'Update Gemini Key' : 'Configure Gemini AI Key'"></span>
-                                </button>
-                                <span class="text-slate-300">|</span>
-                                <span class="text-[11px] text-slate-500">Zero-Crash Offline Fallback</span>
+                            <div class="flex items-center gap-2 text-[11px] text-slate-600">
+                                <i class="fa fa-shield-check text-emerald-600"></i>
+                                <span>Built-in System Key • Zero User Setup • Instant Offline Fallback</span>
                             </div>
                         </div>
-
-                        <!-- Gemini AI Engine Status & Key Configuration Bar -->
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs bg-slate-50 border border-slate-200 px-3.5 py-2.5 rounded-xl">
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <span class="font-bold text-slate-800 flex items-center gap-1.5">
-                                    <i class="fa fa-robot text-teal-600"></i> AI Generation Engine:
-                                </span>
-                                <span class="px-2 py-0.5 rounded-full text-[11px] font-bold"
-                                      :class="hasGeminiApiKey ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-slate-200 text-slate-700 border border-slate-300'"
-                                      x-text="hasGeminiApiKey ? '✨ Gemini AI Active (Live GES Prompts)' : '⚡ NaCCA 360-Week Standard Database (Active)'">
-                                </span>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <button type="button" @click="promptGeminiApiKey()" class="text-blue-900 font-bold hover:underline cursor-pointer flex items-center gap-1 text-[11px]">
-                                    <i class="fa fa-key text-amber-500"></i>
-                                    <span x-text="hasGeminiApiKey ? 'Update Gemini Key' : 'Configure Gemini AI Key'"></span>
-                                </button>
-                                <span class="text-slate-300">|</span>
-                                <span class="text-[11px] text-slate-500">Zero-Crash Offline Fallback</span>
-                            </div>
-                        </div>
-
-                        <!-- Secondary Actions: Print, Word Download, Direct Push to Vetting Queue -->
+<!-- Secondary Actions: Print, Word Download, Direct Push to Vetting Queue -->
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2 border-t border-emerald-200/60">
                             <button type="button" onclick="requestDownload('single')" class="bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 p-2.5 sm:p-3 rounded-xl text-xs font-bold transition shadow-xs flex items-center justify-center gap-2">
                                 <i class="fa fa-file-pdf text-rose-600"></i>
@@ -26431,19 +26407,25 @@
         function engineTriggerFileUploadParse() {
             const statusEl = document.getElementById('engineUploadStatus');
             if (!uploadedSchemeFile) {
-                alert('Please select a PDF, Word, or TXT file first.');
+                alert('Please select an Excel (.xlsx/.xls), Word (.docx), PDF, CSV, or TXT file first.');
                 return;
             }
 
             if (statusEl) statusEl.innerHTML = '<span class="text-amber-600 font-bold">⏳ Parsing scheme document...</span>';
+            const fName = (uploadedSchemeFile.name || '').toLowerCase();
 
-            if (uploadedSchemeFile.name.endsWith('.pdf')) {
+            // 1. PDF Parser via PDF.js
+            if (fName.endsWith('.pdf')) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const typedarray = new Uint8Array(e.target.result);
+                    if (typeof pdfjsLib === 'undefined') {
+                        if (statusEl) statusEl.innerHTML = '<span class="text-rose-600 font-bold">PDF engine loading, please try in 2 seconds.</span>';
+                        return;
+                    }
                     pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
                         let textPromises = [];
-                        for (let i = 1; i <= Math.min(pdf.numPages, 10); i++) {
+                        for (let i = 1; i <= Math.min(pdf.numPages, 12); i++) {
                             textPromises.push(pdf.getPage(i).then(page => page.getTextContent()));
                         }
                         Promise.all(textPromises).then(pages => {
@@ -26457,14 +26439,61 @@
                     });
                 };
                 reader.readAsArrayBuffer(uploadedSchemeFile);
-            } else {
+                return;
+            }
+
+            // 2. Excel Spreadsheet Parser (.xlsx, .xls) via SheetJS
+            if (fName.endsWith('.xlsx') || fName.endsWith('.xls')) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    parseExtractedSchemeText(e.target.result);
-                    if (statusEl) statusEl.innerHTML = `<span class="text-emerald-600 font-bold">✓ Text Scheme Successfully Extracted (${uploadedSchemeFile.name})</span>`;
+                    try {
+                        if (typeof XLSX !== 'undefined') {
+                            const data = new Uint8Array(e.target.result);
+                            const workbook = XLSX.read(data, { type: 'array' });
+                            const sheetName = workbook.SheetNames[0];
+                            const csvText = XLSX.utils.sheet_to_csv(workbook.Sheets[sheetName]);
+                            parseExtractedSchemeText(csvText);
+                            if (statusEl) statusEl.innerHTML = `<span class="text-emerald-600 font-bold">✓ Excel Scheme Successfully Extracted (${uploadedSchemeFile.name})</span>`;
+                        } else {
+                            // Fallback read as text if SheetJS not yet available
+                            const txt = new TextDecoder('utf-8').decode(e.target.result);
+                            parseExtractedSchemeText(txt);
+                        }
+                    } catch(err) {
+                        console.warn('Excel parse fallback:', err);
+                        alert('Could not parse Excel document directly. Please save as CSV or paste topics in Option C.');
+                    }
                 };
-                reader.readAsText(uploadedSchemeFile);
+                reader.readAsArrayBuffer(uploadedSchemeFile);
+                return;
             }
+
+            // 3. Word Document Parser (.docx) via Mammoth
+            if (fName.endsWith('.docx')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    if (typeof mammoth !== 'undefined') {
+                        mammoth.extractRawText({ arrayBuffer: e.target.result }).then(function(result) {
+                            parseExtractedSchemeText(result.value);
+                            if (statusEl) statusEl.innerHTML = `<span class="text-emerald-600 font-bold">✓ Word Document Successfully Extracted (${uploadedSchemeFile.name})</span>`;
+                        }).catch(() => {
+                            alert('Could not parse Word document. You can paste topics directly in Option C.');
+                        });
+                    } else {
+                        alert('Word document engine ready. You can also paste topics in Option C.');
+                    }
+                };
+                reader.readAsArrayBuffer(uploadedSchemeFile);
+                return;
+            }
+
+            // 4. Default: Text and CSV Files (.txt, .csv, .tsv)
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                parseExtractedSchemeText(e.target.result);
+                if (statusEl) statusEl.innerHTML = `<span class="text-emerald-600 font-bold">✓ Scheme File Successfully Extracted (${uploadedSchemeFile.name})</span>`;
+            };
+            reader.readAsText(uploadedSchemeFile);
         }
 
         // Pure Ghanaian NaCCA Topic Sanitizer: Strips out lesson clutter, raw codes, TLM lists, and ensures concise topics
@@ -26957,7 +26986,8 @@ Strict Format: Return ONLY a valid JSON array of ${totalWeeks} objects:
         
         // Helper: Call Google Gemini API to generate authentic Ghanaian lesson content
         async function fetchGeminiLessonContent(row, subject, classLevel, lessonsPerWeek, apiKey) {
-            if (!navigator.onLine || !apiKey) return null;
+            const key = apiKey || window.EDUVET_GEMINI_KEY || localStorage.getItem('eduvet_gemini_api_key') || 'AIzaSyBu0Kgn8luqI6ma9rkZ90F6Gy3sath64Jk';
+            if (!navigator.onLine || !key) return null;
             const promptText = `You are an expert curriculum developer for the Ghana Education Service (GES) and NaCCA.
 Generate rich, authentic Ghanaian 5-Day lesson plan activities strictly following NaCCA standards for:
 Level: ${row.classLevel || classLevel}
@@ -27176,7 +27206,7 @@ Format: Return ONLY a valid JSON object with days Monday through Friday:
             const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
             // Parallel Gemini AI content generation with graceful NaCCA fallback
-            const geminiKey = localStorage.getItem('eduvet_gemini_api_key') || window.EDUVET_GEMINI_KEY || '';
+            const geminiKey = window.EDUVET_GEMINI_KEY || localStorage.getItem('eduvet_gemini_api_key') || 'AIzaSyBu0Kgn8luqI6ma9rkZ90F6Gy3sath64Jk';
             const btnBuild = document.getElementById('btnBuildSmartLessons');
             const origBtnHtml = btnBuild ? btnBuild.innerHTML : '';
             if (btnBuild) {
@@ -27703,6 +27733,37 @@ Format: Return ONLY a valid JSON object with days Monday through Friday:
             }
         }
 
+        
+        // Auto-refresh: Reset generated lessons container to default empty state
+        function resetGeneratedLessonsToDefault() {
+            window.generatedLessonPlansJson = [];
+            if (typeof generatedLessonsList !== 'undefined') {
+                generatedLessonsList = [];
+            }
+            const container = document.getElementById('printable-lessons');
+            if (container) {
+                container.innerHTML = `
+                    <div class="text-center py-10 space-y-2">
+                        <i class="fa fa-book-open-reader text-3xl text-teal-600"></i>
+                        <h4 class="text-sm font-bold text-slate-800">No Lessons Generated Yet</h4>
+                        <p class="text-xs text-slate-500 max-w-md mx-auto">Select Level, Class & Subject above, then click <strong>"Build SMART Lessons"</strong> to generate official Ghana NaCCA 3-Phase lesson notes.</p>
+                    </div>
+                `;
+            }
+            const navContainer = document.getElementById('engineWeekNavContainer');
+            if (navContainer) {
+                navContainer.classList.add('hidden');
+            }
+            const weekTabsList = document.getElementById('engineWeekTabsList');
+            if (weekTabsList) {
+                weekTabsList.innerHTML = '';
+            }
+            const statusLabel = document.getElementById('engineActiveViewingStatus');
+            if (statusLabel) {
+                statusLabel.textContent = 'Showing All Weeks';
+            }
+        }
+
         // Export Lessons to Word (.doc) matching exact sample PDF layout
         function engineExportLessonsWord() {
             if (!window.generatedLessonPlansJson || window.generatedLessonPlansJson.length === 0) {
@@ -27909,6 +27970,8 @@ Format: Return ONLY a valid JSON object with days Monday through Friday:
             a.download = `NaCCA_SMART_Lesson_Notes_${first.subject.replace(/[^a-zA-Z0-9]/g, '_')}_${selectedVal === 'all' ? 'AllWeeks' : 'Wk' + selectedVal}.doc`;
             a.click();
             URL.revokeObjectURL(url);
+            // Auto-refresh: Restore generated lessons container to default empty state
+            setTimeout(resetGeneratedLessonsToDefault, 600);
         }
 
         // View and Export Raw Strict JSON Schema of Generated Lessons
@@ -27966,6 +28029,8 @@ Format: Return ONLY a valid JSON object with days Monday through Friday:
             a.download = `GES_NaCCA_Lessons_${window.generatedLessonPlansJson[0].subject.replace(/[^a-zA-Z0-9]/g, '_')}_2026.json`;
             a.click();
             URL.revokeObjectURL(url);
+            // Auto-refresh: Restore generated lessons container to default empty state
+            setTimeout(resetGeneratedLessonsToDefault, 600);
         }
 
         function requestDownload(type) {
@@ -27974,6 +28039,8 @@ Format: Return ONLY a valid JSON object with days Monday through Friday:
             }
             if (type === 'single') {
                 window.print();
+                // Auto-refresh after single print
+                setTimeout(resetGeneratedLessonsToDefault, 1000);
             } else {
                 engineExportLessonsWord();
             }
@@ -28037,12 +28104,14 @@ Format: Return ONLY a valid JSON object with days Monday through Friday:
 
             db.collection('lessons').doc(newLessonId).set(lessonPayload).then(() => {
                 alert(`Lesson Plan submitted successfully to ${app.activeSchoolName} Vetting Queue for Headteacher approval!`);
+                resetGeneratedLessonsToDefault();
                 app.teacherSubTab = 'upload';
             }).catch(err => {
                 // If offline, save locally
                 app.lessons.unshift(lessonPayload);
                 safeSetLocalStorage('eduvet_lessons_' + app.authenticatedSchoolId, JSON.stringify(sanitizeLessonsForCache(app.lessons)));
                 alert(`✓ Lesson saved to offline queue!`);
+                resetGeneratedLessonsToDefault();
                 app.teacherSubTab = 'upload';
             });
         }
@@ -28522,6 +28591,42 @@ Format: Return exactly a JSON object with:
                     }
                 },
 
+                closePackagesModal() {
+                    this.showFeatureLockModal = false;
+                    this.showProUpgradeModal = false;
+                    this.pendingPostPaymentAction = null; // Strict anti-bypass: cancel queued actions
+                    // STRICT PRODUCTION RULE: NO PAYMENT PROOF, NO PRO PRIVILEGE!
+                    if (!this.hasValidActiveSubscription()) {
+                        this.isPro = false;
+                        this.isEngineUnlocked = false;
+                        this.isPaidSingle = false;
+                        this.isPaidAll = false;
+                    }
+                },
+
+                hasValidActiveSubscription(teacherId, schoolId) {
+                    const tid = teacherId || (this.activeTeacher ? this.activeTeacher.id : 'GES-001');
+                    const sid = (schoolId || this.authenticatedSchoolId || 'ATAK-983').trim().toUpperCase();
+
+                    // Check school subscription
+                    const schoolSubs = JSON.parse(localStorage.getItem('eduvet_school_subscriptions') || '{}');
+                    const directSchoolSub = JSON.parse(localStorage.getItem('eduvet_school_sub_' + sid) || 'null');
+                    const schoolSub = directSchoolSub || schoolSubs[sid];
+                    if (schoolSub && (schoolSub.status === 'active' || schoolSub.plan) && (schoolSub.schoolId || '').toUpperCase() === sid) {
+                        return true;
+                    }
+
+                    // Check individual teacher subscription
+                    const teacherSubs = JSON.parse(localStorage.getItem('eduvet_teacher_subscriptions') || '{}');
+                    const directTeacherSub = JSON.parse(localStorage.getItem('eduvet_teacher_pro_' + tid) || 'null');
+                    const teacherSub = directTeacherSub || teacherSubs[tid];
+                    if (teacherSub && (teacherSub.status === 'active' || teacherSub.plan) && ((teacherSub.teacherId === tid) || ((teacherSub.schoolId || '').toUpperCase() === sid))) {
+                        return true;
+                    }
+
+                    return false;
+                },
+
                 openPaystackInAppModal() {
                     this.showFeatureLockModal = false;
                     this.showProUpgradeModal = false;
@@ -28538,8 +28643,7 @@ Format: Return exactly a JSON object with:
 
                 checkoutSelectedPlanInApp() {
                     if (this.selectedProPlan === 'free') {
-                        this.showFeatureLockModal = false;
-                        this.showProUpgradeModal = false;
+                        this.closePackagesModal();
                         return;
                     }
                     this.openPaystackInAppModal();
@@ -29736,7 +29840,15 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                         };
                     }
 
-                    // 3. Global Pro override (if activated in active browser session)
+                    // 3. Strict Check: If no valid verified subscription exists, reset in-memory flags
+                    if (!this.hasValidActiveSubscription(tid, sid)) {
+                        this.isPro = false;
+                        this.isEngineUnlocked = false;
+                        this.isPaidSingle = false;
+                        this.isPaidAll = false;
+                        return { isPro: false, tier: 'free', inherited: false };
+                    }
+
                     if (this.isPro) {
                         return {
                             isPro: true,
@@ -29871,6 +29983,8 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                 },
 
                 confirmMomoApproval() {
+                    alert('🔒 Please send payment directly to 0543521863 (Felix Fleku) and enter your verified Activation Code.');
+                    return;
                     const txId = 'MOMO-' + Date.now().toString().slice(-6);
                     this.lastMomoTxRef = txId;
 
@@ -30894,12 +31008,10 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                 },
 
                 simulatePaystackSuccess() {
-                    setTimeout(() => {
-                        this.isPaidSingle = true;
-                        this.isPaidAll = true;
-                        this.showPaymentModal = false;
-                        alert('Payment confirmed! All lesson plans unlocked for download.');
-                    }, 2000);
+                    // Permanently Disabled: Strict Production Rule Requires Real Paystack Transaction Reference or Activation Code
+                    alert('🔒 Security Notice: Production verification requires a valid Paystack Transaction Reference or School-Locked Activation Code. Please complete payment to unlock Pro features.');
+                    this.showPaymentModal = false;
+                    this.openPaystackInAppModal();
                 }
             }
         }
