@@ -938,11 +938,11 @@
             <form @submit.prevent="verifySisoPin()" class="space-y-3">
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">Assigned School ID</label>
-                    <input type="text" x-model="sisoAssignedSchoolId" placeholder="e.g. ATAK-983" class="w-full text-center uppercase tracking-wider text-sm rounded-lg border-slate-300 border px-3 py-2 font-mono font-bold focus:outline-none focus:border-amber-600" required>
+                    <input type="text" x-model="sisoAssignedSchoolId" placeholder="e.g. ATAK983" class="w-full text-center uppercase tracking-wider text-sm rounded-lg border-slate-300 border px-3 py-2 font-mono font-bold focus:outline-none focus:border-amber-600" required>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">SISO Inspection PIN</label>
-                    <input type="password" x-model="enteredSisoPin" placeholder="Default: 2026" autofocus class="w-full text-center tracking-widest text-lg rounded-lg border-slate-300 border px-3 py-2 focus:outline-none focus:border-amber-600 font-bold" maxlength="8" required>
+                    <input type="password" x-model="enteredSisoPin" placeholder="xxxx" autofocus class="w-full text-center tracking-widest text-lg rounded-lg border-slate-300 border px-3 py-2 focus:outline-none focus:border-amber-600 font-bold" maxlength="8" required>
                 </div>
                 <div class="flex gap-2 pt-1">
                     <button type="submit" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 rounded-lg transition shadow-sm">Enter SISO Portal</button>
@@ -959,7 +959,7 @@
                 <div class="w-12 h-12 bg-amber-100 text-amber-900 rounded-2xl flex items-center justify-center text-xl mx-auto mb-2 font-bold shadow-sm">
                     <i class="fa fa-signature"></i>
                 </div>
-                <h3 class="text-base font-black text-slate-900">SISO Circuit Supervision Feedback</h3>
+                <h3 class="text-base font-black text-slate-900">SISO Supervision Feedback</h3>
                 <p class="text-xs text-slate-500 mt-1">Official Circuit Quality & Lesson Delivery Recommendations</p>
             </div>
 
@@ -6942,7 +6942,7 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
 
                 verifyFeatureCode(customCode) {
                     const code = (customCode || this.enteredFeatureCode || '').trim();
-                    const validMasterCodes = ['1863', '0543521863', 'EDUVET-PRO-2026', 'GES-TEACHER-PRO', 'GES-SCHOOL-PRO', 'GES-YEARLY-PRO', 'ACCRA-INST-882'];
+                    const validMasterCodes = ['9523','EDUVET63', 'EDUVET-PRO-2026', 'GES-TEACHER-PRO', 'GES-SCHOOL-PRO', 'GES-YEARLY-PRO', 'ACCRA-INST-882'];
                     if (validMasterCodes.includes(code) || code.toUpperCase().startsWith('PRO-') || code.toUpperCase().startsWith('GES-')) {
                         const tid = (this.activeTeacher ? this.activeTeacher.id : 'GES-001');
                         const sid = this.authenticatedSchoolId || 'ATAK-983';
@@ -7625,14 +7625,14 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                 verifySisoPin() {
                     const pin = (this.enteredSisoPin || '').trim();
                     const targetSchoolId = (this.sisoAssignedSchoolId || this.authenticatedSchoolId || 'ATAK-983').trim().toUpperCase();
-                    if (pin === '2026' || pin === '0543') {
+                    if (pin === 'S2026' || pin === 'S0543') {
                         this.switchSisoSchool(targetSchoolId, false);
                         this.portalMode = 'siso';
                         this.showSisoPinModal = false;
                         this.enteredSisoPin = '';
                         this.sisoActiveWeek = 'all';
                     } else {
-                        alert('Incorrect SISO Inspection PIN (Use default: 2026)');
+                        alert('Incorrect SISO Inspection PIN. Please verify with your Circuit Supervisor.');
                         this.enteredSisoPin = '';
                     }
                 },
