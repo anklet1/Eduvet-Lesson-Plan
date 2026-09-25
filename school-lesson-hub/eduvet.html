@@ -28565,6 +28565,14 @@ Format: Return exactly a JSON object with:
                     const sid = this.authenticatedSchoolId || 'ATAK-983';
                     const cleanRef = ref.toUpperCase().replace(/[^A-Z0-9_-]/g, '');
 
+                    // Generate Unique Activation Code permanently tied to School ID
+                    const cleanSid = (sid || 'ATAK-983').replace(/[^A-Z0-9]/g, '');
+                    const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+                    let randToken = '';
+                    for (let i = 0; i < 4; i++) randToken += chars.charAt(Math.floor(Math.random() * chars.length));
+                    const uniqueSchoolCode = `EDV-${cleanSid}-${randToken}`;
+                    const registeredTeacherIds = (this.teachers || []).map(t => t.id);
+
                     // Check Firestore if reference was already claimed
                     if (typeof db !== 'undefined' && db && db.collection) {
                         try {
@@ -28575,9 +28583,10 @@ Format: Return exactly a JSON object with:
                                 return;
                             }
 
-                            // Register transaction in Firestore to prevent any reuse
+                            // 1. Register transaction in Firestore
                             await db.collection('paystack_transactions').doc(cleanRef).set({
                                 reference: cleanRef,
+                                activationCode: uniqueSchoolCode,
                                 teacherId: tid,
                                 schoolId: sid,
                                 plan: this.selectedProPlan || 'teacher_term',
@@ -28585,9 +28594,27 @@ Format: Return exactly a JSON object with:
                                 status: 'claimed'
                             });
 
+                            // 2. Register School-Locked Activation Key in Firestore
+                            await db.collection('activation_keys').doc(uniqueSchoolCode).set({
+                                code: uniqueSchoolCode,
+                                plan: this.selectedProPlan || 'teacher_term',
+                                targetSchoolId: sid,
+                                schoolName: this.activeSchoolName || 'Authorized School',
+                                paystackReference: cleanRef,
+                                status: (this.selectedProPlan === 'teacher_term' ? 'used' : 'active'),
+                                createdAt: new Date().toISOString(),
+                                issuedBy: 'Paystack Automated Gateway',
+                                targetTeacherId: tid,
+                                usedBy: tid,
+                                usedBySchool: sid,
+                                usedAt: new Date().toISOString(),
+                                registeredTeachers: registeredTeacherIds,
+                                redeemedTeachers: [tid]
+                            });
+
                             this.showPaystackModal = false;
-                            this.confirmPaymentSuccess('Paystack Ref: ' + cleanRef);
-                            alert(`🎉 Paystack Payment Verified!\n\nTransaction Reference [${cleanRef}] has been registered and verified in real time. All Pro features and full term lessons are now unlocked.`);
+                            this.confirmPaymentSuccess('Paystack Ref: ' + cleanRef + ' (' + uniqueSchoolCode + ')');
+                            alert(`🎉 Paystack Payment Verified!\n\nUnique School Activation Code Generated: [${uniqueSchoolCode}]\n\n🔒 This activation code is strictly tied to School ID: ${sid} (${this.activeSchoolName || 'Your School'}). Teachers not registered under this school cannot use this code.\n\nAll Pro features and full term lessons are now unlocked.`);
                             return;
                         } catch (e) {
                             console.warn('Firestore transaction check notice:', e.message);
@@ -28604,8 +28631,8 @@ Format: Return exactly a JSON object with:
                     localStorage.setItem('eduvet_claimed_paystack_refs', JSON.stringify(claimedRefs));
 
                     this.showPaystackModal = false;
-                    this.confirmPaymentSuccess('Paystack Ref: ' + cleanRef);
-                    alert(`🎉 Paystack Payment Registered!\n\nTransaction Reference [${cleanRef}] has been verified. All Pro features and full term lessons are now unlocked.`);
+                    this.confirmPaymentSuccess('Paystack Ref: ' + cleanRef + ' (' + uniqueSchoolCode + ')');
+                    alert(`🎉 Paystack Payment Registered!\n\nUnique School Activation Code Generated: [${uniqueSchoolCode}]\n\n🔒 This code is strictly locked to School ID: ${sid}. Teachers not registered under this school cannot use it.\n\nAll Pro features and full term lessons are now unlocked.`);
                 },
 
                 async verifyActivationCode(inputCode) {
@@ -28616,7 +28643,8 @@ Format: Return exactly a JSON object with:
                     }
 
                     const tid = (this.activeTeacher ? this.activeTeacher.id : 'GES-001');
-                    const sid = this.authenticatedSchoolId || 'ATAK-983';
+                    const sid = (this.authenticatedSchoolId || 'ATAK-983').trim().toUpperCase();
+                    const cleanSid = sid.replace(/[^A-Z0-9]/g, '');
 
                     // 1. Check Real-Time Firestore activation_keys collection
                     if (typeof db !== 'undefined' && db && db.collection) {
@@ -28624,29 +28652,55 @@ Format: Return exactly a JSON object with:
                             const keyDoc = await db.collection('activation_keys').doc(code).get();
                             if (keyDoc.exists) {
                                 const data = keyDoc.data();
-                                if (data.status === 'used') {
-                                    alert(`🔒 This Activation Code has already been redeemed by Staff ID: ${data.usedBy || 'another user'} on ${data.usedAt ? new Date(data.usedAt).toLocaleDateString() : 'a previous date'}.\n\nActivation codes are strictly single-use. If you need a new code, please contact Felix Fleku at 0543521863.`);
+                                const codeSchoolId = (data.targetSchoolId || '').trim().toUpperCase();
+
+                                // STRICT SCHOOL ID LOCK: Code cannot be used outside its assigned school!
+                                if (codeSchoolId && codeSchoolId !== sid) {
+                                    alert(`🔒 Access Denied: Cross-School Activation Blocked!\n\nThis Activation Code is strictly tied to School ID: ${codeSchoolId} (${data.schoolName || 'Authorized School'}).\n\nYour current School ID is ${sid}. Teachers not registered under School ID ${codeSchoolId} cannot use this code.`);
                                     return;
                                 }
 
-                                if (data.targetTeacherId && data.targetTeacherId !== tid) {
-                                    alert(`🔒 This Activation Code was generated specifically for Staff ID: ${data.targetTeacherId}. Your active Staff ID is ${tid}.\n\nPlease contact Felix Fleku at 0543521863.`);
-                                    return;
+                                // STRICT TEACHER ENROLLMENT LOCK: Teacher must be registered under this school!
+                                if (this.teachers && this.teachers.length > 0) {
+                                    const isTeacherRegistered = this.teachers.some(t => t.id === tid);
+                                    if (!isTeacherRegistered) {
+                                        alert(`🔒 Access Denied: Unregistered Teacher!\n\nStaff ID [${tid}] is not registered under School ID [${sid}]. Only verified teachers enrolled in this school's faculty directory can activate this license.`);
+                                        return;
+                                    }
                                 }
 
-                                // Mark key as used in Firestore in real time
-                                await db.collection('activation_keys').doc(code).update({
-                                    status: 'used',
-                                    usedBy: tid,
-                                    usedBySchool: sid,
-                                    usedAt: new Date().toISOString()
-                                });
+                                // Check Single-Use vs School-Wide Plan
+                                if (data.plan === 'teacher_term') {
+                                    if (data.status === 'used' && data.usedBy !== tid) {
+                                        alert(`🔒 This individual Teacher Pro code has already been redeemed by Staff ID: ${data.usedBy || 'another user'} on ${data.usedAt ? new Date(data.usedAt).toLocaleDateString() : 'a previous date'}.\n\nIndividual teacher codes are strictly single-use. If you need your own code, please contact Felix Fleku at 0543521863.`);
+                                        return;
+                                    }
+
+                                    // Mark key as used in Firestore in real time
+                                    await db.collection('activation_keys').doc(code).update({
+                                        status: 'used',
+                                        usedBy: tid,
+                                        usedBySchool: sid,
+                                        usedAt: new Date().toISOString()
+                                    });
+                                } else {
+                                    // School Institutional Plan: record redeeming teacher
+                                    const redeemedTeachers = data.redeemedTeachers || [];
+                                    if (!redeemedTeachers.includes(tid)) {
+                                        redeemedTeachers.push(tid);
+                                        await db.collection('activation_keys').doc(code).update({
+                                            redeemedTeachers: redeemedTeachers,
+                                            lastRedeemedBy: tid,
+                                            lastRedeemedAt: new Date().toISOString()
+                                        });
+                                    }
+                                }
 
                                 this.showDirectMomoModal = false;
                                 this.showFeatureLockModal = false;
                                 this.showProUpgradeModal = false;
                                 this.confirmPaymentSuccess('Activation Code: ' + code, data.plan || this.selectedProPlan);
-                                alert(`🎉 License Activated Successfully!\n\nOfficial Activation Code [${code}] has been verified in real time. All Pro features and full term lesson plans are now unlocked.`);
+                                alert(`🎉 License Activated Successfully!\n\nActivation Code [${code}] has been verified and locked to School ID: ${sid}. All Pro features and full term lesson plans are now unlocked for Staff ID: ${tid}.`);
                                 return;
                             }
                         } catch (err) {
@@ -28654,8 +28708,17 @@ Format: Return exactly a JSON object with:
                         }
                     }
 
-                    // 2. Owner Cryptographic / Algorithmic Signature Verification
-                    if (this.isValidOwnerAlgorithmicCode(code)) {
+                    // 2. Owner Cryptographic / Algorithmic Signature Verification with School ID enforcement
+                    if (this.isValidOwnerAlgorithmicCode(code, sid)) {
+                        // Ensure teacher is registered in current school
+                        if (this.teachers && this.teachers.length > 0) {
+                            const isTeacherRegistered = this.teachers.some(t => t.id === tid);
+                            if (!isTeacherRegistered) {
+                                alert(`🔒 Access Denied: Staff ID [${tid}] is not registered under School ID [${sid}]. Only registered teachers can activate this license.`);
+                                return;
+                            }
+                        }
+
                         const claimedAlgo = JSON.parse(localStorage.getItem('eduvet_claimed_algo_codes') || '[]');
                         if (claimedAlgo.includes(code)) {
                             alert('🔒 This Activation Code has already been claimed on this device.');
@@ -28668,20 +28731,31 @@ Format: Return exactly a JSON object with:
                         this.showFeatureLockModal = false;
                         this.showProUpgradeModal = false;
                         this.confirmPaymentSuccess('Activation Code: ' + code);
-                        alert(`🎉 License Activated Successfully!\n\nActivation Code verified. All Pro features and full term lessons are now unlocked.`);
+                        alert(`🎉 License Activated Successfully!\n\nActivation Code verified for School ID [${sid}]. All Pro features and full term lessons are now unlocked.`);
                         return;
                     }
 
                     // 3. If unverified: REJECT!
-                    alert('❌ Invalid Activation Code.\n\nThe code entered is not registered or recognized. Please ensure you have completed payment and received an official code from Felix Fleku at 0543521863.');
+                    alert('❌ Invalid Activation Code.\n\nThe code entered is not registered, or does not belong to your School ID (' + sid + '). Please ensure you have completed payment and received an official code from Felix Fleku at 0543521863.');
                 },
 
-                isValidOwnerAlgorithmicCode(code) {
+                isValidOwnerAlgorithmicCode(code, activeSchoolId) {
                     if (!code || typeof code !== 'string') return false;
                     const clean = code.trim().toUpperCase();
-                    // High-entropy format EDV-XXXX-XXXX or FLEKU-XXXX generated by owner
+                    const cleanSid = (activeSchoolId || 'ATAK-983').replace(/[^A-Z0-9]/g, '').toUpperCase();
+
+                    // Check school prefix in format: EDV-[SCHOOL_ID]-[TOKEN]
+                    if (clean.startsWith('EDV-')) {
+                        const parts = clean.split('-');
+                        if (parts.length >= 3) {
+                            const codeSchool = parts[1].replace(/[^A-Z0-9]/g, '');
+                            if (cleanSid && codeSchool !== cleanSid) {
+                                return false; // Cross-school mismatch rejected!
+                            }
+                            return parts[2].length >= 3;
+                        }
+                    }
                     if (clean.startsWith('FLEKU-') && clean.length >= 10) return true;
-                    if (clean.startsWith('EDV-') && clean.length >= 12) return true;
                     return false;
                 },
 
@@ -28689,13 +28763,14 @@ Format: Return exactly a JSON object with:
                     const tid = this.keyGenForm.teacherId || '';
                     const sid = this.authenticatedSchoolId || 'ATAK-983';
                     const plan = this.keyGenForm.plan || 'teacher_term';
+                    const cleanSid = sid.replace(/[^A-Z0-9]/g, '');
 
                     const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
-                    let rand1 = '';
-                    let rand2 = '';
-                    for (let i = 0; i < 4; i++) rand1 += chars.charAt(Math.floor(Math.random() * chars.length));
-                    for (let i = 0; i < 4; i++) rand2 += chars.charAt(Math.floor(Math.random() * chars.length));
-                    const newCode = `EDV-${rand1}-${rand2}`;
+                    let randToken = '';
+                    for (let i = 0; i < 4; i++) randToken += chars.charAt(Math.floor(Math.random() * chars.length));
+                    // Code format is strictly tied to School ID: EDV-[SCHOOL_ID]-[TOKEN]
+                    const newCode = `EDV-${cleanSid}-${randToken}`;
+                    const registeredTeacherIds = (this.teachers || []).map(t => t.id);
 
                     const keyObj = {
                         code: newCode,
@@ -28705,6 +28780,8 @@ Format: Return exactly a JSON object with:
                         createdAt: new Date().toLocaleString(),
                         targetTeacherId: tid,
                         targetSchoolId: sid,
+                        schoolName: this.activeSchoolName || 'Authorized School',
+                        registeredTeachers: registeredTeacherIds,
                         usedBy: null,
                         usedAt: null
                     };
@@ -28720,7 +28797,7 @@ Format: Return exactly a JSON object with:
                     }
 
                     const planLabel = plan === 'teacher_term' ? 'Teacher Pro (Termly GH₵ 49.99)' : (plan === 'school_term' ? 'School Termly License (GH₵ 199.99)' : 'School Yearly Institutional (GH₵ 399.99)');
-                    const waText = `Hello ${teacherName || 'Teacher'}, your official Eduvet Pro Activation Code is: ${newCode} (${planLabel}). Enter this code in Eduvet to unlock your full term lesson plans.`;
+                    const waText = `Hello ${teacherName || 'Teacher'}, your official Eduvet Pro Activation Code is: ${newCode} (${planLabel}). 🔒 This code is strictly locked to School ID: ${sid} (${this.activeSchoolName || 'Your School'}). Teachers from other schools cannot use this code. Enter it in Eduvet to unlock your lesson plans.`;
                     keyObj.whatsappUrl = `https://wa.me/${(teacherContact || '233543521863').replace(/\D/g, '')}?text=${encodeURIComponent(waText)}`;
 
                     if (typeof db !== 'undefined' && db && db.collection) {
