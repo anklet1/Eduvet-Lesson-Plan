@@ -20,11 +20,28 @@
     {
       "source": "/eduvet.css",
       "destination": "/eduvet.css"
+    },
+    {
+      "source": "/sw.js",
+      "destination": "/sw.js"
     }
   ],
   "headers": [
     {
-      "source": "/(.*\\.(css|js|woff2|woff|ttf|png|svg|ico|webp))",
+      "source": "/sw.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        },
+        {
+          "key": "Service-Worker-Allowed",
+          "value": "/"
+        }
+      ]
+    },
+    {
+      "source": "/eduvet.css",
       "headers": [
         {
           "key": "Cache-Control",
@@ -33,16 +50,7 @@
       ]
     },
     {
-      "source": "/(.*\\.html)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
-        }
-      ]
-    },
-    {
-      "source": "/(.*)",
+      "source": "/:path*",
       "headers": [
         {
           "key": "X-Content-Type-Options",
