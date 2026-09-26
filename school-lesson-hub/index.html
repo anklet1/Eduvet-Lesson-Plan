@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduVet — Sovereign Offline School Operating System & NaCCA Assessment Engine</title>
-    <meta name="description" content="EduVet is Ghana's offline-first school operating system. Generate authentic 3-Phase NaCCA lesson notes, compute GES 50/50 SBA continuous assessments, calculate WAEC Best 6 aggregates, and print terminal report cards with zero internet required.">
-    <meta name="theme-color" content="#0B1220">
+    <title>EduVet — Simple Sovereign Offline School Operating System & NaCCA Engine</title>
+    <meta name="description" content="Simple, offline-first school operating system for Ghanaian Basic Schools. Generate 3-Phase NaCCA lesson notes, compute GES 50/50 SBA continuous assessments, and print terminal reports with zero data.">
+    <meta name="theme-color" content="#FFFFFF">
     <link rel="canonical" href="https://eduvet.edubyteafrica.com/">
 
     <!-- Open Graph / Social Meta -->
-    <meta property="og:title" content="EduVet — Sovereign Offline School OS & NaCCA Assessment Engine">
+    <meta property="og:title" content="EduVet — Simple Offline School OS & NaCCA Engine">
     <meta property="og:description" content="100% Offline 3-Phase NaCCA lesson planning, GES 50/50 Continuous Assessment, and WAEC Best 6 aggregates for Ghanaian Basic & Secondary Schools. Zero data required.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://eduvet.edubyteafrica.com/">
 
-    <!-- Typography: Plus Jakarta Sans (Headings & Body) + JetBrains Mono (Scores & Telemetry) -->
+    <!-- Typography: Plus Jakarta Sans & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -24,17 +24,21 @@
 
     <style>
         :root {
-            --brand-navy: #0B1220;
-            --brand-blue: #2563EB;
-            --brand-cyan: #06B6D4;
-            --brand-amber: #F59E0B;
-            --brand-soft: #F8FAFC;
             --brand-white: #FFFFFF;
+            --brand-black: #0F172A;
+            --brand-sea-blue: #0284C7;
+            --brand-sea-blue-dark: #0369A1;
+            --brand-sea-blue-light: #E0F2FE;
+            --brand-cyan: #06B6D4;
+            --brand-blue: #2563EB;
+            --brand-navy: #0B1220;
+            --brand-amber: #F59E0B;
+            --brand-slate: #F8FAFC;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--brand-white);
+            background-color: #FFFFFF;
             color: #0F172A;
             -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
@@ -44,30 +48,71 @@
             font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
         }
 
-        /* Modern Web Guidance: Deferred Rendering for below-the-fold sections */
+        /* Deferred rendering for below-the-fold sections */
         .cv-auto {
             content-visibility: auto;
             contain-intrinsic-size: auto 600px;
         }
 
-        /* Glassmorphism Navigation */
-        .glass-nav {
-            background-color: rgba(11, 18, 32, 0.92);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+        /* Interactive Swipe Track Slider */
+        .swipe-slider-track {
+            position: relative;
+            background: #F1F5F9;
+            border: 1px solid #CBD5E1;
+            border-radius: 9999px;
+            height: 52px;
+            overflow: hidden;
+            user-select: none;
+            touch-action: pan-y;
         }
 
-        /* Swipe Transition Screen Overlay */
+        .swipe-slider-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 0%;
+            background: linear-gradient(90deg, #E0F2FE, #BAE6FD);
+            border-radius: 9999px;
+            transition: width 0.1s ease;
+        }
+
+        .swipe-slider-handle {
+            position: absolute;
+            left: 4px;
+            top: 4px;
+            bottom: 4px;
+            width: 44px;
+            height: 44px;
+            background: #0284C7;
+            color: #FFFFFF;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.35);
+            transition: transform 0.05s ease, background-color 0.2s;
+            z-index: 2;
+        }
+
+        .swipe-slider-handle:active {
+            cursor: grabbing;
+            background: #0369A1;
+            transform: scale(1.05);
+        }
+
+        /* Screen Slide Overlay for Portal Navigation */
         #swipeTransitionOverlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: #0B1220;
+            background: #FFFFFF;
             z-index: 9999;
             transform: translateX(100%);
-            transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             pointer-events: none;
             display: flex;
             flex-direction: column;
@@ -80,74 +125,10 @@
             pointer-events: auto;
         }
 
-        /* Pulse Dot */
-        .pulse-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: #06B6D4;
-            box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.7);
-            animation: pulse-cyan 2s infinite;
-        }
-
-        @keyframes pulse-cyan {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(6, 182, 212, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(6, 182, 212, 0); }
-        }
-
-        /* Interactive Swipe Track Slider */
-        .swipe-slider-track {
-            position: relative;
-            background: rgba(11, 18, 32, 0.08);
-            border: 1px solid rgba(37, 99, 235, 0.25);
-            border-radius: 9999px;
-            height: 58px;
-            overflow: hidden;
-            user-select: none;
-            touch-action: pan-y;
-        }
-
-        .swipe-slider-fill {
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 0%;
-            background: linear-gradient(90deg, rgba(37, 99, 235, 0.15), rgba(6, 182, 212, 0.35));
-            border-radius: 9999px;
-            transition: width 0.1s ease;
-        }
-
-        .swipe-slider-handle {
-            position: absolute;
-            left: 4px;
-            top: 4px;
-            bottom: 4px;
-            width: 50px;
-            height: 50px;
-            background: #2563EB;
-            color: #FFFFFF;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: grab;
-            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
-            transition: transform 0.05s ease, background-color 0.2s;
-            z-index: 2;
-        }
-
-        .swipe-slider-handle:active {
-            cursor: grabbing;
-            background: #1D4ED8;
-            transform: scale(1.04);
-        }
-
-        /* Custom Scrollbar */
+        /* Subtle scrollbars */
         ::-webkit-scrollbar {
-            width: 7px;
-            height: 7px;
+            width: 6px;
+            height: 6px;
         }
         ::-webkit-scrollbar-track {
             background: #F8FAFC;
@@ -165,1054 +146,654 @@
 </head>
 <body class="bg-white text-slate-900 flex flex-col min-h-screen">
 
-    <!-- Top Sovereign Infrastructure Telemetry Strip -->
-    <aside class="bg-[#0B1220] text-slate-300 text-xs py-2 px-4 border-b border-slate-800">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-1 sm:gap-4 text-[11px]">
+    <!-- Top Sovereign Offline Telemetry Banner (Simple & Clean) -->
+    <div class="bg-slate-50 border-b border-slate-200 py-2 px-4 text-xs">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-slate-600">
             <div class="flex items-center gap-2">
-                <span class="pulse-dot"></span>
-                <span class="text-[#06B6D4] font-mono font-semibold uppercase tracking-wider">OFFLINE LOCAL-LAN SYNC READY</span>
-                <span class="text-slate-600 hidden sm:inline">&bull;</span>
-                <span class="text-slate-400 font-mono hidden sm:inline">ZERO-DATA AIR-GAP ENGINE</span>
+                <span class="inline-block w-2 h-2 rounded-full bg-[#0284C7] animate-pulse"></span>
+                <span class="text-[#0284C7] font-mono font-bold uppercase tracking-wider text-[11px]">100% OFFLINE LOCAL-LAN ENGINE</span>
+                <span class="text-slate-300 hidden sm:inline">&bull;</span>
+                <span class="text-slate-500 hidden sm:inline font-medium">Zero Data Required in Classroom</span>
             </div>
-            <div class="flex items-center gap-4 text-slate-300">
-                <span class="font-mono text-emerald-400 flex items-center gap-1.5">
-                    <i class="fa fa-shield-check"></i> GES &bull; NaCCA &bull; WAEC Compliant
+            <div class="flex items-center gap-3 text-xs">
+                <span class="font-medium text-slate-700 flex items-center gap-1.5">
+                    <i class="fa fa-shield-halved text-[#0284C7]"></i> GES &bull; NaCCA &bull; WAEC Compliant
                 </span>
-                <span class="text-slate-600 hidden md:inline">|</span>
-                <a href="https://wa.me/233543521863?text=Hello%20EduVet%20Desk,%20we%20want%20to%20deploy%20EduVet%20in%20our%20school." target="_blank" rel="noopener noreferrer" class="hover:text-[#06B6D4] transition flex items-center gap-1.5 font-medium">
-                    <i class="fa-brands fa-whatsapp text-emerald-400"></i> School Desk: +233 54 352 1863
+                <span class="text-slate-300">|</span>
+                <a href="https://wa.me/233543521863?text=Hello%20EduVet%20Desk,%20I%20would%20like%20to%20request%20a%20school%20setup%20for%20my%20school." target="_blank" rel="noopener noreferrer" class="text-[#0284C7] hover:text-[#0369A1] font-semibold flex items-center gap-1 transition">
+                    <i class="fa-brands fa-whatsapp text-emerald-600"></i> Setup Desk: +233 54 352 1863
                 </a>
             </div>
         </div>
-    </aside>
+    </div>
 
-    <!-- Main Navigation Header (Strictly 5 Parent-Only Items) -->
-    <header class="sticky top-0 z-50 glass-nav border-b border-slate-800/80 shadow-md">
+    <!-- Navigation Header (Strictly 5 Parent-Only Menu Items) -->
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
             
             <!-- Brand Logo -->
             <a href="#top" class="flex items-center gap-3 group focus:outline-none" aria-label="EduVet Home">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#2563EB] to-[#06B6D4] flex items-center justify-center text-white font-black text-lg shadow-md group-hover:scale-105 transition-transform">
+                <div class="w-10 h-10 rounded-xl bg-[#0284C7] text-white flex items-center justify-center font-black text-xl shadow-sm group-hover:bg-[#0369A1] transition">
                     <i class="fa fa-graduation-cap"></i>
                 </div>
                 <div>
-                    <div class="flex items-center gap-1.5">
-                        <span class="text-white font-black text-xl tracking-tight">EduVet</span>
-                        <span class="bg-[#2563EB] text-white text-[9px] font-mono font-extrabold px-1.5 py-0.5 rounded uppercase tracking-wider">OS</span>
-                    </div>
-                    <p class="text-[10px] text-[#06B6D4] font-medium tracking-wide">By Edubyte Africa</p>
+                    <span class="text-2xl font-black text-slate-900 tracking-tight">Edu<span class="text-[#0284C7]">Vet</span></span>
+                    <span class="text-[10px] uppercase font-mono font-bold bg-[#E0F2FE] text-[#0369A1] px-1.5 py-0.5 rounded ml-1.5">OS</span>
+                    <p class="text-[10px] text-slate-400 font-medium">By Edubyte Africa</p>
                 </div>
             </a>
 
-            <!-- Desktop Menu: Exactly 5 Parent-Only Menu Items (No Numbers, No Submenus) -->
-            <nav class="hidden lg:flex items-center space-x-1" aria-label="Primary Navigation">
-                <a href="#features" class="text-slate-300 hover:text-white px-3.5 py-2 rounded-lg text-sm font-semibold hover:bg-slate-800/60 transition">Features</a>
-                <a href="#offline-engine" class="text-slate-300 hover:text-white px-3.5 py-2 rounded-lg text-sm font-semibold hover:bg-slate-800/60 transition">Offline Engine</a>
-                <a href="#sba-grading" class="text-slate-300 hover:text-white px-3.5 py-2 rounded-lg text-sm font-semibold hover:bg-slate-800/60 transition">SBA Grading</a>
-                <a href="#pricing" class="text-slate-300 hover:text-white px-3.5 py-2 rounded-lg text-sm font-semibold hover:bg-slate-800/60 transition">Pricing</a>
-                <a href="#schools" class="text-slate-300 hover:text-white px-3.5 py-2 rounded-lg text-sm font-semibold hover:bg-slate-800/60 transition">Schools</a>
+            <!-- Desktop Navigation: Exactly 5 Parent-Only Items -->
+            <nav class="hidden lg:flex items-center gap-1 xl:gap-2" aria-label="Main Navigation">
+                <a href="#features" class="text-slate-700 hover:text-[#0284C7] px-3.5 py-2 rounded-lg text-sm font-semibold hover:bg-slate-50 transition">Features</a>
+                <a href="#offline-engine" class="text-slate-700 hover:text-[#0284C7] px-3.5 py-2 rounded-lg text-sm font-semibold hover:bg-slate-50 transition">Offline Engine</a>
+                <a href="#sba-grading" class="text-slate-700 hover:text-[#0284C7] px-3.5 py-2 rounded-lg text-sm font-semibold hover:bg-slate-50 transition">SBA Grading</a>
+                <a href="#pricing" class="text-slate-700 hover:text-[#0284C7] px-3.5 py-2 rounded-lg text-sm font-semibold hover:bg-slate-50 transition">Pricing</a>
+                <a href="#schools" class="text-slate-700 hover:text-[#0284C7] px-3.5 py-2 rounded-lg text-sm font-semibold hover:bg-slate-50 transition">Schools</a>
             </nav>
 
-            <!-- Desktop Action Group -->
+            <!-- Actions: Request Setup (WhatsApp) & Launch Portal -->
             <div class="hidden sm:flex items-center gap-3">
-                <button type="button" onclick="triggerSwipeLogin()" class="bg-[#2563EB] hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow-md transition flex items-center gap-2 cursor-pointer">
-                    <span>Launch Portal</span>
-                    <i class="fa fa-arrow-right text-xs"></i>
+                <button type="button" onclick="triggerSwipeLogin()" class="text-slate-700 hover:text-[#0284C7] font-bold text-sm px-4 py-2 rounded-xl transition cursor-pointer">
+                    Teacher Login
                 </button>
+                <a href="https://wa.me/233543521863?text=Hello%20EduVet%20Desk,%20I%20would%20like%20to%20request%20a%20school%20setup%20for%20my%20school." target="_blank" rel="noopener noreferrer" class="bg-[#0284C7] hover:bg-[#0369A1] active:bg-[#075985] text-white font-bold text-sm px-5 py-2.5 rounded-xl shadow-sm transition flex items-center gap-2 cursor-pointer">
+                    <i class="fa-brands fa-whatsapp text-base"></i>
+                    <span>Request School Setup</span>
+                </a>
             </div>
 
-            <!-- Mobile Hamburger Toggle -->
-            <div class="lg:hidden flex items-center">
-                <button id="mobileMenuBtn" type="button" class="text-slate-300 hover:text-white p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB]" aria-label="Toggle navigation menu" aria-expanded="false">
-                    <i id="menuIcon" class="fa fa-bars text-xl"></i>
+            <!-- Mobile Menu Toggle Button -->
+            <div class="flex items-center gap-2 lg:hidden">
+                <a href="https://wa.me/233543521863?text=Hello%20EduVet%20Desk,%20I%20would%20like%20to%20request%20a%20school%20setup%20for%20my%20school." target="_blank" rel="noopener noreferrer" class="bg-[#0284C7] text-white text-xs font-bold px-3 py-2 rounded-lg flex items-center gap-1 sm:hidden">
+                    <i class="fa-brands fa-whatsapp"></i> Setup
+                </a>
+                <button type="button" id="mobileMenuBtn" class="p-2 rounded-lg text-slate-700 hover:bg-slate-100 focus:outline-none cursor-pointer" aria-label="Toggle Navigation Menu" aria-expanded="false">
+                    <i class="fa fa-bars text-xl" id="menuIcon"></i>
                 </button>
             </div>
         </div>
 
-        <!-- Mobile Navigation Drawer: Exactly 5 Parent-Only Menu Items (Instant Auto-Dismissal) -->
-        <div id="mobileDrawer" class="hidden lg:hidden bg-[#0B1220] border-b border-slate-800 px-4 pt-3 pb-6 space-y-2">
-            <a href="#features" onclick="closeMobileDrawer()" class="mobile-nav-link block text-slate-200 hover:text-[#06B6D4] hover:bg-slate-900 px-3 py-2.5 rounded-lg text-base font-semibold transition">Features</a>
-            <a href="#offline-engine" onclick="closeMobileDrawer()" class="mobile-nav-link block text-slate-200 hover:text-[#06B6D4] hover:bg-slate-900 px-3 py-2.5 rounded-lg text-base font-semibold transition">Offline Engine</a>
-            <a href="#sba-grading" onclick="closeMobileDrawer()" class="mobile-nav-link block text-slate-200 hover:text-[#06B6D4] hover:bg-slate-900 px-3 py-2.5 rounded-lg text-base font-semibold transition">SBA Grading</a>
-            <a href="#pricing" onclick="closeMobileDrawer()" class="mobile-nav-link block text-slate-200 hover:text-[#06B6D4] hover:bg-slate-900 px-3 py-2.5 rounded-lg text-base font-semibold transition">Pricing</a>
-            <a href="#schools" onclick="closeMobileDrawer()" class="mobile-nav-link block text-slate-200 hover:text-[#06B6D4] hover:bg-slate-900 px-3 py-2.5 rounded-lg text-base font-semibold transition">Schools</a>
+        <!-- Mobile Navigation Drawer: Exactly 5 Parent-Only Menu Items -->
+        <div id="mobileDrawer" class="hidden lg:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-6 space-y-2">
+            <a href="#features" onclick="closeMobileDrawer()" class="mobile-nav-link block text-slate-800 hover:text-[#0284C7] hover:bg-slate-50 px-3 py-2.5 rounded-lg text-base font-semibold transition">Features</a>
+            <a href="#offline-engine" onclick="closeMobileDrawer()" class="mobile-nav-link block text-slate-800 hover:text-[#0284C7] hover:bg-slate-50 px-3 py-2.5 rounded-lg text-base font-semibold transition">Offline Engine</a>
+            <a href="#sba-grading" onclick="closeMobileDrawer()" class="mobile-nav-link block text-slate-800 hover:text-[#0284C7] hover:bg-slate-50 px-3 py-2.5 rounded-lg text-base font-semibold transition">SBA Grading</a>
+            <a href="#pricing" onclick="closeMobileDrawer()" class="mobile-nav-link block text-slate-800 hover:text-[#0284C7] hover:bg-slate-50 px-3 py-2.5 rounded-lg text-base font-semibold transition">Pricing</a>
+            <a href="#schools" onclick="closeMobileDrawer()" class="mobile-nav-link block text-slate-800 hover:text-[#0284C7] hover:bg-slate-50 px-3 py-2.5 rounded-lg text-base font-semibold transition">Schools</a>
             
-            <div class="pt-3 border-t border-slate-800 flex flex-col gap-2">
-                <button type="button" onclick="triggerSwipeLogin()" class="w-full bg-[#2563EB] hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-3 rounded-xl text-center text-sm shadow-md transition flex items-center justify-center gap-2">
-                    <i class="fa fa-arrow-right-to-bracket"></i>
+            <div class="pt-3 border-t border-slate-100 flex flex-col gap-2.5">
+                <a href="https://wa.me/233543521863?text=Hello%20EduVet%20Desk,%20I%20would%20like%20to%20request%20a%20school%20setup%20for%20my%20school." target="_blank" rel="noopener noreferrer" class="w-full bg-[#0284C7] hover:bg-[#0369A1] text-white font-bold py-3 rounded-xl text-center text-sm shadow-sm transition flex items-center justify-center gap-2">
+                    <i class="fa-brands fa-whatsapp text-lg"></i>
+                    <span>Request School Setup</span>
+                </a>
+                <button type="button" onclick="triggerSwipeLogin()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-3 rounded-xl text-center text-sm transition flex items-center justify-center gap-2">
+                    <i class="fa fa-arrow-right-to-bracket text-[#0284C7]"></i>
                     <span>Swipe into Login Page</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- HERO SECTION (Above the Fold — Immediate Render) -->
-    <main class="flex-grow">
-        <section id="top" class="relative bg-gradient-to-b from-[#0B1220] via-[#0F172A] to-slate-900 text-white pt-12 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
-            <!-- Ambient Tech Glow Background Elements -->
-            <div class="absolute -top-32 -left-32 w-96 h-96 bg-[#2563EB]/20 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="absolute top-1/3 -right-32 w-96 h-96 bg-[#06B6D4]/15 rounded-full blur-3xl pointer-events-none"></div>
-
-            <div class="max-w-7xl mx-auto">
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+    <!-- HERO SECTION (Simple, Clean, White Background with Sea Blue Accents) -->
+    <section id="top" class="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 bg-white border-b border-slate-100">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+                
+                <!-- Left Column: Copy & Primary WhatsApp Button -->
+                <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
                     
-                    <!-- Left Hero Content -->
-                    <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
-                        <div class="inline-flex items-center gap-2 bg-slate-800/80 border border-slate-700 px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-300 shadow-sm">
-                            <span class="w-2 h-2 rounded-full bg-[#F59E0B]"></span>
-                            <span>Ghana Education Service (GES) &bull; 100% NaCCA Standard</span>
-                        </div>
-
-                        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight sm:leading-none">
-                            Ghana's Sovereign <br class="hidden sm:inline">
-                            <span class="bg-gradient-to-r from-blue-400 via-[#06B6D4] to-cyan-300 bg-clip-text text-transparent">Offline School OS</span> <br>
-                            &amp; NaCCA Engine.
-                        </h1>
-
-                        <p class="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-normal">
-                            Equip your teachers with zero-data 3-Phase NaCCA daily lesson notes, 50/50 Continuous Assessment marksheets, WAEC Best 6 broadsheet aggregation, and batch terminal report card printing.
-                        </p>
-
-                        <!-- Telemetry Pill Indicators -->
-                        <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 pt-1 text-xs">
-                            <span class="bg-slate-800/90 text-[#06B6D4] border border-cyan-500/30 px-3 py-1.5 rounded-lg font-mono flex items-center gap-1.5">
-                                <i class="fa fa-wifi-slash text-cyan-400"></i> Zero Internet Required
-                            </span>
-                            <span class="bg-slate-800/90 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-lg font-mono flex items-center gap-1.5">
-                                <i class="fa fa-bolt"></i> 0ms Latency (Local Storage)
-                            </span>
-                            <span class="bg-slate-800/90 text-[#F59E0B] border border-amber-500/30 px-3 py-1.5 rounded-lg font-mono flex items-center gap-1.5">
-                                <i class="fa fa-stamp"></i> Headteacher Rubber Stamp
-                            </span>
-                        </div>
-
-                        <!-- High-Converting Action Group & Swipe Login Widget -->
-                        <div class="space-y-4 pt-2 max-w-lg mx-auto lg:mx-0">
-                            <!-- Direct Button to Trigger Swipe into Login -->
-                            <div class="flex flex-col sm:flex-row gap-3">
-                                <button type="button" onclick="triggerSwipeLogin()" class="flex-1 bg-[#2563EB] hover:bg-blue-600 active:bg-blue-700 text-white font-extrabold px-6 py-4 rounded-2xl text-base shadow-xl hover:shadow-blue-500/25 transition flex items-center justify-center gap-3 cursor-pointer group">
-                                    <span>Swipe into Login Page</span>
-                                    <i class="fa fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
-                                </button>
-                                <a href="#pricing" class="bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold px-5 py-4 rounded-2xl text-sm transition flex items-center justify-center gap-2">
-                                    <i class="fa fa-tags text-[#F59E0B]"></i> View Packages
-                                </a>
-                            </div>
-
-                            <!-- Interactive Native-Feeling Horizontal Swipe Track -->
-                            <div class="space-y-1.5 text-left">
-                                <div class="flex items-center justify-between text-[11px] text-slate-400 px-1 font-mono">
-                                    <span><i class="fa fa-hand-pointer text-[#06B6D4]"></i> Drag slider to launch portal</span>
-                                    <span class="text-[#06B6D4] font-bold">Target: ATAK-983</span>
-                                </div>
-                                <div class="swipe-slider-track" id="heroSwipeTrack">
-                                    <div class="swipe-slider-fill" id="heroSwipeFill"></div>
-                                    <div class="swipe-slider-handle" id="heroSwipeHandle" title="Slide right to login">
-                                        <i class="fa fa-angles-right text-base"></i>
-                                    </div>
-                                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none text-xs font-extrabold uppercase tracking-wider text-slate-400/80 font-mono">
-                                        &bull;&bull;&bull; Swipe to Enter EduVet &bull;&bull;&bull;
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Quick Social Proof Stats -->
-                        <div class="pt-4 border-t border-slate-800/80 grid grid-cols-3 gap-4 text-center lg:text-left">
-                            <div>
-                                <div class="font-mono text-xl sm:text-2xl font-black text-white">42+</div>
-                                <div class="text-[11px] text-slate-400">Schools Deployed</div>
-                            </div>
-                            <div>
-                                <div class="font-mono text-xl sm:text-2xl font-black text-[#06B6D4]">15 Wks</div>
-                                <div class="text-[11px] text-slate-400">NaCCA Term Schemes</div>
-                            </div>
-                            <div>
-                                <div class="font-mono text-xl sm:text-2xl font-black text-[#F59E0B]">50 / 50</div>
-                                <div class="text-[11px] text-slate-400">GES Continuous SBA</div>
-                            </div>
-                        </div>
+                    <!-- Standard Pill Badge -->
+                    <div class="inline-flex items-center gap-2 bg-[#E0F2FE] border border-[#BAE6FD] text-[#0369A1] px-3.5 py-1.5 rounded-full text-xs font-bold shadow-xs">
+                        <i class="fa fa-circle-check text-[#0284C7]"></i>
+                        <span>Ghana Education Service (GES) &bull; 100% NaCCA Standard</span>
                     </div>
 
-                    <!-- Right Hero: High-Fidelity EduVet Dashboard Illustration -->
-                    <div class="lg:col-span-5">
-                        <div class="relative mx-auto max-w-md lg:max-w-none">
+                    <!-- Main Headline: Black & Sea Blue -->
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.12]">
+                        Ghana's Simple <br class="hidden sm:inline">
+                        <span class="text-[#0284C7]">Offline School OS</span> <br>
+                        &amp; NaCCA Engine.
+                    </h1>
+
+                    <!-- Clean Subtitle -->
+                    <p class="text-lg sm:text-xl text-slate-600 max-w-2xl font-normal leading-relaxed mx-auto lg:mx-0">
+                        Equip your teachers with zero-data 3-Phase NaCCA daily lesson notes, 50/50 Continuous Assessment marksheets, WAEC Best 6 broadsheet aggregation, and batch terminal report card printing.
+                    </p>
+
+                    <!-- Trust Tags -->
+                    <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 pt-1 text-xs font-semibold text-slate-600">
+                        <span class="bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+                            <i class="fa fa-wifi-slash text-[#0284C7]"></i> Zero Internet Required
+                        </span>
+                        <span class="bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+                            <i class="fa fa-bolt text-[#0284C7]"></i> 0ms Latency (Local Storage)
+                        </span>
+                        <span class="bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+                            <i class="fa fa-stamp text-[#F59E0B]"></i> Headteacher Rubber Stamp
+                        </span>
+                    </div>
+
+                    <!-- Primary Action Group: WhatsApp Request + Login Button -->
+                    <div class="pt-4 space-y-4 max-w-md mx-auto lg:mx-0">
+                        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                            <!-- Button to Request School Setup (Direct WhatsApp) -->
+                            <a href="https://wa.me/233543521863?text=Hello%20EduVet%20Desk,%20I%20would%20like%20to%20request%20a%20school%20setup%20for%20my%20school." target="_blank" rel="noopener noreferrer" class="flex-1 bg-[#0284C7] hover:bg-[#0369A1] active:bg-[#075985] text-white font-extrabold px-6 py-4 rounded-2xl text-base shadow-lg shadow-sky-500/20 transition flex items-center justify-center gap-2.5 cursor-pointer">
+                                <i class="fa-brands fa-whatsapp text-xl"></i>
+                                <span>Request School Setup</span>
+                            </a>
                             
-                            <!-- Window Container -->
-                            <div class="bg-[#0B1220] rounded-3xl border border-slate-700/80 shadow-2xl overflow-hidden text-left">
-                                
-                                <!-- Window Chrome Header -->
-                                <div class="bg-slate-900/90 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
-                                    <div class="flex items-center gap-1.5">
-                                        <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span>
-                                        <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
-                                        <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
-                                    </div>
-                                    <div class="text-[11px] font-mono text-slate-300 bg-slate-950/70 border border-slate-800 px-3 py-1 rounded-md flex items-center gap-1.5">
-                                        <i class="fa fa-lock text-[#06B6D4] text-[10px]"></i>
-                                        <span>eduvet.edubyteafrica.com</span>
-                                        <span class="text-[9px] bg-emerald-950 text-emerald-300 px-1 rounded font-bold">OFFLINE</span>
-                                    </div>
-                                    <span class="text-[10px] font-mono text-[#06B6D4]">v2.4-STABLE</span>
-                                </div>
-
-                                <!-- Dashboard Mock Header Banner -->
-                                <div class="p-4 bg-gradient-to-r from-blue-950/80 to-slate-900 border-b border-slate-800 flex items-center justify-between">
-                                    <div>
-                                        <div class="flex items-center gap-2">
-                                            <span class="bg-blue-600 text-white font-mono text-[10px] font-black px-2 py-0.5 rounded">ATAK-983</span>
-                                            <h3 class="text-xs font-black text-white">ATAKORA D/A J.H.S.</h3>
-                                        </div>
-                                        <p class="text-[10px] text-slate-400 mt-0.5">Kwahu Afram Plains North &bull; Term 1 Academic Cycle</p>
-                                    </div>
-                                    <!-- Official Rubber Stamp Graphic -->
-                                    <div class="border-2 border-dashed border-rose-500/80 rounded-lg p-1.5 text-center rotate-[-3deg] bg-rose-950/40">
-                                        <div class="text-[7.5px] font-black text-rose-400 uppercase tracking-widest font-mono">OFFICIAL RUBBER STAMP</div>
-                                        <div class="text-[8.5px] font-black text-rose-300">GES VETTED &bull; APPROVED</div>
-                                        <div class="text-[7.5px] font-bold text-rose-400 font-mono">MR. FELIX FLEKU &bull; SISO</div>
-                                    </div>
-                                </div>
-
-                                <!-- Dashboard Inner Body: Lesson Generator & SBA Preview -->
-                                <div class="p-4 space-y-3.5 bg-slate-950/60 text-xs">
-                                    
-                                    <!-- NaCCA 3-Phase SMART Daily Lesson Card -->
-                                    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 space-y-2">
-                                        <div class="flex items-center justify-between">
-                                            <div class="flex items-center gap-1.5">
-                                                <span class="w-5 h-5 rounded bg-blue-600/30 text-blue-400 flex items-center justify-center font-bold text-[10px]">1</span>
-                                                <span class="font-black text-slate-200 text-xs">NaCCA SMART Daily Lesson</span>
-                                            </div>
-                                            <span class="text-[10px] font-mono text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800/40">Week 4 &bull; Basic 7</span>
-                                        </div>
-                                        <div class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800/70 text-[11px] space-y-1">
-                                            <div class="font-bold text-white flex items-center justify-between">
-                                                <span>Subject: Computing / ICT</span>
-                                                <span class="text-[#06B6D4] font-mono text-[10px]">70 Mins Delivery</span>
-                                            </div>
-                                            <div class="text-slate-400 text-[10px]">Strand: Productivity Software &bull; Sub-Strand: Formatting Word Documents</div>
-                                            <div class="font-mono text-[9px] text-amber-300 pt-0.5">Indicator: B7.2.1.1.2 Demonstrate practical skills in text formatting and layout</div>
-                                        </div>
-                                    </div>
-
-                                    <!-- GES 50/50 Continuous Assessment & WAEC Stanine Matrix -->
-                                    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 space-y-2">
-                                        <div class="flex items-center justify-between">
-                                            <div class="flex items-center gap-1.5">
-                                                <span class="w-5 h-5 rounded bg-[#F59E0B]/30 text-amber-400 flex items-center justify-center font-bold text-[10px]">2</span>
-                                                <span class="font-black text-slate-200 text-xs">GES 50/50 SBA Gradebook</span>
-                                            </div>
-                                            <span class="text-[10px] font-mono text-[#F59E0B] bg-amber-950/60 px-2 py-0.5 rounded border border-amber-800/40">WAEC Stanine 1-9</span>
-                                        </div>
-
-                                        <!-- Mini Live Score Table -->
-                                        <div class="overflow-x-auto">
-                                            <table class="w-full text-[10px] font-mono border-collapse">
-                                                <thead>
-                                                    <tr class="text-slate-400 border-b border-slate-800 text-[9px]">
-                                                        <th class="py-1 text-left">Learner</th>
-                                                        <th class="py-1 text-center">Class (50%)</th>
-                                                        <th class="py-1 text-center">Exam (50%)</th>
-                                                        <th class="py-1 text-center">Total</th>
-                                                        <th class="py-1 text-right">WAEC Grade</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody class="divide-y divide-slate-800/60 text-slate-300">
-                                                    <tr>
-                                                        <td class="py-1.5 font-sans font-bold text-white">Mensah Kofi</td>
-                                                        <td class="py-1.5 text-center text-[#06B6D4]">46.0</td>
-                                                        <td class="py-1.5 text-center text-blue-400">45.0</td>
-                                                        <td class="py-1.5 text-center font-bold text-white">91.0</td>
-                                                        <td class="py-1.5 text-right"><span class="bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded font-black">1 (A1)</span></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="py-1.5 font-sans font-bold text-white">Osei Abena</td>
-                                                        <td class="py-1.5 text-center text-[#06B6D4]">42.5</td>
-                                                        <td class="py-1.5 text-center text-blue-400">40.0</td>
-                                                        <td class="py-1.5 text-center font-bold text-white">82.5</td>
-                                                        <td class="py-1.5 text-right"><span class="bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded font-black">1 (A1)</span></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="py-1.5 font-sans font-bold text-white">Addo Kwame</td>
-                                                        <td class="py-1.5 text-center text-[#06B6D4]">38.0</td>
-                                                        <td class="py-1.5 text-center text-blue-400">36.0</td>
-                                                        <td class="py-1.5 text-center font-bold text-white">74.0</td>
-                                                        <td class="py-1.5 text-right"><span class="bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded font-black">3 (B3)</span></td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-
-                                        <!-- Broadsheet Aggregate Footer Pill -->
-                                        <div class="flex items-center justify-between pt-1 border-t border-slate-800 text-[10px] font-mono">
-                                            <span class="text-slate-400">BECE Best 6 Computation:</span>
-                                            <span class="text-[#F59E0B] font-bold bg-amber-950/40 px-2 py-0.5 rounded border border-amber-800/30">Agg 07 &bull; Grade 1 Distinction</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Dashboard Bottom Action Bar -->
-                                <div class="bg-slate-900 px-4 py-2.5 border-t border-slate-800 flex items-center justify-between text-[11px]">
-                                    <div class="flex items-center gap-1.5 text-slate-400">
-                                        <i class="fa fa-database text-[#06B6D4]"></i>
-                                        <span>Local SQLite / IndexedDB</span>
-                                    </div>
-                                    <button type="button" onclick="triggerSwipeLogin()" class="text-[#2563EB] hover:text-blue-400 font-bold flex items-center gap-1">
-                                        <span>Open Live Session</span>
-                                        <i class="fa fa-arrow-up-right-from-square text-[10px]"></i>
-                                    </button>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION 1: FEATURES (Deferred Rendering via content-visibility) -->
-        <section id="features" class="cv-auto py-20 px-4 sm:px-6 lg:px-8 bg-white border-b border-slate-200">
-            <div class="max-w-7xl mx-auto space-y-12">
-                <div class="text-center max-w-3xl mx-auto space-y-3">
-                    <span class="text-xs font-mono font-bold uppercase tracking-wider text-[#2563EB] bg-blue-50 border border-blue-200 px-3 py-1 rounded-full">
-                        Comprehensive School Architecture
-                    </span>
-                    <h2 class="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
-                        Built for Everyday Ghanaian Classroom Realities
-                    </h2>
-                    <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
-                        Eliminate late night paperwork, calculation errors, and lost grades. EduVet digitizes the complete workflow from lesson notes preparation to regional supervision.
-                    </p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    
-                    <!-- Feature 1: NaCCA 3-Phase Daily Lessons -->
-                    <div class="bg-[#F8FAFC] border border-slate-200 rounded-3xl p-6 hover:shadow-lg transition space-y-3">
-                        <div class="w-12 h-12 rounded-2xl bg-blue-100 text-[#2563EB] flex items-center justify-center text-xl font-bold">
-                            <i class="fa fa-book-open-reader"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-slate-900">3-Phase SMART Lesson Notes</h3>
-                        <p class="text-xs sm:text-sm text-slate-600 leading-snug">
-                            Generates authentic 15-week daily notes with Phase 1 Starter, Phase 2 Main Activity, and Phase 3 Reflection. Aligned across Kindergarten, Primary (Basic 1–6), and JHS (Basic 7–9).
-                        </p>
-                        <div class="font-mono text-[11px] text-[#2563EB] pt-1 flex items-center gap-1 font-bold">
-                            <span>Word (.doc) &amp; PDF Exports</span> &rarr;
-                        </div>
-                    </div>
-
-                    <!-- Feature 2: GES 50/50 Continuous Assessment -->
-                    <div class="bg-[#F8FAFC] border border-slate-200 rounded-3xl p-6 hover:shadow-lg transition space-y-3">
-                        <div class="w-12 h-12 rounded-2xl bg-cyan-100 text-[#06B6D4] flex items-center justify-center text-xl font-bold">
-                            <i class="fa fa-calculator"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-slate-900">GES 50/50 SBA Automation</h3>
-                        <p class="text-xs sm:text-sm text-slate-600 leading-snug">
-                            Auto-calculates Homework (15%), Projects (15%), and Class Tests (20%) into a 50% Class Score, paired with the 50% Terminal Exam to derive accurate scores without manual calculator errors.
-                        </p>
-                        <div class="font-mono text-[11px] text-[#06B6D4] pt-1 flex items-center gap-1 font-bold">
-                            <span>Zero Rounding Discrepancies</span> &rarr;
-                        </div>
-                    </div>
-
-                    <!-- Feature 3: WAEC Stanine & Best 6 -->
-                    <div class="bg-[#F8FAFC] border border-slate-200 rounded-3xl p-6 hover:shadow-lg transition space-y-3">
-                        <div class="w-12 h-12 rounded-2xl bg-amber-100 text-[#F59E0B] flex items-center justify-center text-xl font-bold">
-                            <i class="fa fa-award"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-slate-900">WAEC Best 6 Aggregate Engine</h3>
-                        <p class="text-xs sm:text-sm text-slate-600 leading-snug">
-                            Automatic algorithm isolates the 4 Core subjects (English, Maths, Integrated Science, Social Studies) plus the top 2 Electives to compute raw scores and BECE candidate placement aggregates.
-                        </p>
-                        <div class="font-mono text-[11px] text-[#F59E0B] pt-1 flex items-center gap-1 font-bold">
-                            <span>Stanine Grades 1 (A1) to 9 (F9)</span> &rarr;
-                        </div>
-                    </div>
-
-                    <!-- Feature 4: Master Broadsheet Matrix -->
-                    <div class="bg-[#F8FAFC] border border-slate-200 rounded-3xl p-6 hover:shadow-lg transition space-y-3">
-                        <div class="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl font-bold">
-                            <i class="fa fa-table-cells"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-slate-900">Master Broadsheet Matrix</h3>
-                        <p class="text-xs sm:text-sm text-slate-600 leading-snug">
-                            Consolidates hundreds of students across all classes and subjects onto one institutional grid. Instant export to tailored Excel templates and bulk student register uploads.
-                        </p>
-                        <div class="font-mono text-[11px] text-indigo-600 pt-1 flex items-center gap-1 font-bold">
-                            <span>1-Click Headteacher Inspection</span> &rarr;
-                        </div>
-                    </div>
-
-                    <!-- Feature 5: Reviewer Vetting & Rubber Stamp -->
-                    <div class="bg-[#F8FAFC] border border-slate-200 rounded-3xl p-6 hover:shadow-lg transition space-y-3">
-                        <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center text-xl font-bold">
-                            <i class="fa fa-stamp"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-slate-900">SISO Reviewer &amp; Stamp Portal</h3>
-                        <p class="text-xs sm:text-sm text-slate-600 leading-snug">
-                            Enables Headteachers and Circuit Supervisors (SISO) to vet lesson notes weekly, apply an official SVG security rubber stamp with Officer Name &amp; School ID, and dispatch approvals via WhatsApp.
-                        </p>
-                        <div class="font-mono text-[11px] text-rose-600 pt-1 flex items-center gap-1 font-bold">
-                            <span>Digital GES Audit Trail</span> &rarr;
-                        </div>
-                    </div>
-
-                    <!-- Feature 6: Terminal Report Cards -->
-                    <div class="bg-[#F8FAFC] border border-slate-200 rounded-3xl p-6 hover:shadow-lg transition space-y-3">
-                        <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl font-bold">
-                            <i class="fa fa-file-invoice"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-slate-900">Batch Terminal Report Cards</h3>
-                        <p class="text-xs sm:text-sm text-slate-600 leading-snug">
-                            Print clean, official GES terminal report cards with automated class teacher remarks, headteacher remarks, attendance metrics, and embedded high-resolution school logo watermarks.
-                        </p>
-                        <div class="font-mono text-[11px] text-emerald-600 pt-1 flex items-center gap-1 font-bold">
-                            <span>Print Full Class in 1 Click</span> &rarr;
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION 2: OFFLINE ENGINE (Deferred Rendering via content-visibility) -->
-        <section id="offline-engine" class="cv-auto py-20 px-4 sm:px-6 lg:px-8 bg-[#0B1220] text-white">
-            <div class="max-w-7xl mx-auto space-y-12">
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-                    
-                    <div class="lg:col-span-6 space-y-5 text-center lg:text-left">
-                        <div class="inline-flex items-center gap-2 bg-cyan-950/80 border border-cyan-800 px-3 py-1 rounded-full text-xs font-mono text-[#06B6D4]">
-                            <i class="fa fa-satellite-dish"></i>
-                            <span>SOVEREIGN AIR-GAP ARCHITECTURE</span>
-                        </div>
-                        <h2 class="text-2xl sm:text-4xl font-black tracking-tight text-white leading-tight">
-                            Engineered for Zero-Data <br>
-                            &amp; Local LAN School Sync.
-                        </h2>
-                        <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
-                            Most school software fails in rural West Africa because it requires an active 4G data subscription. EduVet runs 100% locally on teachers' devices and campus local networks without touching the internet.
-                        </p>
-
-                        <div class="space-y-3 pt-2">
-                            <div class="flex items-start gap-3 text-left">
-                                <div class="w-6 h-6 rounded-full bg-cyan-500/20 text-[#06B6D4] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
-                                    <i class="fa fa-check"></i>
-                                </div>
-                                <div>
-                                    <h4 class="text-sm font-bold text-white">Zero Telecommunication Dependency</h4>
-                                    <p class="text-xs text-slate-400">Lesson note preparation, marks recording, and broadsheets calculate inside the browser using IndexedDB &amp; SQLite.</p>
-                                </div>
-                            </div>
-
-                            <div class="flex items-start gap-3 text-left">
-                                <div class="w-6 h-6 rounded-full bg-cyan-500/20 text-[#06B6D4] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
-                                    <i class="fa fa-check"></i>
-                                </div>
-                                <div>
-                                    <h4 class="text-sm font-bold text-white">Peer-to-Peer Local Network Sync</h4>
-                                    <p class="text-xs text-slate-400">Teachers can sync submitted marks to the Headteacher's laptop via a battery-powered offline Wi-Fi router with zero internet connection.</p>
-                                </div>
-                            </div>
-
-                            <div class="flex items-start gap-3 text-left">
-                                <div class="w-6 h-6 rounded-full bg-cyan-500/20 text-[#06B6D4] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
-                                    <i class="fa fa-check"></i>
-                                </div>
-                                <div>
-                                    <h4 class="text-sm font-bold text-white">Opportunistic Cloud Bridge</h4>
-                                    <p class="text-xs text-slate-400">When internet is detected (e.g. visiting a district center), EduVet automatically queues background backups to secure cloud Firestore without losing state.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="pt-4">
-                            <button type="button" onclick="triggerSwipeLogin()" class="bg-[#06B6D4] hover:bg-cyan-500 text-slate-950 font-black px-6 py-3.5 rounded-xl text-sm transition shadow-lg flex items-center gap-2 cursor-pointer mx-auto lg:mx-0">
-                                <i class="fa fa-bolt"></i>
-                                <span>Test Offline Engine in Browser</span>
+                            <!-- Secondary: Swipe into Login Page Button -->
+                            <button type="button" onclick="triggerSwipeLogin()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-5 py-4 rounded-2xl text-sm transition flex items-center justify-center gap-2 cursor-pointer">
+                                <i class="fa fa-arrow-right-to-bracket text-[#0284C7]"></i>
+                                <span>Swipe into Login Page</span>
                             </button>
                         </div>
-                    </div>
 
-                    <!-- Offline Architecture Graphic -->
-                    <div class="lg:col-span-6">
-                        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 font-mono text-xs">
-                            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-                                <span class="text-slate-400">TOPOLOGY DIAGRAM:</span>
-                                <span class="text-emerald-400 font-bold bg-emerald-950 px-2 py-0.5 rounded">LAN AIR-GAP ACTIVE</span>
+                        <!-- Interactive Touch/Mouse Swipe Slider Track -->
+                        <div class="space-y-1.5 text-left">
+                            <div class="flex items-center justify-between text-[11px] text-slate-500 font-medium px-1">
+                                <span><i class="fa fa-hand-point-right text-[#0284C7]"></i> Drag slider to launch portal</span>
+                                <span class="font-mono text-slate-400">Target: ATAK-983</span>
                             </div>
-
-                            <!-- LAN Node Flow -->
-                            <div class="space-y-3">
-                                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
-                                    <div class="flex items-center gap-2.5">
-                                        <i class="fa fa-laptop text-[#2563EB] text-lg"></i>
-                                        <div>
-                                            <div class="text-white font-bold font-sans">Teacher Device (B7 ICT)</div>
-                                            <div class="text-[10px] text-slate-500">IndexedDB: 15-Week Schemes</div>
-                                        </div>
-                                    </div>
-                                    <span class="text-[10px] text-emerald-400">READY</span>
+                            <div class="swipe-slider-track" id="heroSwipeTrack">
+                                <div class="swipe-slider-fill" id="heroSwipeFill"></div>
+                                <div class="absolute inset-0 flex items-center justify-center pointer-events-none text-xs font-mono font-bold text-slate-500 uppercase tracking-widest" id="heroSwipeText">
+                                    &bull;&bull;&bull; Swipe to Enter EduVet &bull;&bull;&bull;
                                 </div>
-
-                                <div class="flex justify-center my-1 text-slate-600">
-                                    <i class="fa fa-arrow-down"></i> &bull; Local Wi-Fi Packets &bull; <i class="fa fa-arrow-up"></i>
+                                <div class="swipe-slider-handle" id="heroSwipeHandle" title="Slide right to login">
+                                    <i class="fa fa-angles-right text-sm"></i>
                                 </div>
-
-                                <div class="bg-blue-950/40 p-4 rounded-xl border border-blue-800/60 flex items-center justify-between">
-                                    <div class="flex items-center gap-2.5">
-                                        <i class="fa fa-server text-[#06B6D4] text-xl"></i>
-                                        <div>
-                                            <div class="text-white font-bold font-sans">Headteacher Central Hub (ATAK-983)</div>
-                                            <div class="text-[10px] text-[#06B6D4]">Master Broadsheet &bull; Vetting Stamp Engine</div>
-                                        </div>
-                                    </div>
-                                    <span class="text-[10px] font-bold text-amber-400 bg-amber-950/60 px-2 py-1 rounded">BROADCASTING</span>
-                                </div>
-
-                                <div class="flex justify-center my-1 text-slate-600">
-                                    <i class="fa fa-arrow-down"></i> &bull; End-of-Term Snapshot &bull; <i class="fa fa-arrow-up"></i>
-                                </div>
-
-                                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
-                                    <div class="flex items-center gap-2.5">
-                                        <i class="fa fa-cloud text-slate-400 text-lg"></i>
-                                        <div>
-                                            <div class="text-slate-300 font-bold font-sans">Regional Cloud Backup (Optional)</div>
-                                            <div class="text-[10px] text-slate-500">Syncs when teacher reaches network range</div>
-                                        </div>
-                                    </div>
-                                    <span class="text-[10px] text-slate-500">PAUSED UNTIL 3G</span>
-                                </div>
-                            </div>
-
-                            <div class="p-2.5 bg-slate-950/80 rounded-xl border border-slate-800/80 text-[11px] text-slate-400 flex items-center justify-between">
-                                <span>Field Verified In:</span>
-                                <span class="text-white font-sans font-bold">Afram Plains North &bull; 42 Schools</span>
                             </div>
                         </div>
                     </div>
 
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION 3: SBA GRADING & INTERACTIVE CALCULATOR (Deferred Rendering via content-visibility) -->
-        <section id="sba-grading" class="cv-auto py-20 px-4 sm:px-6 lg:px-8 bg-slate-50 border-b border-slate-200">
-            <div class="max-w-7xl mx-auto space-y-12">
-                <div class="text-center max-w-3xl mx-auto space-y-3">
-                    <span class="text-xs font-mono font-bold uppercase tracking-wider text-[#F59E0B] bg-amber-50 border border-amber-200 px-3 py-1 rounded-full">
-                        Official GES Evaluation Standard
-                    </span>
-                    <h2 class="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
-                        GES 50/50 Continuous Assessment &amp; Stanine Matrix
-                    </h2>
-                    <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
-                        Test our real-time grading engine below. Input student test scores to see the automatic 50/50 SBA split, WAEC 9-point stanine conversion, and official remarks instantly.
-                    </p>
+                    <!-- Clean Quick Stats -->
+                    <div class="grid grid-cols-3 gap-4 pt-4 border-t border-slate-100 max-w-lg mx-auto lg:mx-0 text-left">
+                        <div>
+                            <div class="text-2xl font-black text-slate-900 font-mono">42+</div>
+                            <div class="text-xs text-slate-500">Schools Deployed</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-black text-[#0284C7] font-mono">15 Wks</div>
+                            <div class="text-xs text-slate-500">NaCCA Term Schemes</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-black text-slate-900 font-mono">50 / 50</div>
+                            <div class="text-xs text-slate-500">GES Continuous SBA</div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Interactive Mini Calculator Demonstration -->
-                <div class="max-w-4xl mx-auto bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl">
-                    <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+                <!-- Right Column: Simple, Clean UI Dashboard Illustration -->
+                <div class="lg:col-span-5">
+                    <div class="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200 shadow-xl shadow-slate-200/50 space-y-4">
                         
-                        <!-- Inputs Column -->
-                        <div class="md:col-span-6 space-y-4">
-                            <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider border-b pb-2 flex items-center justify-between">
-                                <span>Learner Continuous Score Inputs</span>
-                                <span class="text-[10px] text-blue-600 font-mono font-bold">LIVE PREVIEW</span>
-                            </h3>
-
-                            <div class="grid grid-cols-2 gap-3 text-xs">
-                                <div>
-                                    <label class="block font-bold text-slate-700 mb-1">Homework (15%)</label>
-                                    <input type="number" id="calcHw" value="13.5" min="0" max="15" step="0.5" class="w-full font-mono text-sm border border-slate-300 rounded-xl p-2.5 font-bold text-slate-900 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-[#2563EB] focus:outline-none" oninput="runLiveScoreCalculation()">
+                        <!-- Header of Card -->
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="font-mono text-[11px] font-black bg-[#E0F2FE] text-[#0369A1] px-2 py-0.5 rounded">ATAK-983</span>
+                                    <h3 class="text-sm font-black text-slate-900">ATAKORA D/A J.H.S.</h3>
                                 </div>
-                                <div>
-                                    <label class="block font-bold text-slate-700 mb-1">Project (15%)</label>
-                                    <input type="number" id="calcProj" value="14.0" min="0" max="15" step="0.5" class="w-full font-mono text-sm border border-slate-300 rounded-xl p-2.5 font-bold text-slate-900 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-[#2563EB] focus:outline-none" oninput="runLiveScoreCalculation()">
-                                </div>
+                                <p class="text-[11px] text-slate-500 mt-0.5">Kwahu Afram Plains North &bull; Term 1</p>
                             </div>
-
-                            <div class="grid grid-cols-2 gap-3 text-xs">
-                                <div>
-                                    <label class="block font-bold text-slate-700 mb-1">Class Tests (20%)</label>
-                                    <input type="number" id="calcTest" value="18.0" min="0" max="20" step="0.5" class="w-full font-mono text-sm border border-slate-300 rounded-xl p-2.5 font-bold text-slate-900 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-[#2563EB] focus:outline-none" oninput="runLiveScoreCalculation()">
-                                </div>
-                                <div>
-                                    <label class="block font-bold text-slate-700 mb-1">Terminal Exam (50%)</label>
-                                    <input type="number" id="calcExam" value="44.0" min="0" max="50" step="0.5" class="w-full font-mono text-sm border border-blue-300 rounded-xl p-2.5 font-bold text-blue-900 bg-blue-50/50 focus:bg-white focus:ring-2 focus:ring-[#2563EB] focus:outline-none" oninput="runLiveScoreCalculation()">
-                                </div>
-                            </div>
-
-                            <p class="text-[11px] text-slate-500 italic">
-                                *Class Score = HW (15%) + Project (15%) + Test (20%) = 50%. Overall Score = Class (50%) + Exam (50%) = 100%.
-                            </p>
-                        </div>
-
-                        <!-- Computed Results Column -->
-                        <div class="md:col-span-6 bg-[#0B1220] rounded-2xl p-6 text-white space-y-4 text-center">
-                            <div class="text-[11px] font-mono text-[#06B6D4] uppercase tracking-wider font-bold">
-                                REAL-TIME COMPUTATION RESULT
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-3 pt-1">
-                                <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
-                                    <div class="text-[10px] text-slate-400 font-mono">Class Score (50%)</div>
-                                    <div id="resClassScore" class="font-mono text-2xl font-black text-[#06B6D4]">45.5</div>
-                                </div>
-                                <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
-                                    <div class="text-[10px] text-slate-400 font-mono">Exam Score (50%)</div>
-                                    <div id="resExamScore" class="font-mono text-2xl font-black text-blue-400">44.0</div>
-                                </div>
-                            </div>
-
-                            <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 flex items-center justify-between">
-                                <div class="text-left">
-                                    <div class="text-[10px] text-slate-400 font-mono">FINAL TOTAL SCORE</div>
-                                    <div id="resTotalScore" class="font-mono text-3xl font-black text-white">89.5%</div>
-                                </div>
-                                <div class="text-right">
-                                    <div class="text-[10px] text-slate-400 font-mono">WAEC STANINE</div>
-                                    <div id="resWaecGrade" class="font-mono text-xl font-black text-emerald-400 bg-emerald-950 px-3 py-1 rounded-lg border border-emerald-800/60">
-                                        1 (A1)
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flex items-center justify-between text-xs px-1">
-                                <span class="text-slate-400">Official Remark:</span>
-                                <span id="resRemark" class="font-bold text-amber-400 uppercase tracking-wide">Excellent Distinction</span>
+                            <!-- Official Rubber Stamp Graphic -->
+                            <div class="border-2 border-dashed border-rose-500/80 rounded-lg p-1.5 text-center rotate-[-3deg] bg-rose-50">
+                                <div class="text-[7.5px] font-black text-rose-600 uppercase tracking-widest font-mono">OFFICIAL RUBBER STAMP</div>
+                                <div class="text-[8.5px] font-black text-rose-700">GES VETTED &bull; APPROVED</div>
+                                <div class="text-[7.5px] font-bold text-rose-600 font-mono">MR. FELIX FLEKU &bull; SISO</div>
                             </div>
                         </div>
 
+                        <!-- NaCCA 3-Phase SMART Lesson Preview -->
+                        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 space-y-2 text-xs">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-1.5 font-black text-slate-800">
+                                    <span class="w-5 h-5 rounded bg-[#0284C7] text-white flex items-center justify-center font-bold text-[10px]">1</span>
+                                    <span>NaCCA SMART Daily Lesson</span>
+                                </div>
+                                <span class="text-[10px] font-mono text-[#0369A1] bg-[#E0F2FE] px-2 py-0.5 rounded font-bold">Week 4 &bull; Basic 7</span>
+                            </div>
+                            <div class="bg-white p-2.5 rounded-xl border border-slate-200 space-y-1">
+                                <div class="font-bold text-slate-900 flex items-center justify-between">
+                                    <span>Subject: Computing / ICT</span>
+                                    <span class="text-[#0284C7] font-mono text-[10px]">70 Mins Delivery</span>
+                                </div>
+                                <div class="text-slate-600 text-[10px]">Strand: Productivity Software &bull; Sub-Strand: Formatting Word Documents</div>
+                                <div class="font-mono text-[9.5px] text-[#0369A1] pt-0.5">Indicator: B7.2.1.1.2 Demonstrate practical skills in text formatting and layout</div>
+                            </div>
+                            <!-- 3-Phase Structure Pills -->
+                            <div class="grid grid-cols-3 gap-1.5 text-[9px] font-bold text-center pt-1">
+                                <span class="bg-white border border-slate-200 py-1 rounded text-slate-700">Phase 1: Starter</span>
+                                <span class="bg-[#E0F2FE] border border-[#BAE6FD] py-1 rounded text-[#0369A1]">Phase 2: Main</span>
+                                <span class="bg-white border border-slate-200 py-1 rounded text-slate-700">Phase 3: Reflection</span>
+                            </div>
+                        </div>
+
+                        <!-- GES 50/50 Continuous Assessment Preview -->
+                        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 space-y-2 text-xs">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-1.5 font-black text-slate-800">
+                                    <span class="w-5 h-5 rounded bg-emerald-600 text-white flex items-center justify-center font-bold text-[10px]">2</span>
+                                    <span>GES 50/50 SBA Gradebook</span>
+                                </div>
+                                <span class="text-[10px] font-mono text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded font-bold">WAEC Stanine 1-9</span>
+                            </div>
+                            
+                            <table class="w-full text-left text-[11px]">
+                                <thead>
+                                    <tr class="text-slate-400 border-b border-slate-200">
+                                        <th class="pb-1 font-semibold">Learner</th>
+                                        <th class="pb-1 font-mono text-center font-semibold">50% SBA</th>
+                                        <th class="pb-1 font-mono text-center font-semibold">Exam (50%)</th>
+                                        <th class="pb-1 font-mono text-right font-semibold">Grade</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    <tr>
+                                        <td class="py-1 font-medium text-slate-900">Mensah Kofi</td>
+                                        <td class="py-1 font-mono text-center text-slate-700">46.0</td>
+                                        <td class="py-1 font-mono text-center text-slate-700">45.0</td>
+                                        <td class="py-1 font-mono text-right text-emerald-600 font-bold">1 (A1)</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-1 font-medium text-slate-900">Osei Abena</td>
+                                        <td class="py-1 font-mono text-center text-slate-700">42.5</td>
+                                        <td class="py-1 font-mono text-center text-slate-700">40.0</td>
+                                        <td class="py-1 font-mono text-right text-emerald-600 font-bold">1 (A1)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="pt-1 flex items-center justify-between text-[10px] border-t border-slate-200 font-semibold">
+                                <span class="text-slate-500">BECE Best 6 Aggregate:</span>
+                                <span class="font-mono text-[#0284C7] bg-[#E0F2FE] px-2 py-0.5 rounded font-black">Agg 07 &bull; Grade 1 Distinction</span>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Card Button -->
+                        <div class="pt-1 flex items-center justify-between">
+                            <span class="text-[10px] text-slate-400 font-mono">IndexedDB Local Storage</span>
+                            <button type="button" onclick="triggerSwipeLogin()" class="text-[#0284C7] hover:text-[#0369A1] font-bold text-xs flex items-center gap-1 cursor-pointer">
+                                <span>Open Hub Portal</span>
+                                <i class="fa fa-arrow-right text-[10px]"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- WAEC 9-Point Reference Scale Table -->
-                <div class="max-w-4xl mx-auto overflow-x-auto border border-slate-200 rounded-2xl bg-white text-xs">
-                    <table class="w-full text-left border-collapse font-mono">
-                        <thead>
-                            <tr class="bg-slate-900 text-white text-[11px]">
-                                <th class="p-3 border-r border-slate-800">Score Range</th>
-                                <th class="p-3 border-r border-slate-800 text-center">WAEC Grade</th>
-                                <th class="p-3 border-r border-slate-800 text-center">Stanine Point</th>
-                                <th class="p-3">Official Competence Remark</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-200 text-slate-800">
-                            <tr class="bg-emerald-50/50">
-                                <td class="p-2.5 font-bold border-r">80% – 100%</td>
-                                <td class="p-2.5 text-center font-black text-emerald-800 border-r">1 (A1)</td>
-                                <td class="p-2.5 text-center font-bold border-r">Grade 1</td>
-                                <td class="p-2.5 font-sans font-bold text-emerald-900">Highest Distinction (Exceptional Mastery)</td>
-                            </tr>
-                            <tr>
-                                <td class="p-2.5 font-bold border-r">75% – 79%</td>
-                                <td class="p-2.5 text-center font-black text-emerald-700 border-r">2 (B2)</td>
-                                <td class="p-2.5 text-center font-bold border-r">Grade 2</td>
-                                <td class="p-2.5 font-sans font-semibold text-emerald-800">Very Good (Strong Conceptual Competence)</td>
-                            </tr>
-                            <tr class="bg-slate-50/50">
-                                <td class="p-2.5 font-bold border-r">70% – 74%</td>
-                                <td class="p-2.5 text-center font-black text-blue-700 border-r">3 (B3)</td>
-                                <td class="p-2.5 text-center font-bold border-r">Grade 3</td>
-                                <td class="p-2.5 font-sans font-semibold text-blue-800">Good (Commendable Achievement)</td>
-                            </tr>
-                            <tr>
-                                <td class="p-2.5 font-bold border-r">65% – 69%</td>
-                                <td class="p-2.5 text-center font-black text-blue-600 border-r">4 (C4)</td>
-                                <td class="p-2.5 text-center font-bold border-r">Grade 4</td>
-                                <td class="p-2.5 font-sans text-slate-700">Credit (Satisfactory Core Application)</td>
-                            </tr>
-                            <tr class="bg-slate-50/50">
-                                <td class="p-2.5 font-bold border-r">60% – 64%</td>
-                                <td class="p-2.5 text-center font-black text-blue-600 border-r">5 (C5)</td>
-                                <td class="p-2.5 text-center font-bold border-r">Grade 5</td>
-                                <td class="p-2.5 font-sans text-slate-700">Credit (Competent Understanding)</td>
-                            </tr>
-                            <tr>
-                                <td class="p-2.5 font-bold border-r">55% – 59%</td>
-                                <td class="p-2.5 text-center font-black text-blue-600 border-r">6 (C6)</td>
-                                <td class="p-2.5 text-center font-bold border-r">Grade 6</td>
-                                <td class="p-2.5 font-sans text-slate-700">Credit (Basic Proficiency Achieved)</td>
-                            </tr>
-                            <tr class="bg-amber-50/40">
-                                <td class="p-2.5 font-bold border-r">50% – 54%</td>
-                                <td class="p-2.5 text-center font-black text-amber-700 border-r">7 (D7)</td>
-                                <td class="p-2.5 text-center font-bold border-r">Grade 7</td>
-                                <td class="p-2.5 font-sans text-amber-800">Pass (Minimum Baseline Attained)</td>
-                            </tr>
-                            <tr>
-                                <td class="p-2.5 font-bold border-r">45% – 49%</td>
-                                <td class="p-2.5 text-center font-black text-amber-600 border-r">8 (E8)</td>
-                                <td class="p-2.5 text-center font-bold border-r">Grade 8</td>
-                                <td class="p-2.5 font-sans text-amber-800">Weak Pass (Targeted Remediation Required)</td>
-                            </tr>
-                            <tr class="bg-rose-50/40">
-                                <td class="p-2.5 font-bold border-r">0% – 44%</td>
-                                <td class="p-2.5 text-center font-black text-rose-700 border-r">9 (F9)</td>
-                                <td class="p-2.5 text-center font-bold border-r">Grade 9</td>
-                                <td class="p-2.5 font-sans font-bold text-rose-800">Fail (Unsatisfactory &bull; Retake Suggested)</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- SECTION 4: PRICING PLANS (Deferred Rendering via content-visibility) -->
-        <section id="pricing" class="cv-auto py-20 px-4 sm:px-6 lg:px-8 bg-white border-b border-slate-200">
-            <div class="max-w-7xl mx-auto space-y-12">
-                <div class="text-center max-w-3xl mx-auto space-y-3">
-                    <span class="text-xs font-mono font-bold uppercase tracking-wider text-[#2563EB] bg-blue-50 border border-blue-200 px-3 py-1 rounded-full">
-                        Transparent Ghana Cedis Packages
-                    </span>
-                    <h2 class="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
-                        Packages for Individual Teachers &amp; Whole Schools
-                    </h2>
-                    <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
-                        Activate your official tenure code instantly via Paystack or direct MTN MoMo to 0543521863. Pro keys are permanently locked to your official School ID.
-                    </p>
-                </div>
-
-                <!-- 4 Simple, Responsive Pricing Cards (Strict Design System Tokens) -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    
-                    <!-- Plan 0: Free Explorer -->
-                    <div class="bg-white rounded-3xl border-2 border-slate-200 p-6 flex flex-col justify-between hover:border-slate-400 transition shadow-sm">
-                        <div class="space-y-4">
-                            <div class="inline-flex items-center gap-1.5 bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md text-[10px] font-black uppercase font-mono">
-                                Free Explorer
-                            </div>
-                            <div>
-                                <div class="text-2xl sm:text-3xl font-black text-slate-900 font-mono tracking-tight">GH₵ 0.00</div>
-                                <div class="text-xs text-slate-500 font-semibold mt-0.5">Lifetime Standard Access</div>
-                            </div>
-                            <p class="text-xs text-slate-600 leading-snug">
-                                Ideal for an educator testing NaCCA lesson formatting and basic assessment.
-                            </p>
-                            <ul class="text-xs text-slate-700 space-y-2 border-t pt-3">
-                                <li class="flex items-center gap-2"><i class="fa fa-check text-slate-400"></i> First 2 weeks lesson notes</li>
-                                <li class="flex items-center gap-2"><i class="fa fa-check text-slate-400"></i> Single student marks entry</li>
-                                <li class="flex items-center gap-2"><i class="fa fa-check text-slate-400"></i> Default pedagogical presets</li>
-                                <li class="flex items-center gap-2 text-slate-400"><i class="fa fa-xmark"></i> Word (.doc) exports locked</li>
-                            </ul>
-                        </div>
-                        <div class="pt-6">
-                            <button type="button" onclick="triggerSwipeLogin()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-3 rounded-xl text-xs transition">
-                                Start Free Explorer
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Plan 1: Single Teacher Term -->
-                    <div class="bg-white rounded-3xl border-2 border-emerald-500 p-6 flex flex-col justify-between hover:shadow-xl transition shadow-md relative">
-                        <div class="absolute -top-3 right-6 bg-emerald-600 text-white text-[9px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full font-mono">
-                            Educator Pick
-                        </div>
-                        <div class="space-y-4">
-                            <div class="inline-flex items-center gap-1.5 bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-md text-[10px] font-black uppercase font-mono">
-                                Single Teacher Term
-                            </div>
-                            <div>
-                                <div class="text-2xl sm:text-3xl font-black text-emerald-700 font-mono tracking-tight">GH₵ 49.99</div>
-                                <div class="text-xs text-slate-500 font-semibold mt-0.5">Per Term &bull; 1 Teacher License</div>
-                            </div>
-                            <p class="text-xs text-slate-600 leading-snug">
-                                Complete termly freedom for single classroom subject teachers.
-                            </p>
-                            <ul class="text-xs text-slate-700 space-y-2 border-t pt-3">
-                                <li class="flex items-center gap-2 font-bold text-emerald-900"><i class="fa fa-check text-emerald-600"></i> All 15 weeks (50–75 notes)</li>
-                                <li class="flex items-center gap-2"><i class="fa fa-check text-emerald-600"></i> Clean Word (.doc) download</li>
-                                <li class="flex items-center gap-2"><i class="fa fa-check text-emerald-600"></i> Custom Excel scheme parser</li>
-                                <li class="flex items-center gap-2"><i class="fa fa-check text-emerald-600"></i> SBA Gradebook + CSV export</li>
-                            </ul>
-                        </div>
-                        <div class="pt-6">
-                            <button type="button" onclick="triggerSwipeLogin()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs transition shadow-md">
-                                Activate Teacher Term
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Plan 2: Whole School LAN -->
-                    <div class="bg-white rounded-3xl border-2 border-blue-600 p-6 flex flex-col justify-between hover:shadow-xl transition shadow-md relative">
-                        <div class="absolute -top-3 right-6 bg-blue-600 text-white text-[9px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full font-mono">
-                            Save 60%
-                        </div>
-                        <div class="space-y-4">
-                            <div class="inline-flex items-center gap-1.5 bg-blue-100 text-blue-900 px-2.5 py-1 rounded-md text-[10px] font-black uppercase font-mono">
-                                Whole School LAN
-                            </div>
-                            <div>
-                                <div class="text-2xl sm:text-3xl font-black text-blue-900 font-mono tracking-tight">GH₵ 199.99</div>
-                                <div class="text-xs text-slate-500 font-semibold mt-0.5">Per Term &bull; ALL School Staff</div>
-                            </div>
-                            <p class="text-xs text-slate-600 leading-snug">
-                                Full institutional license covering all enrolled teachers in the school ID.
-                            </p>
-                            <ul class="text-xs text-slate-700 space-y-2 border-t pt-3">
-                                <li class="flex items-center gap-2 font-bold text-blue-950"><i class="fa fa-check text-blue-600"></i> ALL School Staff Covered</li>
-                                <li class="flex items-center gap-2"><i class="fa fa-check text-blue-600"></i> Master Broadsheet Matrix</li>
-                                <li class="flex items-center gap-2"><i class="fa fa-check text-blue-600"></i> Headteacher Vetting Stamp</li>
-                                <li class="flex items-center gap-2"><i class="fa fa-check text-blue-600"></i> 1-Click Terminal Reports</li>
-                            </ul>
-                        </div>
-                        <div class="pt-6">
-                            <button type="button" onclick="triggerSwipeLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-xs transition shadow-md">
-                                Activate Whole School LAN
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Plan 3: Full Academic Year -->
-                    <div class="bg-white rounded-3xl border-2 border-amber-500 p-6 flex flex-col justify-between hover:shadow-xl transition shadow-md relative">
-                        <div class="absolute -top-3 right-6 bg-[#F59E0B] text-slate-950 text-[9px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full font-mono">
-                            Best Value &bull; Save 33%
-                        </div>
-                        <div class="space-y-4">
-                            <div class="inline-flex items-center gap-1.5 bg-amber-100 text-amber-900 px-2.5 py-1 rounded-md text-[10px] font-black uppercase font-mono">
-                                Full Academic Year
-                            </div>
-                            <div>
-                                <div class="text-2xl sm:text-3xl font-black text-amber-800 font-mono tracking-tight">GH₵ 399.99</div>
-                                <div class="text-xs text-slate-500 font-semibold mt-0.5">Full Year (3 Terms) &bull; ALL Staff</div>
-                            </div>
-                            <p class="text-xs text-slate-600 leading-snug">
-                                Complete academic year security. 3 full terms coverage for all school teachers.
-                            </p>
-                            <ul class="text-xs text-slate-700 space-y-2 border-t pt-3">
-                                <li class="flex items-center gap-2 font-bold text-amber-950"><i class="fa fa-check text-amber-500"></i> Covers All 3 Terms (1 Year)</li>
-                                <li class="flex items-center gap-2"><i class="fa fa-check text-amber-500"></i> BECE Candidate Analysis</li>
-                                <li class="flex items-center gap-2"><i class="fa fa-check text-amber-500"></i> Priority WhatsApp Support</li>
-                                <li class="flex items-center gap-2"><i class="fa fa-check text-amber-500"></i> School Logo Watermark Included</li>
-                            </ul>
-                        </div>
-                        <div class="pt-6">
-                            <button type="button" onclick="triggerSwipeLogin()" class="w-full bg-[#F59E0B] hover:bg-amber-500 text-slate-950 font-black py-3 rounded-xl text-xs transition shadow-md">
-                                Activate School Yearly
-                            </button>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl max-w-2xl mx-auto text-center text-xs text-slate-600 flex flex-col sm:flex-row items-center justify-between gap-3">
-                    <span class="flex items-center gap-1.5">
-                        <i class="fa fa-shield text-emerald-600"></i>
-                        <span>All codes permanently tied to School ID (e.g. ATAK-983)</span>
-                    </span>
-                    <a href="https://wa.me/233543521863?text=Hello%20Felix,%20I%20want%20to%20pay%20for%20an%20EduVet%20School%20Plan." target="_blank" rel="noopener noreferrer" class="font-bold text-[#2563EB] hover:underline">
-                        Call Desk: 054 352 1863 &rarr;
-                    </a>
-                </div>
+    <!-- SECTION 1: ESSENTIAL FEATURES (Simple & Straightforward) -->
+    <section id="features" class="cv-auto py-20 px-4 sm:px-6 lg:px-8 bg-slate-50 border-b border-slate-200">
+        <div class="max-w-7xl mx-auto space-y-12">
+            <div class="text-center max-w-3xl mx-auto space-y-3">
+                <span class="text-xs font-mono font-bold uppercase tracking-wider text-[#0284C7] bg-[#E0F2FE] px-3 py-1 rounded-full">
+                    Core Capabilities
+                </span>
+                <h2 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                    Everything Teachers Need. Nothing They Don't.
+                </h2>
+                <p class="text-slate-600 text-sm sm:text-base">
+                    No complicated setups or fragile cloud dependencies. EduVet is purpose-built for Ghanaian school classrooms.
+                </p>
             </div>
-        </section>
 
-        <!-- SECTION 5: SCHOOLS & FIELD DEPLOYMENTS (Deferred Rendering via content-visibility) -->
-        <section id="schools" class="cv-auto py-20 px-4 sm:px-6 lg:px-8 bg-slate-900 text-white">
-            <div class="max-w-7xl mx-auto space-y-12">
-                <div class="text-center max-w-3xl mx-auto space-y-3">
-                    <span class="text-xs font-mono font-bold uppercase tracking-wider text-[#06B6D4] bg-cyan-950/80 border border-cyan-800 px-3 py-1 rounded-full">
-                        Field Validated in West Africa
+            <!-- 4 Clean Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                    <div class="w-12 h-12 rounded-xl bg-[#E0F2FE] text-[#0284C7] flex items-center justify-center text-xl font-bold">
+                        <i class="fa fa-book-open"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900">NaCCA 3-Phase Notes</h3>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Generate official Phase 1 (Starter), Phase 2 (Main), and Phase 3 (Reflection) lesson plans aligned to the NaCCA curriculum standards for Basic 1 to 9.
+                    </p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold">
+                        <i class="fa fa-calculator"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900">GES 50/50 SBA Grading</h3>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Automatic computation of Homework (15%), Projects (15%), Class Tests (20%), and 50% Exam with instant WAEC Stanine 1–9 and BECE Best 6 aggregates.
+                    </p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                    <div class="w-12 h-12 rounded-xl bg-sky-50 text-[#0284C7] flex items-center justify-center text-xl font-bold">
+                        <i class="fa fa-network-wired"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900">100% Offline LAN Sync</h3>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Operates completely offline. Teachers connect over the school's local offline Wi-Fi without needing internet access, bundles, or airtime.
+                    </p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                    <div class="w-12 h-12 rounded-xl bg-amber-50 text-[#F59E0B] flex items-center justify-center text-xl font-bold">
+                        <i class="fa fa-stamp"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900">SISO Reviewer &amp; Stamp</h3>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Headteachers and Circuit Supervisors (SISO) vet weekly notes, apply official SVG security rubber stamps, and track classroom compliance.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 2: OFFLINE ENGINE (Simple Architecture Explanation) -->
+    <section id="offline-engine" class="cv-auto py-20 px-4 sm:px-6 lg:px-8 bg-white border-b border-slate-200">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <div class="lg:col-span-6 space-y-4">
+                    <span class="text-xs font-mono font-bold uppercase tracking-wider text-[#0284C7] bg-[#E0F2FE] px-3 py-1 rounded-full">
+                        Zero Internet Architecture
                     </span>
-                    <h2 class="text-2xl sm:text-4xl font-black text-white tracking-tight">
-                        Trusted by Headteachers, Teachers &amp; SISOs
+                    <h2 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                        Built for Schools Where Internet Connectivity is Unreliable.
                     </h2>
-                    <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
-                        From rural Afram Plains riverside schools with zero cell towers to metropolitan academies in Accra, EduVet delivers resilient performance.
+                    <p class="text-slate-600 text-sm leading-relaxed">
+                        Most rural and suburban schools face poor data connectivity. EduVet operates directly from the device's local memory and IndexedDB database. Teachers never wait for a page to load or risk losing notes because the network went down.
                     </p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    
-                    <!-- Case 1: Atakora D/A JHS -->
-                    <div class="bg-slate-950/80 border border-slate-800 rounded-3xl p-6 space-y-4">
-                        <div class="flex items-center justify-between">
-                            <span class="bg-blue-600/30 text-blue-400 font-mono text-[10px] font-bold px-2 py-0.5 rounded">ID: ATAK-983</span>
-                            <div class="text-amber-400 text-xs">
-                                <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
-                            </div>
-                        </div>
-                        <p class="text-xs sm:text-sm text-slate-300 leading-snug italic">
-                            "Before EduVet, our teachers spent entire weekends writing lesson notes by hand. Now schemes and 3-phase notes are ready in seconds, and our terminal broadsheet computes in one click."
-                        </p>
-                        <div class="pt-2 border-t border-slate-800/80">
-                            <div class="font-bold text-white text-xs">Mr. Felix Fleku</div>
-                            <div class="text-[11px] text-slate-400">Headteacher &bull; Atakora D/A J.H.S.</div>
-                        </div>
-                    </div>
-
-                    <!-- Case 2: Circuit Supervisor / SISO -->
-                    <div class="bg-slate-950/80 border border-slate-800 rounded-3xl p-6 space-y-4">
-                        <div class="flex items-center justify-between">
-                            <span class="bg-cyan-600/30 text-[#06B6D4] font-mono text-[10px] font-bold px-2 py-0.5 rounded">INSPECTION PORTAL</span>
-                            <div class="text-amber-400 text-xs">
-                                <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
-                            </div>
-                        </div>
-                        <p class="text-xs sm:text-sm text-slate-300 leading-snug italic">
-                            "The Reviewer Vetting portal with the official digital rubber stamp makes weekly inspection seamless. I can verify compliant NaCCA strands across 14 circuit schools without paperwork backlog."
-                        </p>
-                        <div class="pt-2 border-t border-slate-800/80">
-                            <div class="font-bold text-white text-xs">GES Circuit Supervisor</div>
-                            <div class="text-[11px] text-slate-400">Afram Plains North Directorate</div>
-                        </div>
-                    </div>
-
-                    <!-- Case 3: Subject Teacher -->
-                    <div class="bg-slate-950/80 border border-slate-800 rounded-3xl p-6 space-y-4">
-                        <div class="flex items-center justify-between">
-                            <span class="bg-emerald-600/30 text-emerald-400 font-mono text-[10px] font-bold px-2 py-0.5 rounded">STAFF: GES-001</span>
-                            <div class="text-amber-400 text-xs">
-                                <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
-                            </div>
-                        </div>
-                        <p class="text-xs sm:text-sm text-slate-300 leading-snug italic">
-                            "I teach Computing and Integrated Science. The 50/50 SBA continuous assessment table is a lifesaver. I enter homework and test scores on my phone offline, and it computes total grades automatically."
-                        </p>
-                        <div class="pt-2 border-t border-slate-800/80">
-                            <div class="font-bold text-white text-xs">Classroom Subject Teacher</div>
-                            <div class="text-[11px] text-slate-400">Basic 7 &amp; 8 Faculty</div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- Onboarding Call to Action -->
-                <div class="bg-gradient-to-r from-blue-900/60 to-slate-900 border border-blue-700/50 rounded-3xl p-8 text-center max-w-4xl mx-auto space-y-4">
-                    <h3 class="text-xl sm:text-2xl font-black text-white">Register Your School on EduVet Today</h3>
-                    <p class="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto">
-                        We issue your official School ID (e.g. ATAK-983), pre-load your faculty directory, and configure your institutional rubber stamp within 2 hours.
-                    </p>
-                    <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
-                        <a href="https://wa.me/233543521863?text=Hello%20EduVet,%20we%20want%20to%20register%20our%20school%20ID." target="_blank" rel="noopener noreferrer" class="bg-[#2563EB] hover:bg-blue-600 text-white font-extrabold px-6 py-3.5 rounded-xl text-sm transition shadow-lg flex items-center gap-2">
-                            <i class="fa-brands fa-whatsapp text-emerald-400"></i>
-                            <span>Register via WhatsApp (+233 54 352 1863)</span>
+                    <div class="pt-2">
+                        <a href="https://wa.me/233543521863?text=Hello%20EduVet%20Desk,%20I%20would%20like%20to%20request%20a%20school%20setup%20for%20my%20school." target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-[#0284C7] hover:bg-[#0369A1] text-white font-bold px-6 py-3 rounded-xl text-sm transition shadow-sm">
+                            <i class="fa-brands fa-whatsapp"></i>
+                            <span>Request Offline Setup for Your School</span>
                         </a>
-                        <button type="button" onclick="triggerSwipeLogin()" class="bg-slate-800 hover:bg-slate-700 text-white font-bold px-6 py-3.5 rounded-xl text-sm transition border border-slate-700">
-                            Sign In with Existing School ID
+                    </div>
+                </div>
+
+                <div class="lg:col-span-6 bg-slate-50 border border-slate-200 rounded-3xl p-6 space-y-4">
+                    <h3 class="font-bold text-slate-900 text-base">Simple 3-Step Setup Process:</h3>
+                    
+                    <div class="space-y-3">
+                        <div class="flex items-start gap-3 bg-white p-3.5 rounded-xl border border-slate-200">
+                            <span class="w-7 h-7 rounded-lg bg-[#E0F2FE] text-[#0284C7] font-bold text-xs flex items-center justify-center shrink-0">1</span>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-900">Request Setup on WhatsApp</h4>
+                                <p class="text-[11px] text-slate-500">Message our desk with your School Name and District. We assign your unique School ID (e.g. ATAK-983).</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3 bg-white p-3.5 rounded-xl border border-slate-200">
+                            <span class="w-7 h-7 rounded-lg bg-[#E0F2FE] text-[#0284C7] font-bold text-xs flex items-center justify-center shrink-0">2</span>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-900">We Pre-load Faculty &amp; Stamp</h4>
+                                <p class="text-[11px] text-slate-500">We configure your official digital rubber stamp, teacher list, and subjects in under 2 hours.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3 bg-white p-3.5 rounded-xl border border-slate-200">
+                            <span class="w-7 h-7 rounded-lg bg-[#E0F2FE] text-[#0284C7] font-bold text-xs flex items-center justify-center shrink-0">3</span>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-900">Teachers Open and Work 100% Offline</h4>
+                                <p class="text-[11px] text-slate-500">Teachers log in with the School ID and generate compliant lesson notes with zero data cost.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 3: SBA GRADING CALCULATOR (Simple & Interactive) -->
+    <section id="sba-grading" class="cv-auto py-20 px-4 sm:px-6 lg:px-8 bg-slate-50 border-b border-slate-200">
+        <div class="max-w-4xl mx-auto space-y-8">
+            <div class="text-center space-y-2">
+                <span class="text-xs font-mono font-bold uppercase tracking-wider text-[#0284C7] bg-[#E0F2FE] px-3 py-1 rounded-full">
+                    Interactive Demo
+                </span>
+                <h2 class="text-3xl font-black text-slate-900 tracking-tight">
+                    Live GES 50/50 Continuous Assessment Simulator
+                </h2>
+                <p class="text-slate-600 text-xs sm:text-sm">
+                    Enter component scores below to see instant 50/50 aggregation and WAEC Stanine grading.
+                </p>
+            </div>
+
+            <!-- Simple Interactive Calculator Card -->
+            <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Homework (15%)</label>
+                        <input type="number" id="calcHw" value="13.5" min="0" max="15" step="0.5" class="w-full font-mono text-sm border border-slate-300 rounded-xl p-2.5 font-bold text-slate-900 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-[#0284C7] focus:outline-none" oninput="runLiveScoreCalculation()">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Project (15%)</label>
+                        <input type="number" id="calcProj" value="14.0" min="0" max="15" step="0.5" class="w-full font-mono text-sm border border-slate-300 rounded-xl p-2.5 font-bold text-slate-900 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-[#0284C7] focus:outline-none" oninput="runLiveScoreCalculation()">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Class Test (20%)</label>
+                        <input type="number" id="calcTest" value="18.0" min="0" max="20" step="0.5" class="w-full font-mono text-sm border border-slate-300 rounded-xl p-2.5 font-bold text-slate-900 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-[#0284C7] focus:outline-none" oninput="runLiveScoreCalculation()">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-[#0369A1] mb-1">Exam Score (50%)</label>
+                        <input type="number" id="calcExam" value="44.0" min="0" max="50" step="0.5" class="w-full font-mono text-sm border border-[#BAE6FD] rounded-xl p-2.5 font-bold text-[#0369A1] bg-[#F0F9FF] focus:bg-white focus:ring-2 focus:ring-[#0284C7] focus:outline-none" oninput="runLiveScoreCalculation()">
+                    </div>
+                </div>
+
+                <!-- Results Output Strip -->
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center gap-6 text-center sm:text-left">
+                        <div>
+                            <div class="text-[11px] text-slate-500 font-semibold uppercase">50% Class SBA</div>
+                            <div class="text-xl font-black text-slate-900 font-mono" id="resClassScore">45.5</div>
+                        </div>
+                        <div class="text-slate-300 text-lg font-light">+</div>
+                        <div>
+                            <div class="text-[11px] text-slate-500 font-semibold uppercase">50% Exam</div>
+                            <div class="text-xl font-black text-[#0284C7] font-mono" id="resExamScore">44.0</div>
+                        </div>
+                        <div class="text-slate-300 text-lg font-light">=</div>
+                        <div>
+                            <div class="text-[11px] text-slate-500 font-semibold uppercase">Total (100%)</div>
+                            <div class="text-xl font-black text-emerald-700 font-mono" id="resTotalScore">89.5%</div>
+                        </div>
+                    </div>
+
+                    <div class="text-center sm:text-right">
+                        <div class="text-[11px] text-slate-500 font-semibold uppercase mb-0.5">WAEC Stanine Grade</div>
+                        <span id="resWaecGrade" class="font-mono text-lg font-black px-3 py-1 rounded-lg bg-emerald-100 text-emerald-800 border border-emerald-300">
+                            1 (A1)
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 4: PRICING (4 Clean Cards) -->
+    <section id="pricing" class="cv-auto py-20 px-4 sm:px-6 lg:px-8 bg-white border-b border-slate-200">
+        <div class="max-w-7xl mx-auto space-y-12">
+            <div class="text-center max-w-2xl mx-auto space-y-2">
+                <span class="text-xs font-mono font-bold uppercase tracking-wider text-[#0284C7] bg-[#E0F2FE] px-3 py-1 rounded-full">
+                    Transparent Ghana Cedis Packages
+                </span>
+                <h2 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                    Packages for Individual Teachers &amp; Whole Schools
+                </h2>
+                <p class="text-slate-600 text-xs sm:text-sm">
+                    Affordable pricing designed specifically for Ghanaian public and private basic schools.
+                </p>
+            </div>
+
+            <!-- 4 Responsive Pricing Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                
+                <!-- Plan 0: Free Explorer -->
+                <div class="bg-white rounded-3xl border border-slate-200 p-6 flex flex-col justify-between hover:border-slate-400 transition shadow-xs">
+                    <div class="space-y-4">
+                        <span class="inline-block bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md text-[10px] font-black uppercase font-mono">
+                            Free Explorer
+                        </span>
+                        <div>
+                            <div class="text-2xl font-black text-slate-900 font-mono">GH₵ 0.00</div>
+                            <div class="text-xs text-slate-500 mt-0.5">Standard Preview Access</div>
+                        </div>
+                        <ul class="text-xs text-slate-600 space-y-2 border-t pt-3">
+                            <li class="flex items-center gap-2"><i class="fa fa-check text-slate-400"></i> First 2 weeks notes</li>
+                            <li class="flex items-center gap-2"><i class="fa fa-check text-slate-400"></i> Single student marks</li>
+                            <li class="flex items-center gap-2 text-slate-400"><i class="fa fa-xmark"></i> Word export locked</li>
+                        </ul>
+                    </div>
+                    <div class="pt-6">
+                        <button type="button" onclick="triggerSwipeLogin()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-3 rounded-xl text-xs transition cursor-pointer">
+                            Start Free Explorer
                         </button>
                     </div>
                 </div>
 
-            </div>
-        </section>
-
-        <!-- BOTTOM CONVERSION STRIP WITH SWIPE BUTTON -->
-        <section class="bg-[#0B1220] border-t border-slate-800 py-12 px-4 sm:px-6 lg:px-8 text-center text-white">
-            <div class="max-w-4xl mx-auto space-y-6">
-                <span class="pulse-dot mx-auto inline-block"></span>
-                <h3 class="text-2xl sm:text-3xl font-black tracking-tight">
-                    Ready to Prepare This Week's NaCCA Lesson Plans?
-                </h3>
-                <p class="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto">
-                    Click the swipe button below to open the sovereign EduVet operating system portal. Works on any mobile phone, tablet, or laptop.
-                </p>
-                
-                <div class="pt-2 max-w-md mx-auto">
-                    <button type="button" onclick="triggerSwipeLogin()" class="w-full bg-[#2563EB] hover:bg-blue-600 active:bg-blue-700 text-white font-extrabold py-4 px-8 rounded-2xl text-base sm:text-lg shadow-xl hover:shadow-blue-500/30 transition flex items-center justify-center gap-3 cursor-pointer group">
-                        <span>Swipe into Login Page</span>
-                        <i class="fa fa-arrow-right text-base group-hover:translate-x-1.5 transition-transform"></i>
-                    </button>
-                    <div class="text-[11px] font-mono text-slate-500 mt-2">
-                        Instant Zero-Lag Transition &bull; Direct Hub Gateway
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- FOOTER (Deep Technology Navy #0B1220) -->
-    <footer class="cv-auto bg-[#0B1220] border-t border-slate-800/80 text-slate-400 text-xs py-12 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-7xl mx-auto space-y-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                
-                <!-- Col 1: Brand Info -->
-                <div class="space-y-3">
-                    <div class="flex items-center gap-2">
-                        <div class="w-7 h-7 rounded-lg bg-[#2563EB] flex items-center justify-center text-white font-black text-xs">
-                            <i class="fa fa-graduation-cap"></i>
+                <!-- Plan 1: Single Teacher Term -->
+                <div class="bg-white rounded-3xl border-2 border-[#0284C7] p-6 flex flex-col justify-between hover:shadow-md transition relative">
+                    <span class="absolute -top-3 right-6 bg-[#0284C7] text-white text-[9px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full font-mono">
+                        Teacher Pick
+                    </span>
+                    <div class="space-y-4">
+                        <span class="inline-block bg-[#E0F2FE] text-[#0369A1] px-2.5 py-1 rounded-md text-[10px] font-black uppercase font-mono">
+                            Single Teacher Term
+                        </span>
+                        <div>
+                            <div class="text-2xl font-black text-[#0284C7] font-mono">GH₵ 49.99</div>
+                            <div class="text-xs text-slate-500 mt-0.5">1 Term &bull; 1 Teacher License</div>
                         </div>
-                        <span class="text-white font-black text-lg tracking-tight">EduVet</span>
+                        <ul class="text-xs text-slate-600 space-y-2 border-t pt-3">
+                            <li class="flex items-center gap-2 font-bold text-slate-900"><i class="fa fa-check text-[#0284C7]"></i> All 15 weeks (50–75 notes)</li>
+                            <li class="flex items-center gap-2"><i class="fa fa-check text-[#0284C7]"></i> Word (.doc) exports</li>
+                            <li class="flex items-center gap-2"><i class="fa fa-check text-[#0284C7]"></i> SBA Gradebook + CSV export</li>
+                        </ul>
                     </div>
-                    <p class="text-[11px] text-slate-400 leading-relaxed">
-                        Sovereign offline school operating system engineered by Edubyte Africa for West African educational environments.
-                    </p>
-                    <div class="font-mono text-[10px] text-[#06B6D4]">
-                        Status: All Systems Operational (Air-Gap Ready)
+                    <div class="pt-6">
+                        <a href="https://wa.me/233543521863?text=Hello%20Felix,%20I%20want%20to%20activate%20the%20Single%20Teacher%20Term%20plan%20(GH%E2%82%B549.99)." target="_blank" rel="noopener noreferrer" class="w-full bg-[#0284C7] hover:bg-[#0369A1] text-white font-bold py-3 rounded-xl text-xs transition shadow-sm block text-center">
+                            Activate Teacher Term
+                        </a>
                     </div>
                 </div>
 
-                <!-- Col 2: Navigation -->
-                <div class="space-y-2">
-                    <h4 class="text-white font-bold text-xs uppercase tracking-wider font-mono">Platform</h4>
-                    <ul class="space-y-1.5 text-[11px]">
-                        <li><a href="#features" class="hover:text-white transition">Features Overview</a></li>
-                        <li><a href="#offline-engine" class="hover:text-white transition">Offline Architecture</a></li>
-                        <li><a href="#sba-grading" class="hover:text-white transition">GES 50/50 SBA Grading</a></li>
-                        <li><a href="#pricing" class="hover:text-white transition">Packages &amp; Pricing</a></li>
-                        <li><a href="#schools" class="hover:text-white transition">Verified Deployments</a></li>
-                    </ul>
+                <!-- Plan 2: Whole School LAN -->
+                <div class="bg-white rounded-3xl border border-slate-200 p-6 flex flex-col justify-between hover:shadow-md transition relative">
+                    <div class="space-y-4">
+                        <span class="inline-block bg-slate-100 text-slate-800 px-2.5 py-1 rounded-md text-[10px] font-black uppercase font-mono">
+                            Whole School LAN
+                        </span>
+                        <div>
+                            <div class="text-2xl font-black text-slate-900 font-mono">GH₵ 199.99</div>
+                            <div class="text-xs text-slate-500 mt-0.5">1 Term &bull; ALL School Staff</div>
+                        </div>
+                        <ul class="text-xs text-slate-600 space-y-2 border-t pt-3">
+                            <li class="flex items-center gap-2 font-bold text-slate-900"><i class="fa fa-check text-[#0284C7]"></i> ALL Teachers in School ID</li>
+                            <li class="flex items-center gap-2"><i class="fa fa-check text-[#0284C7]"></i> Master Broadsheet Matrix</li>
+                            <li class="flex items-center gap-2"><i class="fa fa-check text-[#0284C7]"></i> Headteacher Vetting Stamp</li>
+                            <li class="flex items-center gap-2"><i class="fa fa-check text-[#0284C7]"></i> 1-Click Terminal Reports</li>
+                        </ul>
+                    </div>
+                    <div class="pt-6">
+                        <a href="https://wa.me/233543521863?text=Hello%20Felix,%20I%20want%20to%20activate%20the%20Whole%20School%20LAN%20plan%20(GH%E2%82%B5199.99)." target="_blank" rel="noopener noreferrer" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl text-xs transition shadow-sm block text-center">
+                            Request School Setup
+                        </a>
+                    </div>
                 </div>
 
-                <!-- Col 3: Institutional Standards -->
-                <div class="space-y-2">
-                    <h4 class="text-white font-bold text-xs uppercase tracking-wider font-mono">Standards</h4>
-                    <ul class="space-y-1.5 text-[11px]">
-                        <li><span class="text-slate-300">GES Common Core Framework</span></li>
-                        <li><span class="text-slate-300">NaCCA 3-Phase Daily Pedagogy</span></li>
-                        <li><span class="text-slate-300">WAEC 9-Point Stanine Scale</span></li>
-                        <li><span class="text-slate-300">Best 6 Candidate Computation</span></li>
-                        <li><span class="text-slate-300">Local Area Network (LAN) Air-Gap</span></li>
-                    </ul>
-                </div>
-
-                <!-- Col 4: Engineering & Contact -->
-                <div class="space-y-2">
-                    <h4 class="text-white font-bold text-xs uppercase tracking-wider font-mono">Engineering Desk</h4>
-                    <p class="text-[11px] text-slate-400">
-                        Edubyte Africa &bull; Accra &amp; Eastern Region, Ghana
-                    </p>
-                    <p class="text-[11px] font-mono text-white font-bold">
-                        WhatsApp: +233 54 352 1863
-                    </p>
-                    <p class="text-[11px] font-mono text-slate-400">
-                        Email: flekufelix@gmail.com
-                    </p>
+                <!-- Plan 3: Full Academic Year -->
+                <div class="bg-white rounded-3xl border-2 border-amber-400 p-6 flex flex-col justify-between hover:shadow-md transition relative">
+                    <span class="absolute -top-3 right-6 bg-amber-500 text-slate-950 text-[9px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full font-mono">
+                        Best Value
+                    </span>
+                    <div class="space-y-4">
+                        <span class="inline-block bg-amber-50 text-amber-900 px-2.5 py-1 rounded-md text-[10px] font-black uppercase font-mono">
+                            Full Academic Year
+                        </span>
+                        <div>
+                            <div class="text-2xl font-black text-amber-800 font-mono">GH₵ 399.99</div>
+                            <div class="text-xs text-slate-500 mt-0.5">3 Full Terms &bull; ALL Staff</div>
+                        </div>
+                        <ul class="text-xs text-slate-600 space-y-2 border-t pt-3">
+                            <li class="flex items-center gap-2 font-bold text-amber-950"><i class="fa fa-check text-amber-500"></i> Full Year (3 Terms) Coverage</li>
+                            <li class="flex items-center gap-2"><i class="fa fa-check text-amber-500"></i> BECE Candidate Analysis</li>
+                            <li class="flex items-center gap-2"><i class="fa fa-check text-amber-500"></i> Priority WhatsApp Support</li>
+                        </ul>
+                    </div>
+                    <div class="pt-6">
+                        <a href="https://wa.me/233543521863?text=Hello%20Felix,%20I%20want%20to%20activate%20the%20Full%20Academic%20Year%20plan%20(GH%E2%82%B5399.99)." target="_blank" rel="noopener noreferrer" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-black py-3 rounded-xl text-xs transition shadow-sm block text-center">
+                            Request Full Year Setup
+                        </a>
+                    </div>
                 </div>
 
             </div>
+        </div>
+    </section>
 
-            <div class="pt-6 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px]">
-                <p>&copy; 2026 Edubyte Africa. All rights reserved. EduVet&trade; is a proprietary education technology platform.</p>
-                <div class="flex items-center gap-4">
-                    <a href="https://edubyteafrica.com" target="_blank" rel="noopener noreferrer" class="hover:text-white transition">Edubyte Africa Parent Site</a>
-                    <span>&bull;</span>
-                    <button type="button" onclick="triggerSwipeLogin()" class="text-[#06B6D4] hover:underline font-bold">Open Hub Portal</button>
+    <!-- SECTION 5: SCHOOLS (Social Proof) -->
+    <section id="schools" class="cv-auto py-16 px-4 sm:px-6 lg:px-8 bg-slate-50 border-b border-slate-200">
+        <div class="max-w-7xl mx-auto text-center space-y-6">
+            <span class="text-xs font-mono font-bold uppercase tracking-wider text-[#0284C7] bg-[#E0F2FE] px-3 py-1 rounded-full">
+                Institutional Deployments
+            </span>
+            <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                Trusted in Basic Schools Across Ghana
+            </h2>
+            <div class="flex flex-wrap items-center justify-center gap-4 text-xs font-semibold text-slate-600">
+                <span class="bg-white border border-slate-200 px-4 py-2 rounded-xl shadow-xs">Atakora D/A J.H.S. (ATAK-983)</span>
+                <span class="bg-white border border-slate-200 px-4 py-2 rounded-xl shadow-xs">Donkorkrom Presby Basic</span>
+                <span class="bg-white border border-slate-200 px-4 py-2 rounded-xl shadow-xs">Amankwa Methodist J.H.S.</span>
+                <span class="bg-white border border-slate-200 px-4 py-2 rounded-xl shadow-xs">Battor D/A Model School</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- SIMPLE & MINIMALISTIC FOOTER -->
+    <footer class="bg-white py-12 px-4 sm:px-6 lg:px-8 border-t border-slate-200">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-slate-500">
+            
+            <!-- Brand & Tagline -->
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-[#0284C7] text-white flex items-center justify-center font-bold text-sm">
+                    <i class="fa fa-graduation-cap"></i>
                 </div>
+                <div>
+                    <span class="font-black text-slate-900">Edu<span class="text-[#0284C7]">Vet</span></span>
+                    <span class="text-xs text-slate-400 ml-1">&bull; Simple Offline School OS</span>
+                </div>
+            </div>
+
+            <!-- Minimal Links -->
+            <div class="flex items-center gap-6 text-xs font-semibold text-slate-600">
+                <a href="#features" class="hover:text-[#0284C7] transition">Features</a>
+                <a href="#pricing" class="hover:text-[#0284C7] transition">Pricing</a>
+                <a href="https://wa.me/233543521863?text=Hello%20EduVet%20Desk,%20I%20would%20like%20to%20request%20a%20school%20setup%20for%20my%20school." target="_blank" rel="noopener noreferrer" class="text-[#0284C7] hover:underline flex items-center gap-1 font-bold">
+                    <i class="fa-brands fa-whatsapp text-emerald-600"></i> Setup: +233 54 352 1863
+                </a>
+                <button type="button" onclick="triggerSwipeLogin()" class="text-slate-800 hover:text-[#0284C7] font-bold">
+                    Teacher Portal
+                </button>
+            </div>
+
+            <!-- Copyright -->
+            <div class="text-xs text-slate-400">
+                &copy; 2026 EduVet &bull; Edubyte Africa. All rights reserved.
             </div>
         </div>
     </footer>
 
-    <!-- Swipe Transition Screen Overlay (Smooth Visual Slide into /eduvet.html) -->
+    <!-- Screen Slide Overlay for Portal Navigation -->
     <div id="swipeTransitionOverlay">
-        <div class="text-center space-y-4 p-6 max-w-sm mx-auto">
-            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#2563EB] to-[#06B6D4] flex items-center justify-center text-white text-2xl font-black mx-auto shadow-2xl animate-pulse">
+        <div class="text-center space-y-4">
+            <div class="w-16 h-16 rounded-2xl bg-[#0284C7] text-white flex items-center justify-center text-3xl font-black mx-auto animate-bounce shadow-lg">
                 <i class="fa fa-graduation-cap"></i>
             </div>
-            <div>
-                <h3 class="text-xl font-black text-white tracking-tight">Launching EduVet OS...</h3>
-                <p class="text-xs font-mono text-[#06B6D4] mt-1" id="swipeStatusText">Connecting to sovereign local hub &bull; School ID: ATAK-983</p>
-            </div>
-            <div class="w-48 h-1.5 bg-slate-800 rounded-full mx-auto overflow-hidden">
-                <div class="h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full animate-pulse w-full"></div>
-            </div>
+            <div class="text-xl font-black text-slate-900">Entering EduVet Portal...</div>
+            <div class="text-xs text-slate-500 font-mono">Loading Offline School Hub</div>
         </div>
     </div>
 
-    <!-- Ultra-Lightweight Vanilla JS (< 3 KB) -->
+    <!-- Ultra-Lightweight Vanilla JS (< 2 KB) -->
     <script>
         // 1. Mobile Drawer Navigation Toggle (5 items with instant auto-dismissal)
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
@@ -1239,87 +820,66 @@
                 }
             });
 
-            // Instant auto-dismissal on clicking any of the 5 parent items
             document.querySelectorAll('.mobile-nav-link').forEach(link => {
                 link.addEventListener('click', closeMobileDrawer);
             });
         }
 
-        // 2. High-Converting Swipe into Login Mechanism
+        // 2. Swipe into Login Mechanism
         function triggerSwipeLogin() {
             const overlay = document.getElementById('swipeTransitionOverlay');
             if (overlay) {
                 overlay.classList.add('swiping-active');
             }
-            // Seamlessly slide screen and navigate to EduVet portal login
             setTimeout(() => {
                 window.location.href = 'eduvet.html';
-            }, 380);
+            }, 300);
         }
 
-        // 3. Interactive Touch/Mouse Slider Track
-        const track = document.getElementById('heroSwipeTrack');
+        // 3. Interactive Touch / Mouse Swipe Slider Logic
         const handle = document.getElementById('heroSwipeHandle');
+        const track = document.getElementById('heroSwipeTrack');
         const fill = document.getElementById('heroSwipeFill');
+        let isDragging = false;
+        let startX = 0;
 
-        if (track && handle && fill) {
-            let isDragging = false;
-            let startX = 0;
-            let currentX = 0;
-            let maxSlide = 0;
-
-            const updateMaxSlide = () => {
-                maxSlide = track.clientWidth - handle.clientWidth - 8;
-            };
-            window.addEventListener('resize', updateMaxSlide);
-            updateMaxSlide();
-
-            const onStart = (e) => {
+        if (handle && track) {
+            function onStart(e) {
                 isDragging = true;
-                updateMaxSlide();
                 startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-                currentX = 0;
-            };
+                handle.style.transition = 'none';
+                if (fill) fill.style.transition = 'none';
+            }
 
-            const onMove = (e) => {
+            function onMove(e) {
                 if (!isDragging) return;
-                const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-                let delta = clientX - startX;
-                if (delta < 0) delta = 0;
-                if (delta > maxSlide) delta = maxSlide;
-                currentX = delta;
+                const currentX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                const diff = currentX - startX;
+                const maxMove = track.clientWidth - handle.clientWidth - 8;
+                const clamped = Math.max(0, Math.min(diff, maxMove));
+                handle.style.transform = `translateX(${clamped}px)`;
+                if (fill) fill.style.width = `${(clamped / maxMove) * 100}%`;
 
-                handle.style.transform = 'translateX(' + delta + 'px)';
-                fill.style.width = (delta + 25) + 'px';
-
-                // Threshold check (> 70% of slider)
-                if (delta >= maxSlide * 0.75) {
+                if (clamped >= maxMove * 0.85) {
                     isDragging = false;
-                    handle.style.backgroundColor = '#06B6D4';
                     triggerSwipeLogin();
                 }
-            };
+            }
 
-            const onEnd = () => {
+            function onEnd() {
                 if (!isDragging) return;
                 isDragging = false;
-                if (currentX < maxSlide * 0.75) {
-                    // Snap back
-                    handle.style.transition = 'transform 0.25s ease, background-color 0.2s';
+                handle.style.transition = 'transform 0.25s ease';
+                handle.style.transform = 'translateX(0px)';
+                if (fill) {
                     fill.style.transition = 'width 0.25s ease';
-                    handle.style.transform = 'translateX(0px)';
                     fill.style.width = '0%';
-                    setTimeout(() => {
-                        handle.style.transition = '';
-                        fill.style.transition = '';
-                    }, 250);
                 }
-            };
+            }
 
             handle.addEventListener('mousedown', onStart);
             window.addEventListener('mousemove', onMove);
             window.addEventListener('mouseup', onEnd);
-
             handle.addEventListener('touchstart', onStart, { passive: true });
             window.addEventListener('touchmove', onMove, { passive: true });
             window.addEventListener('touchend', onEnd);
@@ -1340,56 +900,43 @@
             const examScoreEl = document.getElementById('resExamScore');
             const totalScoreEl = document.getElementById('resTotalScore');
             const waecGradeEl = document.getElementById('resWaecGrade') || document.getElementById('waecGrade');
-            const remarkEl = document.getElementById('resRemark');
 
             if (classScoreEl) classScoreEl.textContent = classScore.toFixed(1);
             if (examScoreEl) examScoreEl.textContent = terminalExam.toFixed(1);
             if (totalScoreEl) totalScoreEl.textContent = totalScore.toFixed(1) + '%';
 
             let grade = '9 (F9)';
-            let remark = 'Fail &bull; Remedial Needed';
-            let colorClass = 'bg-rose-950 text-rose-400 border-rose-800/60';
+            let colorClass = 'bg-rose-100 text-rose-800 border-rose-300';
 
             if (totalScore >= 80) {
                 grade = '1 (A1)';
-                remark = 'Highest Distinction &bull; Exceptional';
-                colorClass = 'bg-emerald-950 text-emerald-400 border-emerald-800/60';
+                colorClass = 'bg-emerald-100 text-emerald-800 border-emerald-300';
             } else if (totalScore >= 75) {
                 grade = '2 (B2)';
-                remark = 'Very Good Distinction';
-                colorClass = 'bg-emerald-950 text-emerald-400 border-emerald-800/60';
+                colorClass = 'bg-emerald-100 text-emerald-800 border-emerald-300';
             } else if (totalScore >= 70) {
                 grade = '3 (B3)';
-                remark = 'Good Credit &bull; High Mastery';
-                colorClass = 'bg-blue-950 text-blue-400 border-blue-800/60';
+                colorClass = 'bg-sky-100 text-sky-800 border-sky-300';
             } else if (totalScore >= 65) {
                 grade = '4 (C4)';
-                remark = 'Credit &bull; Satisfactory Standard';
-                colorClass = 'bg-blue-950 text-blue-400 border-blue-800/60';
+                colorClass = 'bg-sky-100 text-sky-800 border-sky-300';
             } else if (totalScore >= 60) {
                 grade = '5 (C5)';
-                remark = 'Credit &bull; Competent Level';
-                colorClass = 'bg-blue-950 text-blue-400 border-blue-800/60';
+                colorClass = 'bg-sky-100 text-sky-800 border-sky-300';
             } else if (totalScore >= 55) {
                 grade = '6 (C6)';
-                remark = 'Credit &bull; Baseline Proficiency';
-                colorClass = 'bg-blue-950 text-blue-400 border-blue-800/60';
+                colorClass = 'bg-sky-100 text-sky-800 border-sky-300';
             } else if (totalScore >= 50) {
                 grade = '7 (D7)';
-                remark = 'Pass &bull; Minimum Standard';
-                colorClass = 'bg-amber-950 text-amber-400 border-amber-800/60';
+                colorClass = 'bg-amber-100 text-amber-800 border-amber-300';
             } else if (totalScore >= 45) {
                 grade = '8 (E8)';
-                remark = 'Weak Pass &bull; Extra Support Required';
-                colorClass = 'bg-amber-950 text-amber-400 border-amber-800/60';
+                colorClass = 'bg-amber-100 text-amber-800 border-amber-300';
             }
 
             if (waecGradeEl) {
                 waecGradeEl.textContent = grade;
-                waecGradeEl.className = 'font-mono text-xl font-black px-3 py-1 rounded-lg border ' + colorClass;
-            }
-            if (remarkEl) {
-                remarkEl.innerHTML = remark;
+                waecGradeEl.className = 'font-mono text-lg font-black px-3 py-1 rounded-lg border ' + colorClass;
             }
         }
         window.calcSba = runLiveScoreCalculation;
