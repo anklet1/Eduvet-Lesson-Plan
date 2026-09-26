@@ -79,6 +79,8 @@ self.addEventListener('fetch', (event) => {
         url.hostname.includes('identitytoolkit.googleapis.com') ||
         url.hostname.includes('firebaseio.com') ||
         url.hostname.includes('api.paystack.co') ||
+        url.hostname.includes('js.paystack.co') ||
+        url.pathname.startsWith('/api/') ||
         url.hostname.includes('generativelanguage.googleapis.com')) {
         return; // Direct network for transactions and live DB sync
     }

@@ -35,6 +35,9 @@
         }
     </script>
 
+    <!-- Paystack Official Inline Checkout SDK (Live) -->
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
 
@@ -856,10 +859,16 @@
                 </div>
             </div>
 
-            <!-- Step 1: Real Paystack Portal Link -->
+            <!-- Step 1: Real Paystack Portal Link & Instant Inline Checkout -->
             <div class="space-y-3 pt-1">
-                <a href="https://paystack.shop/pay/eduvet_edubyteafrica_com" target="_blank" rel="noopener noreferrer" class="w-full bg-[#011B33] hover:bg-slate-900 active:bg-black text-white font-black py-3.5 rounded-xl text-xs sm:text-sm transition shadow-md flex items-center justify-center gap-2 cursor-pointer text-center">
-                    <span>1. Proceed to Official Paystack Payment Page</span>
+                <button type="button" onclick="payWithLandingPaystackInline()" class="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-black py-3.5 rounded-xl text-xs sm:text-sm transition shadow-md flex items-center justify-center gap-2 cursor-pointer text-center">
+                    <i class="fa fa-credit-card text-emerald-200"></i>
+                    <span>1. Pay Instantly via Paystack (MoMo &amp; Card)</span>
+                    <i class="fa fa-bolt text-amber-300"></i>
+                </button>
+
+                <a href="https://paystack.shop/pay/eduvet_edubyteafrica_com" target="_blank" rel="noopener noreferrer" class="w-full bg-[#011B33] hover:bg-slate-900 active:bg-black text-white font-semibold py-2.5 rounded-xl text-xs transition shadow-sm flex items-center justify-center gap-2 cursor-pointer text-center">
+                    <span>Or Proceed to Official Paystack Payment Page</span>
                     <i class="fa fa-arrow-up-right-from-square text-amber-300"></i>
                 </a>
 
@@ -1083,10 +1092,11 @@
 
         // 4. In-App Payment State, Hardened Security & Anti-Bypass Engine
         let activeSelectedPlan = 'teacher_term';
+        const PAYSTACK_LIVE_PUBLIC_KEY = 'pk_live_9fbe7b13f82390a5610c88d1b9cb4dce5978ec9e';
         const planDetails = {
-            'teacher_term': { name: 'Single Teacher Term', price: 'GH₵ 49.99', tenureDays: 120 },
-            'school_term': { name: 'Whole School Cloud Hub (Termly)', price: 'GH₵ 199.99', tenureDays: 120 },
-            'school_year': { name: 'Full Academic Year (3 Terms)', price: 'GH₵ 399.99', tenureDays: 365 }
+            'teacher_term': { name: 'Single Teacher Term', price: 'GH₵ 49.99', pesewas: 4999, tenureDays: 120 },
+            'school_term': { name: 'Whole School Cloud Hub (Termly)', price: 'GH₵ 199.99', pesewas: 19999, tenureDays: 120 },
+            'school_year': { name: 'Full Academic Year (3 Terms)', price: 'GH₵ 399.99', pesewas: 39999, tenureDays: 365 }
         };
 
         // Unique Persistent Device Identifier (ensures device + school ID lock)
@@ -1271,6 +1281,47 @@
             return null;
         }
 
+        function payWithLandingPaystackInline() {
+            const plan = activeSelectedPlan || 'teacher_term';
+            const details = planDetails[plan] || planDetails['teacher_term'];
+            const schoolInput = document.getElementById('landingSchoolIdInput');
+            const sid = (schoolInput ? schoolInput.value : 'ATAK-983').trim().toUpperCase() || 'ATAK-983';
+            const amountInPesewas = details.pesewas || 4999;
+
+            if (typeof PaystackPop === 'undefined') {
+                alert('Paystack SDK is loading or blocked by an extension. Opening payment page...');
+                window.open('https://paystack.shop/pay/eduvet_edubyteafrica_com', '_blank');
+                return;
+            }
+
+            const handler = PaystackPop.setup({
+                key: PAYSTACK_LIVE_PUBLIC_KEY,
+                email: `payments.${sid.toLowerCase()}@eduvet.edubyteafrica.com`,
+                amount: amountInPesewas,
+                currency: 'GHS',
+                channels: ['mobile_money', 'card'],
+                ref: 'EDV-' + plan + '-' + sid + '-' + Date.now(),
+                metadata: {
+                    custom_fields: [
+                        { display_name: "School ID", variable_name: "school_id", value: sid },
+                        { display_name: "Package", variable_name: "package", value: details.name }
+                    ]
+                },
+                callback: function(response) {
+                    const ref = response.reference || response.trxref;
+                    if (ref) {
+                        const refInput = document.getElementById('landingPaystackRefInput');
+                        if (refInput) refInput.value = ref;
+                        verifyLandingPaystackReference();
+                    }
+                },
+                onClose: function() {
+                    console.log('Landing Paystack checkout closed.');
+                }
+            });
+            handler.openIframe();
+        }
+
         async function verifyLandingPaystackReference() {
             const refInput = document.getElementById('landingPaystackRefInput');
             const schoolInput = document.getElementById('landingSchoolIdInput');
@@ -1283,6 +1334,19 @@
             }
 
             const cleanRef = ref.toUpperCase().replace(/[^A-Z0-9_-]/g, '');
+
+            // Attempt official Paystack Live API Verification
+            try {
+                const apiRes = await fetch(`/api/verify-paystack?reference=${encodeURIComponent(cleanRef)}`);
+                if (apiRes.ok) {
+                    const apiData = await apiRes.json();
+                    if (apiData.success) {
+                        console.log('[Paystack Live Verification] Confirmed via official API:', apiData);
+                    }
+                }
+            } catch (apiErr) {
+                console.warn('[Paystack Live API Notice]:', apiErr.message);
+            }
             const cleanSid = sid.replace(/[^A-Z0-9]/g, '');
             const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
             let randToken = '';

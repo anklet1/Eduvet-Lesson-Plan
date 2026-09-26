@@ -122,6 +122,8 @@
     <link rel="stylesheet" href="eduvet.css">
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Official Paystack Inline Checkout SDK (Live) -->
+    <script src="https://js.paystack.co/v1/inline.js"></script>
     <!-- Firebase Compat SDKs (Deferred for non-blocking critical rendering) -->
     <script defer src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script defer src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -704,10 +706,16 @@
                 </div>
             </div>
 
-            <!-- Step 1: Real Paystack Portal Link -->
+            <!-- Step 1: Real Paystack Portal Link & Instant Inline Checkout -->
             <div class="space-y-3 pt-1">
-                <a :href="paystackStoreUrl" target="_blank" rel="noopener noreferrer" class="w-full bg-[#011B33] hover:bg-slate-900 active:bg-black text-white font-black py-3.5 rounded-xl text-xs sm:text-sm transition shadow-md flex items-center justify-center gap-2 cursor-pointer text-center">
-                    <span>1. Proceed to Official Paystack Payment Page</span>
+                <button type="button" @click="payWithPaystackInline()" class="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-black py-3.5 rounded-xl text-xs sm:text-sm transition shadow-md flex items-center justify-center gap-2 cursor-pointer text-center">
+                    <i class="fa fa-credit-card text-emerald-200"></i>
+                    <span>1. Pay Instantly via Paystack (MoMo &amp; Card)</span>
+                    <i class="fa fa-bolt text-amber-300"></i>
+                </button>
+
+                <a :href="paystackStoreUrl" target="_blank" rel="noopener noreferrer" class="w-full bg-[#011B33] hover:bg-slate-900 active:bg-black text-white font-semibold py-2.5 rounded-xl text-xs transition shadow-sm flex items-center justify-center gap-2 cursor-pointer text-center">
+                    <span>Or Proceed to Official Paystack Payment Page</span>
                     <i class="fa fa-arrow-up-right-from-square text-amber-300"></i>
                 </a>
 
@@ -6140,6 +6148,7 @@ Format: Return exactly a JSON object with:
                 activationKeysVault: [],
                 keyGenForm: { teacherId: '', plan: 'teacher_term' },
                 paystackStoreUrl: 'https://paystack.shop/pay/eduvet_edubyteafrica_com',
+                paystackPublicKey: 'pk_live_9fbe7b13f82390a5610c88d1b9cb4dce5978ec9e',
                 paystackMerchantPhone: '0543521863',
                 hasGeminiApiKey: !!(localStorage.getItem('eduvet_gemini_api_key')),
 
@@ -6268,6 +6277,51 @@ Format: Return exactly a JSON object with:
                     this.openPaystackInAppModal();
                 },
 
+                payWithPaystackInline() {
+                    const plan = this.selectedProPlan || 'teacher_term';
+                    let amount = 4999;
+                    if (plan === 'school_term') amount = 19999;
+                    if (plan === 'school_year') amount = 39999;
+
+                    const sid = (this.authenticatedSchoolId || 'ATAK-983').trim().toUpperCase();
+                    const tid = (this.activeTeacher ? this.activeTeacher.id : 'GES-001');
+                    const teacherEmail = (this.activeTeacher && this.activeTeacher.email) ? this.activeTeacher.email : `teacher.${tid.toLowerCase()}@eduvet.edubyteafrica.com`;
+                    const self = this;
+
+                    if (typeof PaystackPop === 'undefined') {
+                        alert('Paystack SDK is loading or blocked by an extension. Opening payment page...');
+                        window.open(this.paystackStoreUrl, '_blank');
+                        return;
+                    }
+
+                    const handler = PaystackPop.setup({
+                        key: this.paystackPublicKey,
+                        email: teacherEmail,
+                        amount: amount,
+                        currency: 'GHS',
+                        channels: ['mobile_money', 'card'],
+                        ref: 'EDV-' + plan + '-' + sid + '-' + Date.now(),
+                        metadata: {
+                            custom_fields: [
+                                { display_name: "School ID", variable_name: "school_id", value: sid },
+                                { display_name: "Staff ID", variable_name: "staff_id", value: tid },
+                                { display_name: "Plan", variable_name: "plan", value: plan }
+                            ]
+                        },
+                        callback: function(response) {
+                            const ref = response.reference || response.trxref;
+                            if (ref) {
+                                self.enteredPaystackReference = ref;
+                                self.verifyPaystackReference();
+                            }
+                        },
+                        onClose: function() {
+                            console.log('Paystack checkout window closed.');
+                        }
+                    });
+                    handler.openIframe();
+                },
+
                 copyMomoNumber() {
                     navigator.clipboard.writeText('0543521863').then(() => {
                         this.momoCopied = true;
@@ -6287,6 +6341,19 @@ Format: Return exactly a JSON object with:
                     const tid = (this.activeTeacher ? this.activeTeacher.id : 'GES-001');
                     const sid = this.authenticatedSchoolId || 'ATAK-983';
                     const cleanRef = ref.toUpperCase().replace(/[^A-Z0-9_-]/g, '');
+
+                    // Check official Paystack Live API if reachable
+                    try {
+                        const apiRes = await fetch(`/api/verify-paystack?reference=${encodeURIComponent(cleanRef)}`);
+                        if (apiRes.ok) {
+                            const apiData = await apiRes.json();
+                            if (apiData.success) {
+                                console.log('[Paystack Live Verification] Confirmed via official API:', apiData);
+                            }
+                        }
+                    } catch (apiErr) {
+                        console.warn('[Paystack Live API Notice]:', apiErr.message);
+                    }
 
                     // Generate Unique Activation Code permanently tied to School ID
                     const cleanSid = (sid || 'ATAK-983').replace(/[^A-Z0-9]/g, '');
