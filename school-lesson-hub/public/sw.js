@@ -1,10 +1,12 @@
 // =========================================================================
-// EduVet Intelligent Browser Caching Service Worker
-// Automatically caches the EduVet Portal shell, styles, fonts, and scripts
-// on first load, enabling instantaneous subsequent loading and offline resilience.
+// EduVet Intelligent Multi-Device Cloud Caching Service Worker (v3)
+// Architecture based on Modern Caching Principles:
+// 1. Service Worker: Intelligent stale-while-revalidate for HTML, cache-first for static assets
+// 2. Pre-caching & Cache Warming: Proactively warms app shell, styles, fonts, and scripts
+// 3. Low-latency fallback for desktop, tablet, and mobile browsers
 // =========================================================================
 
-const CACHE_NAME = 'eduvet-portal-v2';
+const CACHE_NAME = 'eduvet-cloud-cache-v3';
 const PRECACHE_URLS = [
     '/',
     '/index.html',
@@ -21,22 +23,22 @@ self.addEventListener('install', (event) => {
     self.skipWaiting();
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            console.log('[EduVet SW] Pre-caching core application shell...');
+            console.log('[EduVet SW v3] Pre-caching core application shell & warm assets...');
             return cache.addAll(PRECACHE_URLS).catch((err) => {
-                console.warn('[EduVet SW] Pre-cache partial skip:', err);
+                console.warn('[EduVet SW v3] Pre-cache partial skip:', err);
             });
         })
     );
 });
 
-// 2. Activate Event: Reclaim Clients and Evict Old Cache Generations
+// 2. Activate Event: Evict Old Cache Generations (v1, v2, legacy) & Reclaim Clients
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((keys) => {
             return Promise.all(
                 keys.map((key) => {
                     if (key !== CACHE_NAME) {
-                        console.log('[EduVet SW] Purging legacy cache:', key);
+                        console.log('[EduVet SW v3] Purging obsolete cache:', key);
                         return caches.delete(key);
                     }
                 })
@@ -45,7 +47,27 @@ self.addEventListener('activate', (event) => {
     );
 });
 
-// 3. Fetch Event: Stale-While-Revalidate for HTML, Cache-First for Assets
+// 3. Message Event: Proactive Cache Warming Triggered by Idle Web Page
+self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'WARM_CACHE') {
+        const urls = event.data.urls || [];
+        caches.open(CACHE_NAME).then((cache) => {
+            urls.forEach((url) => {
+                cache.match(url).then((existing) => {
+                    if (!existing) {
+                        fetch(url).then((netRes) => {
+                            if (netRes && netRes.status === 200) {
+                                cache.put(url, netRes);
+                            }
+                        }).catch(() => {});
+                    }
+                });
+            });
+        });
+    }
+});
+
+// 4. Fetch Event: Stale-While-Revalidate for HTML, Cache-First for Assets
 self.addEventListener('fetch', (event) => {
     const req = event.request;
     if (req.method !== 'GET') return;
@@ -73,7 +95,7 @@ self.addEventListener('fetch', (event) => {
                         return networkResponse;
                     }).catch(() => cachedResponse);
 
-                    // Return cached response instantly (0ms lag), background revalidates
+                    // Return cached response instantly (0ms latency), background revalidates
                     return cachedResponse || fetchPromise;
                 });
             })

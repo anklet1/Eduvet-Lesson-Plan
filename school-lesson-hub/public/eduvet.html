@@ -6196,7 +6196,8 @@ Format: Return exactly a JSON object with:
                     // 1. Check school subscription (Covers all teachers under this School ID)
                     const schoolSubs = JSON.parse(localStorage.getItem('eduvet_school_subscriptions') || '{}');
                     const directSchoolSub = JSON.parse(localStorage.getItem('eduvet_school_sub_' + sid) || 'null');
-                    const schoolSub = directSchoolSub || schoolSubs[sid];
+                    const directLandingSub = JSON.parse(localStorage.getItem('eduvet_subscription_' + sid) || 'null');
+                    const schoolSub = directSchoolSub || schoolSubs[sid] || directLandingSub;
                     if (schoolSub && (schoolSub.status === 'active' || schoolSub.plan) && (schoolSub.schoolId || '').toUpperCase() === sid) {
                         // Enforce tenure expiration!
                         if (schoolSub.expiresAt && new Date() > new Date(schoolSub.expiresAt)) {
@@ -6219,7 +6220,26 @@ Format: Return exactly a JSON object with:
                     return false;
                 },
 
+                getActiveSubscriptionDetails(teacherId, schoolId) {
+                    const tid = teacherId || (this.activeTeacher ? this.activeTeacher.id : 'GES-001');
+                    const sid = (schoolId || this.authenticatedSchoolId || 'ATAK-983').trim().toUpperCase();
+                    const directSchoolSub = JSON.parse(localStorage.getItem('eduvet_school_sub_' + sid) || 'null');
+                    const schoolSubs = JSON.parse(localStorage.getItem('eduvet_school_subscriptions') || '{}');
+                    const directLandingSub = JSON.parse(localStorage.getItem('eduvet_subscription_' + sid) || 'null');
+                    const teacherSubs = JSON.parse(localStorage.getItem('eduvet_teacher_subscriptions') || '{}');
+                    const directTeacherSub = JSON.parse(localStorage.getItem('eduvet_teacher_pro_' + tid) || 'null');
+
+                    return directLandingSub || directSchoolSub || schoolSubs[sid] || directTeacherSub || teacherSubs[tid];
+                },
+
                 openPaystackInAppModal() {
+                    const sid = (this.authenticatedSchoolId || 'ATAK-983').trim().toUpperCase();
+                    if (this.hasValidActiveSubscription()) {
+                        const sub = this.getActiveSubscriptionDetails();
+                        const expiry = (sub && sub.expiresAt) ? new Date(sub.expiresAt).toLocaleDateString() : 'Active Term';
+                        const proceed = confirm(`🛡️ Duplicate Payment Protection:\n\nSchool ID [${sid}] already has an active Pro subscription on this device, valid until ${expiry}!\n\nAll Pro features are already unlocked. You do not need to pay twice.\n\nDo you want to proceed anyway with renewing or upgrading? Click OK to proceed, or Cancel to keep your current plan.`);
+                        if (!proceed) return;
+                    }
                     this.showFeatureLockModal = false;
                     this.showProUpgradeModal = false;
                     this.showDirectMomoModal = false;
@@ -6227,6 +6247,13 @@ Format: Return exactly a JSON object with:
                 },
 
                 openDirectMomoModal() {
+                    const sid = (this.authenticatedSchoolId || 'ATAK-983').trim().toUpperCase();
+                    if (this.hasValidActiveSubscription()) {
+                        const sub = this.getActiveSubscriptionDetails();
+                        const expiry = (sub && sub.expiresAt) ? new Date(sub.expiresAt).toLocaleDateString() : 'Active Term';
+                        const proceed = confirm(`🛡️ Duplicate Payment Protection:\n\nSchool ID [${sid}] already has an active Pro subscription on this device, valid until ${expiry}!\n\nAll Pro features are already unlocked. You do not need to pay twice.\n\nDo you want to proceed anyway with renewing or upgrading? Click OK to proceed, or Cancel to keep your current plan.`);
+                        if (!proceed) return;
+                    }
                     this.showFeatureLockModal = false;
                     this.showProUpgradeModal = false;
                     this.showPaystackModal = false;
@@ -6340,10 +6367,29 @@ Format: Return exactly a JSON object with:
                     alert(`🎉 Paystack Payment Registered!\n\nUnique School Activation Code Generated: [${uniqueSchoolCode}]\n\n🔒 This code is strictly locked to School ID: ${sid}. Teachers not registered under this school cannot use it.\n\nAll Pro features and full term lessons are now unlocked.`);
                 },
 
+                isDummyOrPlaceholderCode(code) {
+                    if (!code || typeof code !== 'string') return true;
+                    const clean = code.trim().toUpperCase();
+                    if (clean.length < 8) return true;
+                    if (/X{2,}/i.test(clean)) return true;
+                    const alphanumericOnly = clean.replace(/[^A-Z0-9]/g, '');
+                    const xCount = (alphanumericOnly.match(/X/g) || []).length;
+                    if (alphanumericOnly.length > 0 && (xCount / alphanumericOnly.length) >= 0.2) return true;
+                    if (/^(.)\1+$/.test(alphanumericOnly)) return true;
+                    if (/(TEST|DEMO|DUMMY|SAMPLE|PLACEHOLDER|FAKE|TRIAL|BYPASS|TEMP|0000|1234)/i.test(clean)) return true;
+                    return false;
+                },
+
                 async verifyActivationCode(inputCode) {
                     const code = (inputCode || this.enteredActivationCode || this.enteredFeatureCode || '').trim().toUpperCase();
-                    if (!code || code.length < 5) {
-                        alert('Please enter a valid Activation Code.');
+                    if (!code || code.length < 8) {
+                        alert('Please enter a valid Activation Code (minimum 8 characters).');
+                        return;
+                    }
+
+                    // STRICT ANTI-BYPASS: Rejects dummy codes, placeholder strings, and repeated 'X' characters
+                    if (this.isDummyOrPlaceholderCode(code)) {
+                        alert('❌ Invalid Activation Code: Placeholder and dummy codes containing repeated characters (such as "X") are strictly rejected.\n\nPlease enter an authentic, officially issued school activation code.');
                         return;
                     }
 
@@ -6436,6 +6482,10 @@ Format: Return exactly a JSON object with:
                                 this.confirmPaymentSuccess('Activation Code: ' + code, plan, code);
                                 alert(`🎉 License Activated Successfully!\n\nActivation Code [${code}] has been verified and registered for School ID: ${sid}.\n\nPackage: ${plan === 'school_year' ? 'School Yearly Institutional (3 Terms / 365 Days)' : (plan === 'teacher_term' ? 'Teacher Pro (1 Term / 120 Days)' : 'School Termly License (1 Term / 120 Days)')}\nActive Until: ${new Date(expiresAt).toLocaleDateString()}\n\nAll teachers in ${sid} now have full Pro privileges and lesson schemes unlocked!`);
                                 return;
+                            } else {
+                                // STRICT ENFORCEMENT: Key does not exist in official database!
+                                alert(`❌ Activation Code Rejected: Code [${code}] was not found in the official EduVet database for School ID [${sid}].\n\nPlease ensure you have paid or contacted Felix Fleku at 0543521863 to receive an authentic school-locked code.`);
+                                return;
                             }
                         } catch (err) {
                             console.warn('Firestore key lookup notice:', err.message);
@@ -6479,7 +6529,10 @@ Format: Return exactly a JSON object with:
                     const clean = code.trim().toUpperCase();
                     const cleanSid = (activeSchoolId || 'ATAK-983').replace(/[^A-Z0-9]/g, '').toUpperCase();
 
-                    // Check school prefix in format: EDV-[SCHOOL_ID]-[TOKEN] or [SCHOOL_ID]-[TOKEN]
+                    // 1. Strictly reject dummy or placeholder codes (such as repeated 'X')
+                    if (this.isDummyOrPlaceholderCode(clean)) return false;
+
+                    // 2. Format & School prefix check
                     if (clean.startsWith('EDV-')) {
                         const parts = clean.split('-');
                         if (parts.length >= 3) {
@@ -6487,13 +6540,24 @@ Format: Return exactly a JSON object with:
                             if (cleanSid && codeSchool !== cleanSid) {
                                 return false; // Cross-school mismatch rejected!
                             }
-                            return parts[2].length >= 3;
+                        } else {
+                            return false;
                         }
-                    } else if (clean.startsWith(cleanSid + '-')) {
-                        const parts = clean.split('-');
-                        return parts.length >= 2 && parts[1].length >= 3;
+                    } else if (!clean.startsWith(cleanSid + '-')) {
+                        return false;
                     }
-                    // No random codes or unregistered prefixes allowed!
+
+                    // 3. Reject arbitrary unverified tokens:
+                    // Only allow offline activation if this code was already authenticated/cached on this device for this school!
+                    const cachedCode = localStorage.getItem('eduvet_school_code_' + activeSchoolId);
+                    const cachedSub = JSON.parse(localStorage.getItem('eduvet_subscription_' + activeSchoolId) || 'null');
+                    const claimedAlgo = JSON.parse(localStorage.getItem('eduvet_claimed_algo_codes') || '[]');
+                    
+                    if (cachedCode === clean || (cachedSub && cachedSub.activationCode === clean) || claimedAlgo.includes(clean)) {
+                        return true;
+                    }
+
+                    // No unverified codes allowed offline without prior database registration
                     return false;
                 },
 

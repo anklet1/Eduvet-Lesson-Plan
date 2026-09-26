@@ -604,6 +604,30 @@
                 </p>
             </div>
 
+            <!-- Active Subscription Device Banner (Rendered dynamically when active on this device) -->
+            <div id="landingActiveSubscriptionBanner" class="hidden max-w-4xl mx-auto mb-6 p-4 bg-emerald-50 border-2 border-emerald-500 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 text-emerald-950 shadow-xs">
+                <div class="flex items-center gap-3 text-left">
+                    <div class="w-10 h-10 bg-emerald-500 text-white rounded-xl flex items-center justify-center text-lg font-bold shrink-0 shadow-sm">
+                        ✓
+                    </div>
+                    <div>
+                        <div class="font-black text-sm text-emerald-950 flex items-center gap-2">
+                            <span>Package Active &amp; Unlocked on This Device</span>
+                            <span class="bg-emerald-200 text-emerald-900 text-[10px] px-2 py-0.5 rounded-full font-mono uppercase font-black" id="landingActivePlanBadge">Pro Active</span>
+                        </div>
+                        <div class="text-xs text-emerald-800 mt-0.5 font-medium" id="landingActivePlanDetails">
+                            School ID: ATAK-983 &bull; Valid Until: End of Term
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                    <button type="button" onclick="triggerSwipeLogin()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-black px-4 py-2.5 rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer">
+                        <span>Enter EduVet Portal</span>
+                        <i class="fa fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
             <!-- 4 Responsive Pricing Cards on Pure White -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 
@@ -635,7 +659,7 @@
                 </div>
 
                 <!-- Plan 1: Single Teacher Term -->
-                <div class="bg-white rounded-3xl border-2 border-[#0284C7] p-6 flex flex-col justify-between hover:shadow-md transition relative">
+                <div id="pricing-card-teacher_term" class="bg-white rounded-3xl border-2 border-[#0284C7] p-6 flex flex-col justify-between hover:shadow-md transition relative">
                     <span class="absolute -top-3 right-6 bg-[#0284C7] text-white text-[9px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full font-mono">
                         Teacher Pick
                     </span>
@@ -654,7 +678,7 @@
                         </ul>
                     </div>
                     <div class="pt-6 space-y-2">
-                        <button type="button" onclick="openLandingPaymentModal('teacher_term')" class="w-full bg-[#0284C7] hover:bg-[#0369A1] active:bg-[#075985] text-white font-black py-2.5 rounded-xl text-xs transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer">
+                        <button id="pricing-btn-teacher_term" type="button" onclick="openLandingPaymentModal('teacher_term')" class="w-full bg-[#0284C7] hover:bg-[#0369A1] active:bg-[#075985] text-white font-black py-2.5 rounded-xl text-xs transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer">
                             <i class="fa fa-credit-card"></i>
                             <span>Pay Online / MoMo (GH₵ 49.99)</span>
                         </button>
@@ -666,7 +690,7 @@
                 </div>
 
                 <!-- Plan 2: Whole School Cloud Hub -->
-                <div class="bg-white rounded-3xl border-2 border-black p-6 flex flex-col justify-between hover:shadow-md transition relative">
+                <div id="pricing-card-school_term" class="bg-white rounded-3xl border-2 border-black p-6 flex flex-col justify-between hover:shadow-md transition relative">
                     <div class="space-y-4">
                         <span class="inline-block bg-white border border-black text-black px-2.5 py-1 rounded-md text-[10px] font-black uppercase font-mono">
                             Whole School Cloud Hub
@@ -683,7 +707,7 @@
                         </ul>
                     </div>
                     <div class="pt-6 space-y-2">
-                        <button type="button" onclick="openLandingPaymentModal('school_term')" class="w-full bg-black hover:bg-slate-800 active:bg-slate-900 text-white font-black py-2.5 rounded-xl text-xs transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer">
+                        <button id="pricing-btn-school_term" type="button" onclick="openLandingPaymentModal('school_term')" class="w-full bg-black hover:bg-slate-800 active:bg-slate-900 text-white font-black py-2.5 rounded-xl text-xs transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer">
                             <i class="fa fa-credit-card"></i>
                             <span>Pay Online / MoMo (GH₵ 199.99)</span>
                         </button>
@@ -695,7 +719,7 @@
                 </div>
 
                 <!-- Plan 3: Full Academic Year -->
-                <div class="bg-white rounded-3xl border-2 border-[#0284C7] p-6 flex flex-col justify-between hover:shadow-md transition relative">
+                <div id="pricing-card-school_year" class="bg-white rounded-3xl border-2 border-[#0284C7] p-6 flex flex-col justify-between hover:shadow-md transition relative">
                     <span class="absolute -top-3 right-6 bg-[#0284C7] text-white text-[9px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full font-mono">
                         Best Value
                     </span>
@@ -714,7 +738,7 @@
                         </ul>
                     </div>
                     <div class="pt-6 space-y-2">
-                        <button type="button" onclick="openLandingPaymentModal('school_year')" class="w-full bg-[#0284C7] hover:bg-[#0369A1] active:bg-[#075985] text-white font-black py-2.5 rounded-xl text-xs transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer">
+                        <button id="pricing-btn-school_year" type="button" onclick="openLandingPaymentModal('school_year')" class="w-full bg-[#0284C7] hover:bg-[#0369A1] active:bg-[#075985] text-white font-black py-2.5 rounded-xl text-xs transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer">
                             <i class="fa fa-credit-card"></i>
                             <span>Pay Online / MoMo (GH₵ 399.99)</span>
                         </button>
@@ -942,10 +966,15 @@
                 <div class="text-[11px] font-bold text-slate-600" id="landingLockedSchoolDisplay">Permanently Locked to: ATAK-983</div>
             </div>
 
-            <button type="button" onclick="launchEduVetWithPro()" class="w-full bg-[#0284C7] hover:bg-[#0369A1] text-white font-black py-3.5 rounded-xl text-sm transition shadow-md flex items-center justify-center gap-2 cursor-pointer">
-                <span>Launch EduVet Portal Now</span>
-                <i class="fa fa-arrow-right"></i>
-            </button>
+            <div class="space-y-2 pt-1">
+                <button type="button" onclick="launchEduVetWithPro()" class="w-full bg-[#0284C7] hover:bg-[#0369A1] text-white font-black py-3.5 rounded-xl text-sm transition shadow-md flex items-center justify-center gap-2 cursor-pointer">
+                    <span>Launch EduVet Portal Now</span>
+                    <i class="fa fa-arrow-right"></i>
+                </button>
+                <button type="button" onclick="closeLandingSuccessModal()" class="w-full bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-800 font-bold py-2.5 rounded-xl text-xs transition cursor-pointer">
+                    <span>Stay on Landing Page &amp; Enjoy Benefits</span>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1041,7 +1070,7 @@
             window.addEventListener('touchend', onEnd);
         }
 
-        // 4. In-App Payment State & Logic (Paystack & MoMo)
+        // 4. In-App Payment State, Hardened Security & Anti-Bypass Engine
         let activeSelectedPlan = 'teacher_term';
         const planDetails = {
             'teacher_term': { name: 'Single Teacher Term', price: 'GH₵ 49.99', tenureDays: 120 },
@@ -1049,20 +1078,99 @@
             'school_year': { name: 'Full Academic Year (3 Terms)', price: 'GH₵ 399.99', tenureDays: 365 }
         };
 
+        // Unique Persistent Device Identifier (ensures device + school ID lock)
+        function getOrCreateDeviceId() {
+            let deviceId = localStorage.getItem('eduvet_device_id');
+            if (!deviceId) {
+                deviceId = 'DEV-' + Math.random().toString(36).substring(2, 10).toUpperCase() + '-' + Date.now().toString(36).toUpperCase();
+                localStorage.setItem('eduvet_device_id', deviceId);
+            }
+            return deviceId;
+        }
+
+        // Strict detector for dummy, placeholder, or 'x' character codes
+        function isDummyOrPlaceholderCode(code) {
+            if (!code || typeof code !== 'string') return true;
+            const clean = code.trim().toUpperCase();
+            if (clean.length < 8) return true;
+            
+            // 1. Rejects if contains repeated 'X' characters (e.g. XX, XXX, XXXX)
+            if (/X{2,}/i.test(clean)) return true;
+            
+            // 2. Rejects if total proportion of 'X' characters is 20% or more
+            const alphanumericOnly = clean.replace(/[^A-Z0-9]/g, '');
+            const xCount = (alphanumericOnly.match(/X/g) || []).length;
+            if (alphanumericOnly.length > 0 && (xCount / alphanumericOnly.length) >= 0.2) return true;
+            
+            // 3. Rejects repeated identical characters (e.g., 000000, 111111, AAAAAA)
+            if (/^(.)\1+$/.test(alphanumericOnly)) return true;
+            
+            // 4. Rejects common placeholder words
+            if (/(TEST|DEMO|DUMMY|SAMPLE|PLACEHOLDER|FAKE|TRIAL|BYPASS|TEMP|0000|1234)/i.test(clean)) return true;
+            
+            return false;
+        }
+
+        // Check if an active subscription exists for School ID on this device
+        function getExistingActiveSubscription(sid) {
+            if (!sid) return null;
+            const cleanSid = sid.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+            const localSubStr = localStorage.getItem('eduvet_subscription_' + sid) || 
+                                localStorage.getItem('eduvet_subscription_' + cleanSid);
+            if (localSubStr) {
+                try {
+                    const sub = JSON.parse(localSubStr);
+                    if (sub && (sub.isPro || sub.status === 'active') && sub.expiresAt) {
+                        const expiresAt = new Date(sub.expiresAt);
+                        if (expiresAt > new Date()) {
+                            const planInfo = planDetails[sub.plan] || { name: sub.plan || 'Pro' };
+                            return {
+                                isActive: true,
+                                sub: sub,
+                                planName: planInfo.name || sub.plan,
+                                expiresAt: expiresAt
+                            };
+                        }
+                    }
+                } catch(e) {}
+            }
+            return null;
+        }
+
         function openLandingPaymentModal(planId) {
             activeSelectedPlan = planId || 'teacher_term';
             const details = planDetails[activeSelectedPlan] || planDetails['teacher_term'];
             
+            const schoolInput = document.getElementById('landingSchoolIdInput');
+            const currentSchoolId = (schoolInput ? schoolInput.value : '') || localStorage.getItem('eduvet_active_school_id') || 'ATAK-983';
+
+            // Duplicate payment prevention check using Device ID & School ID
+            const existing = getExistingActiveSubscription(currentSchoolId);
+            if (existing && existing.isActive) {
+                const deviceId = getOrCreateDeviceId();
+                const expiryFormatted = existing.expiresAt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+                const proceed = confirm(
+                    `🛡️ DUPLICATE PAYMENT PROTECTION:\n\n` +
+                    `School ID [${currentSchoolId}] already has an active ${existing.planName} on this device!\n\n` +
+                    `• Device ID: ${deviceId.substring(0, 16)}...\n` +
+                    `• Status: Unlocked & Active\n` +
+                    `• Valid Until: ${expiryFormatted}\n\n` +
+                    `You do NOT need to pay twice. All Pro features are already unlocked.\n\n` +
+                    `Do you want to proceed anyway with renewing or upgrading your license? Click OK to proceed to payment, or Cancel to keep your current active access.`
+                );
+                if (!proceed) {
+                    return;
+                }
+            }
+
             const labelEl = document.getElementById('landingPlanLabel');
             const priceEl = document.getElementById('landingPriceLabel');
             const schoolRefEl = document.getElementById('landingMomoSchoolRef');
             const modalEl = document.getElementById('landingPaystackModal');
-            const schoolInput = document.getElementById('landingSchoolIdInput');
             
             if (labelEl) labelEl.textContent = details.name;
             if (priceEl) priceEl.textContent = details.price;
             
-            const currentSchoolId = (schoolInput ? schoolInput.value : '') || localStorage.getItem('eduvet_active_school_id') || 'ATAK-983';
             if (schoolInput) schoolInput.value = currentSchoolId;
             if (schoolRefEl) schoolRefEl.textContent = 'School ID: ' + currentSchoolId;
             
@@ -1079,7 +1187,27 @@
         function openLandingMomoModal() {
             closeLandingPaymentModal();
             const schoolInput = document.getElementById('landingSchoolIdInput');
-            const currentSchoolId = (schoolInput ? schoolInput.value : '') || 'ATAK-983';
+            const currentSchoolId = (schoolInput ? schoolInput.value : '') || localStorage.getItem('eduvet_active_school_id') || 'ATAK-983';
+
+            // Duplicate payment prevention check for Direct MoMo
+            const existing = getExistingActiveSubscription(currentSchoolId);
+            if (existing && existing.isActive) {
+                const deviceId = getOrCreateDeviceId();
+                const expiryFormatted = existing.expiresAt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+                const proceed = confirm(
+                    `🛡️ DUPLICATE PAYMENT PROTECTION:\n\n` +
+                    `School ID [${currentSchoolId}] already has an active ${existing.planName} on this device!\n\n` +
+                    `• Device ID: ${deviceId.substring(0, 16)}...\n` +
+                    `• Status: Unlocked & Active\n` +
+                    `• Valid Until: ${expiryFormatted}\n\n` +
+                    `You do NOT need to pay twice. All Pro features are already unlocked.\n\n` +
+                    `Do you want to proceed anyway with renewing or upgrading your license? Click OK to proceed to payment, or Cancel to keep your current active access.`
+                );
+                if (!proceed) {
+                    return;
+                }
+            }
+
             const details = planDetails[activeSelectedPlan] || planDetails['teacher_term'];
             updateMomoWhatsAppLink(currentSchoolId, details.name);
             const momoModal = document.getElementById('landingDirectMomoModal');
@@ -1089,6 +1217,11 @@
         function closeLandingMomoModal() {
             const momoModal = document.getElementById('landingDirectMomoModal');
             if (momoModal) momoModal.classList.add('hidden');
+        }
+
+        function closeLandingSuccessModal() {
+            const successModal = document.getElementById('landingSuccessModal');
+            if (successModal) successModal.classList.add('hidden');
         }
 
         function updateMomoWhatsAppLink(schoolId, planName) {
@@ -1148,6 +1281,7 @@
             const details = planDetails[activeSelectedPlan] || planDetails['teacher_term'];
             const now = new Date();
             const expiresAt = new Date(now.getTime() + (details.tenureDays * 24 * 60 * 60 * 1000));
+            const deviceId = getOrCreateDeviceId();
 
             const db = getFirestoreDb();
             if (db) {
@@ -1164,6 +1298,7 @@
                         schoolId: sid,
                         plan: activeSelectedPlan,
                         activationCode: uniqueCode,
+                        deviceId: deviceId,
                         claimedAt: now.toISOString(),
                         expiresAt: expiresAt.toISOString(),
                         verifiedOnline: true
@@ -1173,8 +1308,10 @@
                     await db.collection('activation_keys').doc(uniqueCode).set({
                         code: uniqueCode,
                         schoolId: sid,
+                        targetSchoolId: sid,
                         plan: activeSelectedPlan,
                         tenureDays: details.tenureDays,
+                        deviceId: deviceId,
                         generatedAt: now.toISOString(),
                         expiresAt: expiresAt.toISOString(),
                         isRedeemed: true,
@@ -1185,13 +1322,14 @@
                 }
             }
 
-            // Save active subscription to localStorage so portal activates automatically
+            // Save active subscription to localStorage tied to Device ID and School ID
             const subData = {
                 plan: activeSelectedPlan,
                 schoolId: sid,
                 status: 'active',
                 reference: cleanRef,
                 activationCode: uniqueCode,
+                deviceId: deviceId,
                 activatedAt: now.toISOString(),
                 expiresAt: expiresAt.toISOString(),
                 isPro: true
@@ -1201,8 +1339,10 @@
             localStorage.setItem('eduvet_school_code_' + sid, uniqueCode);
             localStorage.setItem('eduvet_is_pro_' + sid, 'true');
 
-            // Close checkout modal & show success code display
+            // Close checkout modal & update package state on page (Retaining user on landing page)
             closeLandingPaymentModal();
+            renderActivePackageState();
+
             const successModal = document.getElementById('landingSuccessModal');
             const codeDisplay = document.getElementById('landingGeneratedCodeDisplay');
             const lockedDisplay = document.getElementById('landingLockedSchoolDisplay');
@@ -1211,33 +1351,98 @@
             if (successModal) successModal.classList.remove('hidden');
         }
 
+        // Hardened Activation Code Verification matching main portal security
         async function verifyLandingLicenseCode() {
             const input = document.getElementById('landingLicenseCodeInput');
             const schoolInput = document.getElementById('landingSchoolIdInput');
             const code = (input ? input.value : '').trim().toUpperCase();
-            const sid = (schoolInput ? schoolInput.value : 'ATAK-983').trim().toUpperCase() || 'ATAK-983';
+            const sid = (schoolInput ? schoolInput.value : localStorage.getItem('eduvet_active_school_id') || 'ATAK-983').trim().toUpperCase() || 'ATAK-983';
 
-            if (!code || code.length < 6) {
-                alert('Please enter a valid activation code or license key.');
+            if (!code || code.length < 8) {
+                alert('Please enter a valid official EduVet activation code (minimum 8 characters).');
+                return;
+            }
+
+            // 1. REJECT DUMMY / PLACEHOLDER CODES (e.g. xxx, xxxx, xxxx-xxxx, repeated characters)
+            if (isDummyOrPlaceholderCode(code)) {
+                alert('❌ Invalid Activation Code: Placeholder and dummy codes containing repeated characters (such as "X") are strictly rejected.\n\nPlease enter an authentic, officially issued school activation code.');
                 return;
             }
 
             const cleanSid = sid.replace(/[^A-Z0-9]/g, '');
-            // Code structure validation: Must be tied to School ID or registered in DB
-            if (code.startsWith('EDV-') && !code.includes(cleanSid) && !code.includes('ATAK983')) {
-                alert(`❌ Activation Code Rejected: This code is locked to a different School ID and cannot be used for ${sid}.`);
+            const cleanCode = code.replace(/\s+/g, '');
+
+            // 2. STRICT SCHOOL ID PREFIX REQUIREMENT: Code must strictly begin with School ID prefix
+            const hasSchoolPrefix = cleanCode.startsWith('EDV-' + cleanSid + '-') ||
+                                    cleanCode.startsWith('EDV-' + sid + '-') ||
+                                    cleanCode.startsWith(cleanSid + '-') ||
+                                    cleanCode.startsWith(sid + '-');
+
+            if (!hasSchoolPrefix) {
+                alert(`❌ Invalid Activation Code: School ID Mismatch!\n\nActivation Code [${code}] is not tied to School ID [${sid}].\n\nEvery authentic activation code strictly begins with your School ID prefix (e.g. EDV-${cleanSid}-XXXX). Random, cross-school, or invalid codes are strictly rejected.`);
                 return;
             }
 
+            // 3. CHECK FIRESTORE ACTIVATION_KEYS COLLECTION IN REAL-TIME
+            const db = getFirestoreDb();
+            let verifiedDoc = null;
+            let isOnline = navigator.onLine;
+
+            if (db && isOnline) {
+                try {
+                    const keyDoc = await db.collection('activation_keys').doc(code).get();
+                    if (keyDoc.exists) {
+                        verifiedDoc = keyDoc.data();
+                    } else {
+                        // Strict rejection when online: key is not in official database!
+                        alert(`❌ Activation Code Rejected: Code [${code}] was not found in the official EduVet database for School ID [${sid}].\n\nPlease ensure you have completed payment or contacted Felix Fleku at 0543521863 to receive an authentic school-locked code.`);
+                        return;
+                    }
+                } catch(err) {
+                    console.warn('Firestore verification lookup notice:', err.message);
+                }
+            }
+
+            // 4. LOW-LATENCY CACHE & LOCAL PERSISTENT VERIFICATION FALLBACK (If network is interrupted)
+            if (!verifiedDoc) {
+                const cachedSub = JSON.parse(localStorage.getItem('eduvet_subscription_' + sid) || 'null');
+                const cachedCode = localStorage.getItem('eduvet_school_code_' + sid);
+                if (cachedCode === code || (cachedSub && cachedSub.activationCode === code)) {
+                    verifiedDoc = cachedSub || { schoolId: sid, plan: activeSelectedPlan };
+                } else {
+                    alert(`❌ Activation Code Rejected: Could not verify [${code}] for School ID [${sid}]. Please connect to the internet to verify your activation code against the official database.`);
+                    return;
+                }
+            }
+
+            // 5. VALIDATE EXPIRATION & SCHOOL LOCK
+            if (verifiedDoc) {
+                const targetSid = (verifiedDoc.targetSchoolId || verifiedDoc.schoolId || '').trim().toUpperCase();
+                if (targetSid && targetSid.replace(/[^A-Z0-9]/g, '') !== cleanSid) {
+                    alert(`🔒 Access Denied: This code is strictly locked to School ID: ${targetSid} and cannot be used for ${sid}.`);
+                    return;
+                }
+
+                const now = new Date();
+                if (verifiedDoc.expiresAt && now > new Date(verifiedDoc.expiresAt)) {
+                    alert(`🔒 Activation Code Expired: This license expired on ${new Date(verifiedDoc.expiresAt).toLocaleDateString()}. Please renew your school subscription.`);
+                    return;
+                }
+            }
+
+            // 6. ACTIVATE PRO IN LOCALSTORAGE & DEVICE
             const details = planDetails[activeSelectedPlan] || planDetails['teacher_term'];
             const now = new Date();
-            const expiresAt = new Date(now.getTime() + (details.tenureDays * 24 * 60 * 60 * 1000));
+            const expiresAt = (verifiedDoc && verifiedDoc.expiresAt) ? new Date(verifiedDoc.expiresAt) : new Date(now.getTime() + (details.tenureDays * 24 * 60 * 60 * 1000));
+            const deviceId = getOrCreateDeviceId();
+            const resolvedPlan = (verifiedDoc && verifiedDoc.plan) ? verifiedDoc.plan : activeSelectedPlan;
 
             const subData = {
-                plan: activeSelectedPlan,
+                plan: resolvedPlan,
                 schoolId: sid,
                 status: 'active',
                 activationCode: code,
+                deviceId: deviceId,
                 activatedAt: now.toISOString(),
                 expiresAt: expiresAt.toISOString(),
                 isPro: true
@@ -1247,16 +1452,98 @@
             localStorage.setItem('eduvet_school_code_' + sid, code);
             localStorage.setItem('eduvet_is_pro_' + sid, 'true');
 
+            // 7. RETAIN USER ON PAGE (Do NOT redirect to portal automatically)
             closeLandingMomoModal();
-            alert(`🎉 Success! License Code Verified for School ID: ${sid}. Launching EduVet...`);
-            triggerSwipeLogin();
+            renderActivePackageState();
+
+            const planLabel = (planDetails[resolvedPlan] || {}).name || resolvedPlan;
+            alert(`🎉 Package Unlocked Successfully!\n\nActivation Code [${code}] verified for School ID: ${sid}.\n\nPackage: ${planLabel}\nValid Until: ${expiresAt.toLocaleDateString()}\nDevice ID: ${deviceId.substring(0, 16)}...\n\nYou have full Pro access on this device. You can review the benefits below or launch the EduVet Portal whenever you are ready!`);
+        }
+
+        // Dynamically renders the active unlocked state on the landing page package cards
+        function renderActivePackageState() {
+            const sid = localStorage.getItem('eduvet_active_school_id') || 'ATAK-983';
+            const subData = getExistingActiveSubscription(sid);
+            
+            const banner = document.getElementById('landingActiveSubscriptionBanner');
+            const badge = document.getElementById('landingActivePlanBadge');
+            const details = document.getElementById('landingActivePlanDetails');
+
+            if (subData && subData.isActive) {
+                const planKey = subData.sub.plan || 'teacher_term';
+                const expiryFormatted = subData.expiresAt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+
+                if (banner) {
+                    banner.classList.remove('hidden');
+                    if (badge) badge.textContent = subData.planName;
+                    if (details) details.textContent = `School ID: ${sid} • Valid Until: ${expiryFormatted} • Device ID: ${getOrCreateDeviceId().substring(0, 14)}...`;
+                }
+
+                // Update pricing cards UI to show unlocked state
+                const cardMap = {
+                    'teacher_term': { card: 'pricing-card-teacher_term', btn: 'pricing-btn-teacher_term' },
+                    'school_term': { card: 'pricing-card-school_term', btn: 'pricing-btn-school_term' },
+                    'school_year': { card: 'pricing-card-school_year', btn: 'pricing-btn-school_year' }
+                };
+
+                Object.keys(cardMap).forEach(key => {
+                    const el = cardMap[key];
+                    const cardEl = document.getElementById(el.card);
+                    const btnEl = document.getElementById(el.btn);
+                    if (cardEl && btnEl) {
+                        if (key === planKey || (planKey === 'school_year' && key !== 'free')) {
+                            cardEl.classList.add('ring-2', 'ring-emerald-500', 'border-emerald-500');
+                            btnEl.className = 'w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-black py-2.5 rounded-xl text-xs transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer';
+                            btnEl.innerHTML = '<i class="fa fa-circle-check"></i><span>Active • Unlocked on this Device</span>';
+                            btnEl.onclick = () => {
+                                alert(`✅ This package is already active and unlocked on this device for School ID: ${sid} until ${expiryFormatted}.\n\nClick "Teacher Portal" in the top bar to enter anytime.`);
+                            };
+                        }
+                    }
+                });
+            }
         }
 
         function launchEduVetWithPro() {
             triggerSwipeLogin();
         }
 
-        // 5. Progressive bits loading for desktop speed
+        // 5. Intelligent Caching, PWA Service Worker & Cache Warming Logic
+        window.addEventListener('load', () => {
+            // Register intelligent caching service worker across mobile, tablet, and desktop
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js').then((reg) => {
+                    console.log('[EduVet Cache] Service Worker registered with scope:', reg.scope);
+                }).catch(err => {
+                    console.log('[EduVet Cache] SW registration note:', err.message);
+                });
+            }
+
+            // Proactive Cache Warming for instant subsequent navigation
+            const warmPortalCache = () => {
+                const criticalUrls = ['/eduvet.html', '/eduvet.css'];
+                criticalUrls.forEach(url => {
+                    fetch(url, { cache: 'force-cache' }).catch(() => {});
+                });
+                if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+                    navigator.serviceWorker.controller.postMessage({
+                        type: 'WARM_CACHE',
+                        urls: criticalUrls
+                    });
+                }
+            };
+
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(warmPortalCache);
+            } else {
+                setTimeout(warmPortalCache, 1200);
+            }
+
+            // Render unlocked state if already active on this device
+            renderActivePackageState();
+        });
+
+        // 6. Progressive bits loading for desktop speed
         // Populates elements with requestAnimationFrame to prevent main thread blocking
         document.addEventListener('DOMContentLoaded', () => {
             const sections = document.querySelectorAll('section');
