@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EduVet — NaCCA Lesson Generation, Weekly Submission & SISO Supervision Portal</title>
-    <meta name="description" content="Purpose-built low-latency school operating system for Ghanaian Basic Schools. Generate 3-Phase NaCCA lesson notes, automate weekly Friday submissions, digital headteacher vetting, and SISO circuit supervision.">
+    <meta name="description" content="Cloud-synchronized school hub with low-connectivity fallback for Ghanaian Basic Schools. Generate 3-Phase NaCCA lesson notes, automate weekly Friday submissions, digital headteacher vetting, and SISO circuit supervision.">
     <meta name="theme-color" content="#FFFFFF">
     <link rel="canonical" href="https://eduvet.edubyteafrica.com/">
 
     <!-- Open Graph / Social Meta -->
     <meta property="og:title" content="EduVet — NaCCA Lesson Generation, Weekly Submission & SISO Supervision Portal">
-    <meta property="og:description" content="Low-latency 3-Phase NaCCA lesson planning, Friday submission workflows, Headteacher vetting stamp, and SISO circuit supervision for Ghanaian Basic Schools.">
+    <meta property="og:description" content="Cloud-synchronized 3-Phase NaCCA lesson planning with low-connectivity fallback, Friday submissions, Headteacher vetting stamp, and SISO circuit supervision for Ghanaian Basic Schools.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://eduvet.edubyteafrica.com/">
 
@@ -68,10 +68,11 @@
             background: #FFFFFF;
             border: 2px solid #0284C7;
             border-radius: 9999px;
-            height: 52px;
+            height: 56px;
             overflow: hidden;
             user-select: none;
             touch-action: pan-y;
+            box-shadow: 0 2px 10px rgba(2, 132, 199, 0.12);
         }
 
         .swipe-slider-fill {
@@ -87,11 +88,11 @@
 
         .swipe-slider-handle {
             position: absolute;
-            left: 4px;
-            top: 4px;
-            bottom: 4px;
-            width: 42px;
-            height: 42px;
+            left: 5px;
+            top: 5px;
+            bottom: 5px;
+            width: 44px;
+            height: 44px;
             background: #0284C7;
             color: #FFFFFF;
             border-radius: 50%;
@@ -99,7 +100,7 @@
             align-items: center;
             justify-content: center;
             cursor: grab;
-            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3);
+            box-shadow: 0 3px 10px rgba(2, 132, 199, 0.35);
             transition: transform 0.05s ease, background-color 0.2s;
             z-index: 2;
         }
@@ -107,7 +108,7 @@
         .swipe-slider-handle:active {
             cursor: grabbing;
             background: #0369A1;
-            transform: scale(1.05);
+            transform: scale(1.06);
         }
 
         /* Screen Slide Overlay for Portal Navigation */
@@ -157,15 +158,22 @@
     <header class="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-xs">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
             
-            <!-- Brand Logo -->
+            <!-- Brand Logo (Original EduVet SVG Logo) -->
             <a href="#top" class="flex items-center gap-3 group focus:outline-none" aria-label="EduVet Home">
-                <div class="w-10 h-10 rounded-xl bg-[#0284C7] text-white flex items-center justify-center font-black text-xl shadow-xs group-hover:bg-[#0369A1] transition">
-                    <i class="fa fa-graduation-cap"></i>
+                <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center p-1.5 shadow-sm border border-slate-200">
+                    <svg class="w-full h-full" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 25C10 25 25 35 45 28V75C25 82 10 70 10 70V25Z" fill="#2563EB"/>
+                        <path d="M90 25C90 25 75 35 55 28V75C75 82 90 70 90 70V25Z" fill="#0D9488"/>
+                        <path d="M28 50L44 65L74 32" stroke="#F97316" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
                 </div>
                 <div>
-                    <span class="text-2xl font-black text-black tracking-tight">Edu<span class="text-[#0284C7]">Vet</span></span>
-                    <span class="text-[10px] uppercase font-mono font-bold bg-[#F0F9FF] border border-[#BAE6FD] text-[#0369A1] px-1.5 py-0.5 rounded ml-1.5">OS</span>
-                    <p class="text-[10px] text-[#0369A1] font-bold">By Edubyte Africa</p>
+                    <div class="text-2xl font-black tracking-tight text-slate-900 leading-none">
+                        edu<span class="text-teal-600">vet</span>
+                    </div>
+                    <div class="text-[9px] font-bold tracking-[0.2em] text-[#0284C7] uppercase mt-0.5">
+                        School Hub
+                    </div>
                 </div>
             </a>
 
@@ -226,13 +234,13 @@
         <div class="max-w-7xl mx-auto">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
                 
-                <!-- Left Column: Copy & Portal Switch -->
+                <!-- Left Column: Copy & Only 1 Swipe Login/Register Button -->
                 <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
                     
                     <!-- Standard Pill Badge -->
                     <div class="inline-flex items-center gap-2 bg-white border-2 border-[#0284C7] text-[#0284C7] px-4 py-1.5 rounded-full text-xs font-black shadow-xs">
                         <i class="fa fa-circle-check text-[#0284C7]"></i>
-                        <span>Ghana Education Service (GES) &bull; 100% NaCCA Standard</span>
+                        <span>Ghana Education Service (GES) &bull; 100% NaCCA Standard &bull; Low-Connectivity Fallback</span>
                     </div>
 
                     <!-- Main Headline: Lesson Generation, Submission, Headteacher Vetting & SISO Supervision -->
@@ -244,13 +252,13 @@
 
                     <!-- Clean Subtitle in High-Contrast Black & Sea Blue -->
                     <p class="text-lg sm:text-xl text-black max-w-2xl font-medium leading-relaxed mx-auto lg:mx-0">
-                        Equip your teachers with low-latency <span class="text-[#0284C7] font-bold">3-Phase NaCCA lesson note generation</span>, automated Friday lesson plan submissions, digital <span class="text-[#0284C7] font-bold">Headteacher rubber stamp vetting</span>, and seamless Circuit SISO supervision.
+                        Equip your teachers with cloud-synced <span class="text-[#0284C7] font-bold">3-Phase NaCCA lesson note generation</span>, automated Friday lesson plan submissions, digital <span class="text-[#0284C7] font-bold">Headteacher rubber stamp vetting</span>, and seamless Circuit SISO supervision.
                     </p>
 
                     <!-- Trust Tags (White background with Sea Blue & Black text) -->
                     <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 pt-1 text-xs font-bold text-black">
                         <span class="bg-white border-2 border-slate-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
-                            <i class="fa fa-bolt text-[#0284C7]"></i> Low Latency Engine
+                            <i class="fa fa-wifi text-[#0284C7]"></i> Low-Connectivity Fallback
                         </span>
                         <span class="bg-white border-2 border-slate-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
                             <i class="fa fa-stamp text-[#0284C7]"></i> Headteacher Rubber Stamp
@@ -260,38 +268,24 @@
                         </span>
                     </div>
 
-                    <!-- Primary Action Group: WhatsApp Request + Slide into EduVet -->
-                    <div class="pt-4 space-y-4 max-w-md mx-auto lg:mx-0">
-                        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                            <!-- Button to Request School Setup (Direct WhatsApp) -->
-                            <a href="https://wa.me/233543521863?text=Hello%20EduVet%20Desk,%20I%20would%20like%20to%20request%20a%20school%20setup%20for%20my%20school." target="_blank" rel="noopener noreferrer" class="flex-1 bg-[#0284C7] hover:bg-[#0369A1] active:bg-[#075985] text-white font-black px-6 py-4 rounded-2xl text-base shadow-lg shadow-sky-500/25 transition flex items-center justify-center gap-2.5 cursor-pointer">
-                                <i class="fa-brands fa-whatsapp text-xl"></i>
-                                <span>Request School Setup</span>
-                            </a>
-                            
-                            <!-- Secondary: Slide into EduVet Portal Button -->
-                            <a href="eduvet.html" onclick="triggerSwipeLogin(); return false;" class="bg-white border-2 border-black hover:bg-slate-50 text-black font-black px-5 py-4 rounded-2xl text-sm transition flex items-center justify-center gap-2 cursor-pointer" title="Enter EduVet School Portal">
-                                <i class="fa fa-arrow-right-to-bracket text-[#0284C7]"></i>
-                                <span>Slide into EduVet Portal</span>
-                            </a>
+                    <!-- ONLY 1 HERO ACTION: Single Interactive Swipe Login / Register Button -->
+                    <div class="pt-6 max-w-md mx-auto lg:mx-0 space-y-2">
+                        <div class="flex items-center justify-between text-xs text-black font-bold px-1">
+                            <span class="flex items-center gap-1.5"><i class="fa fa-hand-point-right text-[#0284C7]"></i> Drag slider to enter portal</span>
+                            <span class="font-mono text-[11px] font-black text-[#0284C7] bg-[#F0F9FF] border border-[#BAE6FD] px-2 py-0.5 rounded">Login / Register</span>
                         </div>
-
-                        <!-- Interactive Touch/Mouse EduVet Portal Switch Track -->
-                        <div class="space-y-1.5 text-left">
-                            <div class="flex items-center justify-between text-[11px] text-black font-bold px-1">
-                                <span><i class="fa fa-hand-point-right text-[#0284C7]"></i> Slide handle to launch EduVet portal</span>
-                                <span class="font-mono text-[#0284C7]">EduVet OS: Ready</span>
+                        <div class="swipe-slider-track" id="heroSwipeTrack" role="button" tabindex="0" onclick="triggerSwipeLogin()" title="Swipe or click to Login / Register">
+                            <div class="swipe-slider-fill" id="heroSwipeFill"></div>
+                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none text-xs font-mono font-black text-black uppercase tracking-widest" id="heroSwipeText">
+                                &bull;&bull;&bull; Swipe to Login / Register &bull;&bull;&bull;
                             </div>
-                            <div class="swipe-slider-track" id="heroSwipeTrack">
-                                <div class="swipe-slider-fill" id="heroSwipeFill"></div>
-                                <div class="absolute inset-0 flex items-center justify-center pointer-events-none text-xs font-mono font-black text-black uppercase tracking-widest" id="heroSwipeText">
-                                    &bull;&bull;&bull; Slide into EduVet Portal &bull;&bull;&bull;
-                                </div>
-                                <div class="swipe-slider-handle" id="heroSwipeHandle" title="Slide right into EduVet Portal">
-                                    <i class="fa fa-angles-right text-sm"></i>
-                                </div>
+                            <div class="swipe-slider-handle" id="heroSwipeHandle" title="Slide right to Login / Register">
+                                <i class="fa fa-angles-right text-sm"></i>
                             </div>
                         </div>
+                        <p class="text-[11px] text-slate-500 font-medium px-1">
+                            Single sign-on for all Ghanaian Basic School teachers, headteachers &amp; SISOs.
+                        </p>
                     </div>
 
                     <!-- Clean Quick Stats -->
@@ -305,8 +299,8 @@
                             <div class="text-xs text-[#0369A1] font-bold">NaCCA Term Schemes</div>
                         </div>
                         <div>
-                            <div class="text-2xl font-black text-black font-mono">0ms</div>
-                            <div class="text-xs text-[#0369A1] font-bold">Low Latency Speed</div>
+                            <div class="text-2xl font-black text-black font-mono">&lt; 10ms</div>
+                            <div class="text-xs text-[#0369A1] font-bold">Local Fallback Speed</div>
                         </div>
                     </div>
                 </div>
@@ -396,7 +390,7 @@
 
                         <!-- Bottom Card Button -->
                         <div class="pt-1 flex items-center justify-between">
-                            <span class="text-[10px] text-[#0369A1] font-mono font-bold">Low-Latency Local Engine</span>
+                            <span class="text-[10px] text-[#0369A1] font-mono font-bold">Cloud-Synced &bull; Low-Connectivity Fallback</span>
                             <a href="eduvet.html" onclick="triggerSwipeLogin(); return false;" class="text-[#0284C7] hover:text-[#0369A1] font-black text-xs flex items-center gap-1 cursor-pointer">
                                 <span>Open EduVet Portal</span>
                                 <i class="fa fa-arrow-right text-[10px]"></i>
@@ -424,7 +418,7 @@
                 </p>
             </div>
 
-            <!-- 4 Clean White Cards -->
+            <!-- 4 Clean White Cards: Headteacher Vetting & Digital Stamp -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 
                 <div class="bg-white p-6 rounded-2xl border-2 border-slate-200 shadow-xs space-y-3">
@@ -434,6 +428,17 @@
                     <h3 class="text-lg font-black text-black">NaCCA 3-Phase Notes</h3>
                     <p class="text-xs text-black font-medium leading-relaxed">
                         Generate official Phase 1 (Starter), Phase 2 (Main), and Phase 3 (Reflection) lesson plans aligned to the NaCCA curriculum standards for Basic 1 to 9.
+                    </p>
+                </div>
+
+                <!-- Headteacher Vetting & Digital Stamp Card -->
+                <div class="bg-white p-6 rounded-2xl border-2 border-slate-200 shadow-xs space-y-3">
+                    <div class="w-12 h-12 rounded-xl bg-[#F0F9FF] border border-[#BAE6FD] text-[#0284C7] flex items-center justify-center text-xl font-bold">
+                        <i class="fa fa-stamp"></i>
+                    </div>
+                    <h3 class="text-lg font-black text-black">Headteacher Vetting</h3>
+                    <p class="text-xs text-black font-medium leading-relaxed">
+                        Digital review desk with official rubber stamp verification, weekly submission tracking, and one-click feedback notes for teacher improvement.
                     </p>
                 </div>
 
@@ -449,21 +454,11 @@
 
                 <div class="bg-white p-6 rounded-2xl border-2 border-slate-200 shadow-xs space-y-3">
                     <div class="w-12 h-12 rounded-xl bg-[#F0F9FF] border border-[#BAE6FD] text-[#0284C7] flex items-center justify-center text-xl font-bold">
-                        <i class="fa fa-bolt"></i>
+                        <i class="fa fa-shield-halved"></i>
                     </div>
-                    <h3 class="text-lg font-black text-black">Low-Latency Engine</h3>
+                    <h3 class="text-lg font-black text-black">SISO Circuit Supervision</h3>
                     <p class="text-xs text-black font-medium leading-relaxed">
-                        Operates with local-first instant data hydration. Teachers plan lessons without hanging spinners or server delays even on low-bandwidth networks.
-                    </p>
-                </div>
-
-                <div class="bg-white p-6 rounded-2xl border-2 border-slate-200 shadow-xs space-y-3">
-                    <div class="w-12 h-12 rounded-xl bg-[#F0F9FF] border border-[#BAE6FD] text-[#0284C7] flex items-center justify-center text-xl font-bold">
-                        <i class="fa fa-stamp"></i>
-                    </div>
-                    <h3 class="text-lg font-black text-black">Headteacher Vetting &amp; Stamp</h3>
-                    <p class="text-xs text-black font-medium leading-relaxed">
-                        Headteachers and Circuit Supervisors (SISO) review weekly notes, apply official SVG security rubber stamps, and track classroom compliance.
+                        Circuit Supervisors access a dedicated inspection console to inspect school compliance, audit weekly coverage, and review lesson delivery standards.
                     </p>
                 </div>
 
@@ -471,19 +466,19 @@
         </div>
     </section>
 
-    <!-- SECTION 2: LOW LATENCY ENGINE (Pure White Background, Sea Blue & Black Text) -->
+    <!-- SECTION 2: LOW CONNECTIVITY FALLBACK (Pure White Background, Sea Blue & Black Text) -->
     <section id="engine" class="cv-auto py-20 px-4 sm:px-6 lg:px-8 bg-white border-b border-slate-200">
         <div class="max-w-7xl mx-auto">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                 <div class="lg:col-span-6 space-y-4">
                     <span class="text-xs font-mono font-black uppercase tracking-wider text-[#0284C7] bg-[#F0F9FF] border border-[#BAE6FD] px-3 py-1 rounded-full">
-                        Low Latency Architecture
+                        Intelligent Connectivity Resilience
                     </span>
                     <h2 class="text-3xl sm:text-4xl font-black text-black tracking-tight">
-                        Built for Speed and Reliability Across Ghanaian Basic Schools.
+                        Cloud-Synchronized with Automatic Low-Connectivity Fallback.
                     </h2>
                     <p class="text-black font-medium text-sm leading-relaxed">
-                        Basic schools need high-efficiency administrative software. EduVet hydrates data locally in under 10ms and synchronizes in the background. Teachers never wait for slow cloud roundtrips or lose prepared lesson plans.
+                        EduVet is a modern cloud-connected school platform built with local memory resilience. When network connectivity slows down or drops in the classroom, teachers never lose their work or get blocked by spinners — the system automatically falls back to local memory, allowing uninterrupted lesson preparation with zero lag, and re-syncs seamlessly when connection restores.
                     </p>
                     <div class="pt-2">
                         <a href="https://wa.me/233543521863?text=Hello%20EduVet%20Desk,%20I%20would%20like%20to%20request%20a%20school%20setup%20for%20my%20school." target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-[#0284C7] hover:bg-[#0369A1] text-white font-black px-6 py-3.5 rounded-xl text-sm transition shadow-sm">
@@ -516,8 +511,8 @@
                         <div class="flex items-start gap-3 bg-white p-3.5 rounded-xl border border-slate-200">
                             <span class="w-7 h-7 rounded-lg bg-[#F0F9FF] border border-[#BAE6FD] text-[#0284C7] font-black text-xs flex items-center justify-center shrink-0">3</span>
                             <div>
-                                <h4 class="text-xs font-black text-black">Teachers Work with Low-Latency Speed</h4>
-                                <p class="text-[11px] text-[#0369A1] font-bold">Teachers log in with the School ID and generate compliant lesson notes with instant responsiveness.</p>
+                                <h4 class="text-xs font-black text-black">Seamless Low-Connectivity Fallback</h4>
+                                <p class="text-[11px] text-[#0369A1] font-bold">Teachers plan lessons without fear of network dips, syncing changes automatically when online.</p>
                             </div>
                         </div>
                     </div>
@@ -717,18 +712,22 @@
         </div>
     </section>
 
-    <!-- SIMPLE & MINIMALISTIC FOOTER (Pure White Background, Sea Blue & Black Text) -->
+    <!-- SIMPLE & MINIMALISTIC FOOTER (Pure White Background, Sea Blue & Black Text with Original EduVet Logo) -->
     <footer class="bg-white py-12 px-4 sm:px-6 lg:px-8 border-t border-slate-200">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-black">
             
-            <!-- Brand & Tagline -->
+            <!-- Original EduVet Logo in Footer -->
             <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-[#0284C7] text-white flex items-center justify-center font-bold text-sm">
-                    <i class="fa fa-graduation-cap"></i>
+                <div class="w-8 h-8 bg-white rounded-lg flex items-center justify-center p-1 border border-slate-200 shadow-xs">
+                    <svg class="w-full h-full" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 25C10 25 25 35 45 28V75C25 82 10 70 10 70V25Z" fill="#2563EB"/>
+                        <path d="M90 25C90 25 75 35 55 28V75C75 82 90 70 90 70V25Z" fill="#0D9488"/>
+                        <path d="M28 50L44 65L74 32" stroke="#F97316" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
                 </div>
                 <div>
-                    <span class="font-black text-black">Edu<span class="text-[#0284C7]">Vet</span></span>
-                    <span class="text-xs text-[#0369A1] font-bold ml-1">&bull; Low-Latency School OS</span>
+                    <span class="font-black text-slate-900 text-base">edu<span class="text-teal-600">vet</span></span>
+                    <span class="text-xs text-[#0369A1] font-bold ml-1.5">&bull; Low-Connectivity Fallback School OS</span>
                 </div>
             </div>
 
@@ -751,11 +750,15 @@
         </div>
     </footer>
 
-    <!-- Screen Slide Overlay for Portal Navigation -->
+    <!-- Screen Slide Overlay for Portal Navigation with Original EduVet Logo -->
     <div id="swipeTransitionOverlay">
         <div class="text-center space-y-4">
-            <div class="w-16 h-16 rounded-2xl bg-[#0284C7] text-white flex items-center justify-center text-3xl font-black mx-auto animate-bounce shadow-lg">
-                <i class="fa fa-graduation-cap"></i>
+            <div class="w-16 h-16 rounded-2xl bg-white flex items-center justify-center p-2.5 mx-auto border border-slate-200 shadow-xl animate-bounce">
+                <svg class="w-full h-full" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 25C10 25 25 35 45 28V75C25 82 10 70 10 70V25Z" fill="#2563EB"/>
+                    <path d="M90 25C90 25 75 35 55 28V75C75 82 90 70 90 70V25Z" fill="#0D9488"/>
+                    <path d="M28 50L44 65L74 32" stroke="#F97316" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
             </div>
             <div class="text-xl font-black text-black">Entering EduVet Portal...</div>
             <div class="text-xs text-[#0284C7] font-mono font-bold">NaCCA Lesson &amp; SISO Portal</div>
@@ -764,7 +767,6 @@
 
     <!-- ========================================================================= -->
     <!-- LANDING PAGE PAYSTACK OFFICIAL CHECKOUT & REFERENCE VERIFICATION MODAL    -->
-    <!-- (Strictly matches the hardened logic and security in the main portal)     -->
     <!-- ========================================================================= -->
     <div id="landingPaystackModal" class="fixed inset-0 bg-blue-950/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 no-print overflow-y-auto hidden">
         <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-5 sm:p-6 space-y-4 border border-slate-200 text-left relative my-4">
@@ -955,7 +957,7 @@
             }, 250);
         }
 
-        // 3. Interactive Touch / Mouse Swipe Slider Logic
+        // 3. Interactive Touch / Mouse Swipe Slider Logic (Single Hero Action)
         const handle = document.getElementById('heroSwipeHandle');
         const track = document.getElementById('heroSwipeTrack');
         const fill = document.getElementById('heroSwipeFill');
@@ -974,12 +976,12 @@
                 if (!isDragging) return;
                 const currentX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
                 const diff = currentX - startX;
-                const maxMove = track.clientWidth - handle.clientWidth - 8;
+                const maxMove = track.clientWidth - handle.clientWidth - 10;
                 const clamped = Math.max(0, Math.min(diff, maxMove));
                 handle.style.transform = `translateX(${clamped}px)`;
                 if (fill) fill.style.width = `${(clamped / maxMove) * 100}%`;
 
-                if (clamped >= maxMove * 0.85) {
+                if (clamped >= maxMove * 0.82) {
                     isDragging = false;
                     triggerSwipeLogin();
                 }
