@@ -255,6 +255,15 @@
             <!-- Quick Explore / Dismiss Button -->
             <!-- Mandatory Authorization: No Guest Bypass Allowed -->
             
+            <!-- Back to Landing Page Button (Top) -->
+            <div class="flex items-center justify-between w-full pb-2 mb-2 border-b border-slate-100">
+                <a href="index.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition shadow-xs" title="Return to EduVet Landing Page">
+                    <i class="fa fa-arrow-left text-[#0284C7]"></i>
+                    <span>Back to Landing Page</span>
+                </a>
+                <span class="text-[11px] font-mono font-bold text-slate-400">Offline OS</span>
+            </div>
+
             <!-- Branded Logo Header -->
             <div class="flex flex-col items-center text-center">
                 <div class="flex items-center space-x-3 mb-2">
@@ -309,6 +318,16 @@
                 <div class="pt-2 text-center text-xs text-slate-500 flex items-center justify-between">
                     <span>Need a new school? <button type="button" @click="gatewayTab = 'register'; loginErrorMsg = '';" class="text-blue-900 hover:underline font-bold">Register</button></span>
                     <span class="text-xs text-slate-400 font-medium">Authorized GES Basic Schools Only</span>
+                </div>
+                <!-- Back to Landing Page & WhatsApp Desk (Bottom of Form) -->
+                <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                    <a href="index.html" class="inline-flex items-center gap-1.5 font-bold text-[#0284C7] hover:text-[#0369A1] hover:underline">
+                        <i class="fa fa-arrow-left"></i>
+                        <span>Back to Landing Page</span>
+                    </a>
+                    <a href="https://wa.me/233543521863?text=Hello%20EduVet%20Desk,%20I%20would%20like%20to%20request%20a%20school%20setup%20for%20my%20school." target="_blank" rel="noopener noreferrer" class="font-semibold text-slate-500 hover:text-emerald-700 flex items-center gap-1">
+                        <i class="fa-brands fa-whatsapp text-emerald-600"></i> Setup Desk
+                    </a>
                 </div>
             </form>
 
@@ -1011,6 +1030,11 @@
     <!-- Top Navbar (Mobile View Header: Sleek, Compact, Sticky with Safe Touch Controls) -->
     <header x-show="authenticatedSchoolId" x-cloak class="bg-blue-900 text-white shadow-md no-print lg:hidden sticky top-0 z-30 border-b border-blue-800/80">
         <div class="px-3.5 py-2.5 flex justify-between items-center gap-2">
+            <!-- Back to Landing Page Toggle (Mobile Header) -->
+            <a href="index.html" class="px-2.5 py-1.5 bg-blue-950 text-blue-200 hover:text-white rounded-lg border border-blue-700 text-xs font-bold flex items-center gap-1 shrink-0" title="Back to Landing Page">
+                <i class="fa fa-arrow-left text-cyan-300"></i>
+                <span class="text-[10px]">Landing</span>
+            </a>
             <!-- Brand + School Info Badge -->
             <div class="flex items-center space-x-2 shrink-0">
                 <div class="w-8 h-8 bg-white rounded-lg flex items-center justify-center p-1 shadow-sm shrink-0">
@@ -1089,6 +1113,15 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Back to Landing Page Quick Toggle Button in Sidebar -->
+                <a href="index.html" class="flex items-center justify-between w-full px-3.5 py-2.5 rounded-xl bg-blue-950/80 hover:bg-blue-800 text-blue-200 hover:text-white border border-blue-700/60 text-xs font-bold transition shadow-xs group" title="Return to EduVet Landing Page Home">
+                    <span class="flex items-center gap-2">
+                        <i class="fa fa-arrow-left text-[#06B6D4] group-hover:-translate-x-1 transition-transform"></i>
+                        <span>Back to Landing Page</span>
+                    </span>
+                    <span class="text-[10px] font-mono text-cyan-300 bg-blue-900/60 px-1.5 py-0.5 rounded">Home</span>
+                </a>
 
                 <!-- Active School Card -->
                 <div class="bg-blue-950/50 p-3.5 rounded-xl border border-blue-800 space-y-1 shadow-inner">
@@ -7822,13 +7855,103 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                         return;
                     }
 
+                    // =========================================================================
+                    // 1. LIGHTNING-FAST LOCAL-FIRST HYDRATION (Instant 0ms-10ms Login)
+                    // =========================================================================
+                    const cachedSchool = JSON.parse(localStorage.getItem('eduvet_school_' + inputId) || 'null');
+                    if (inputId === 'ATAK-983' || cachedSchool) {
+                        const schData = cachedSchool || {
+                            id: 'ATAK-983',
+                            name: 'Atakora D/A Junior High School',
+                            headName: 'Mr. Felix Fleku',
+                            headContact: '0543521863',
+                            notification: 'Wednesday 23:59 GMT GES Lesson Plan Submission Deadline in effect!',
+                            activeTerm: 'Term 1',
+                            academicYear: '2026/2027',
+                            termStartDate: '2026-09-07',
+                            totalWeeks: 15
+                        };
+                        this.authenticatedSchoolId = schData.id || inputId;
+                        this.activeSchoolName = schData.name || `School (${inputId})`;
+                        this.activeHeadName = schData.headName || '';
+                        this.activeHeadContact = schData.headContact || schData.contact || '';
+                        this.schoolNotification = schData.notification || '';
+                        if (schData.activeTerm) this.settingsForm.activeTerm = schData.activeTerm;
+                        if (schData.academicYear) this.settingsForm.academicYear = schData.academicYear;
+                        if (schData.termStartDate) this.settingsForm.termStartDate = schData.termStartDate;
+                        if (schData.totalWeeks) this.settingsForm.totalWeeks = schData.totalWeeks;
+
+                        const cachedTeachers = JSON.parse(localStorage.getItem('eduvet_teachers_' + inputId) || 'null');
+                        if (cachedTeachers && cachedTeachers.length > 0) {
+                            this.teachers = cachedTeachers;
+                        } else if (inputId === 'ATAK-983') {
+                            this.teachers = [
+                                { id: 'GES-001', name: 'Abena Ansomma Effah', contact: '0244192831', subjects: 'English Language, Basic 1', schoolId: 'ATAK-983' },
+                                { id: 'GES-002', name: 'Felix Fleku', contact: '0543521863', subjects: 'Computing / ICT, Mathematics', schoolId: 'ATAK-983' },
+                                { id: 'GES-003', name: 'Grace Boakye', contact: '0244192831', subjects: 'Integrated Science, Career Technology', schoolId: 'ATAK-983' },
+                                { id: 'GES-004', name: 'Kwaku Mensah', contact: '0501928374', subjects: 'English Language, Social Studies', schoolId: 'ATAK-983' }
+                            ];
+                        }
+                        const cachedLessons = JSON.parse(localStorage.getItem('eduvet_lessons_' + inputId) || '[]');
+                        this.lessons = cachedLessons;
+
+                        localStorage.setItem('eduvet_last_school_id', inputId);
+                        localStorage.setItem('eduvet_active_school_id', inputId);
+                        if (typeof sessionStorage !== 'undefined') { sessionStorage.setItem('eduvet_session_school_id', inputId); }
+
+                        this.isLoggingIn = false;
+                        this.loadSchoolData();
+
+                        // Background Non-blocking Cloud Sync (Stale-While-Revalidate without blocking UI)
+                        const firestore = (typeof window.getDb === 'function' ? window.getDb() : (typeof db !== 'undefined' ? db : null));
+                        if (firestore && navigator.onLine !== false) {
+                            Promise.all([
+                                firestore.collection('registered_schools').doc(inputId).get().catch(() => null),
+                                firestore.collection('teachers').where('schoolId', '==', inputId).get().catch(() => null),
+                                firestore.collection('lessons').where('schoolId', '==', inputId).limit(50).get().catch(() => null)
+                            ]).then(([schoolDoc, teachersSnap, lessonsSnap]) => {
+                                if (schoolDoc && schoolDoc.exists) {
+                                    const cData = schoolDoc.data();
+                                    if (cData.name) this.activeSchoolName = cData.name;
+                                    if (cData.headName) this.activeHeadName = cData.headName;
+                                    localStorage.setItem('eduvet_school_' + inputId, JSON.stringify(cData));
+                                }
+                                if (teachersSnap && !teachersSnap.empty) {
+                                    const cTeachers = teachersSnap.docs.map(doc => ({ ...doc.data() }));
+                                    if (cTeachers.length > 0) {
+                                        this.teachers = cTeachers;
+                                        safeSetLocalStorage('eduvet_teachers_' + inputId, JSON.stringify(cTeachers));
+                                    }
+                                }
+                                if (lessonsSnap && !lessonsSnap.empty) {
+                                    const cLessons = lessonsSnap.docs.map(doc => ({ ...doc.data() }));
+                                    if (cLessons.length > 0) {
+                                        this.lessons = cLessons;
+                                        safeSetLocalStorage('eduvet_lessons_' + inputId, JSON.stringify(sanitizeLessonsForCache(cLessons)));
+                                    }
+                                }
+                            }).catch(() => {});
+                        }
+                        return;
+                    }
+
                     this.isLoggingIn = true;
                     const firestore = (typeof window.getDb === 'function' ? window.getDb() : (typeof db !== 'undefined' ? db : null));
 
-                    // 1. CLOUD-FIRST FETCH: Query Firestore for existing School ID & Onboarded Faculty
+                    // =========================================================================
+                    // 2. PARALLEL CLOUD FETCH WITH 2.5s TIMEOUT FOR NEW SCHOOL IDs
+                    // =========================================================================
                     if (firestore && navigator.onLine !== false) {
                         try {
-                            const schoolDoc = await firestore.collection('registered_schools').doc(inputId).get();
+                            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Cloud fetch timeout')), 2500));
+                            const [schoolDoc, teachersSnap, lessonsSnap] = await Promise.race([
+                                Promise.all([
+                                    firestore.collection('registered_schools').doc(inputId).get(),
+                                    firestore.collection('teachers').where('schoolId', '==', inputId).get().catch(() => null),
+                                    firestore.collection('lessons').where('schoolId', '==', inputId).limit(50).get().catch(() => null)
+                                ]),
+                                timeoutPromise
+                            ]).catch(() => [null, null, null]);
 
                             if (schoolDoc && schoolDoc.exists) {
                                 const schData = schoolDoc.data();
@@ -7842,31 +7965,18 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                                 if (schData.termStartDate) this.settingsForm.termStartDate = schData.termStartDate;
                                 if (schData.totalWeeks) this.settingsForm.totalWeeks = schData.totalWeeks;
 
-                                // Fetch Onboarded Teachers Tied to this School ID
-                                try {
-                                    const teachersSnap = await firestore.collection('teachers').where('schoolId', '==', inputId).get();
-                                    if (teachersSnap && !teachersSnap.empty) {
-                                        this.teachers = teachersSnap.docs.map(doc => ({ ...doc.data() }));
-                                    } else {
-                                        this.teachers = [];
-                                    }
-                                } catch(te) {
-                                    console.warn('Teachers fetch warning:', te.message);
+                                if (teachersSnap && !teachersSnap.empty) {
+                                    this.teachers = teachersSnap.docs.map(doc => ({ ...doc.data() }));
+                                } else {
+                                    this.teachers = [];
                                 }
 
-                                // Fetch Submitted Lessons Tied to this School ID
-                                try {
-                                    const lessonsSnap = await firestore.collection('lessons').where('schoolId', '==', inputId).limit(100).get();
-                                    if (lessonsSnap && !lessonsSnap.empty) {
-                                        this.lessons = lessonsSnap.docs.map(doc => ({ ...doc.data() }));
-                                    } else {
-                                        this.lessons = [];
-                                    }
-                                } catch(le) {
-                                    console.warn('Lessons fetch warning:', le.message);
+                                if (lessonsSnap && !lessonsSnap.empty) {
+                                    this.lessons = lessonsSnap.docs.map(doc => ({ ...doc.data() }));
+                                } else {
+                                    this.lessons = [];
                                 }
 
-                                // Persist retrieved data locally so offline access works seamlessly
                                 localStorage.setItem('eduvet_last_school_id', inputId);
                                 localStorage.setItem('eduvet_active_school_id', inputId);
                                 localStorage.setItem('eduvet_school_' + inputId, JSON.stringify(schData));
@@ -7877,71 +7987,33 @@ Please complete and submit your lesson plans on the portal before the Wednesday 
                                 this.isLoggingIn = false;
                                 this.loadSchoolData();
                                 return;
-                            } else if (inputId === 'ATAK-983') {
-                                // Default seed school if not yet created in Firestore
-                                const defaultSeed = {
-                                    id: 'ATAK-983',
-                                    name: 'Atakora D/A Junior High School',
-                                    headName: 'Mr. Felix Fleku',
-                                    headContact: '0543521863',
-                                    location: 'Kwahu Afram Plains North / Eastern Region',
-                                    notification: 'Official Notice: Welcome to Eduvet School Portal. Please submit lesson notes every Friday.',
-                                    activeTerm: 'Term 1',
-                                    academicYear: '2026/2027',
-                                    termStartDate: '2026-09-07',
-                                    totalWeeks: 15
-                                };
-                                this.authenticatedSchoolId = defaultSeed.id;
-                                this.activeSchoolName = defaultSeed.name;
-                                this.activeHeadName = defaultSeed.headName;
-                                this.activeHeadContact = defaultSeed.headContact;
-                                this.schoolNotification = defaultSeed.notification;
-                                localStorage.setItem('eduvet_last_school_id', defaultSeed.id);
-                                localStorage.setItem('eduvet_active_school_id', defaultSeed.id);
-                                localStorage.setItem('eduvet_school_' + defaultSeed.id, JSON.stringify(defaultSeed));
-                                this.isLoggingIn = false;
-                                this.loadSchoolData();
-                                return;
-                            } else {
-                                this.isLoggingIn = false;
-                                this.loginErrorMsg = `School ID "${inputId}" was not found in the Eduvet Registry. Please verify your ID or click Register New School.`;
-                                return;
                             }
-                        } catch (err) {
-                            console.warn('Cloud sync lookup warning:', err.message);
-                            // Fall through to offline cache check below
+                        } catch(e) {
+                            console.warn('[Eduvet Fast Login] Cloud check notice:', e.message);
                         }
                     }
 
-                    // 2. OFFLINE CACHE FALLBACK (Only when offline or network fails)
+                    // Fallback to local registered schools or auto-create session
                     const localRegistered = JSON.parse(localStorage.getItem('eduvet_registered_schools') || '{}');
-                    const localSchoolRecord = JSON.parse(localStorage.getItem('eduvet_school_' + inputId) || 'null');
-
-                    if (localSchoolRecord || localRegistered[inputId] || inputId === 'ATAK-983') {
-                        const sch = localSchoolRecord || localRegistered[inputId] || {
-                            id: 'ATAK-983',
-                            name: 'Atakora D/A Junior High School',
-                            headName: 'Mr. Felix Fleku',
-                            headContact: '0543521863',
-                            location: 'Kwahu Afram Plains North / Eastern Region',
-                            notification: 'Official Notice: Welcome to Eduvet School Portal. Please submit lesson notes every Friday.'
-                        };
-                        this.authenticatedSchoolId = sch.id;
-                        this.activeSchoolName = sch.name;
-                        this.activeHeadName = sch.headName || '';
-                        this.activeHeadContact = sch.headContact || '';
-                        this.schoolNotification = sch.notification || '';
-                        if (sch.activeTerm) this.settingsForm.activeTerm = sch.activeTerm;
-                        if (sch.academicYear) this.settingsForm.academicYear = sch.academicYear;
-                        localStorage.setItem('eduvet_last_school_id', sch.id);
-                        localStorage.setItem('eduvet_active_school_id', sch.id);
+                    const localSchool = localRegistered[inputId] || JSON.parse(localStorage.getItem('eduvet_school_' + inputId) || 'null');
+                    if (localSchool) {
+                        this.authenticatedSchoolId = localSchool.id || inputId;
+                        this.activeSchoolName = localSchool.name || `School (${inputId})`;
+                        this.activeHeadName = localSchool.headName || '';
+                        this.activeHeadContact = localSchool.headContact || '';
+                        this.schoolNotification = localSchool.notification || '';
+                        this.teachers = JSON.parse(localStorage.getItem('eduvet_teachers_' + inputId) || '[]');
+                        this.lessons = JSON.parse(localStorage.getItem('eduvet_lessons_' + inputId) || '[]');
+                        localStorage.setItem('eduvet_last_school_id', inputId);
+                        localStorage.setItem('eduvet_active_school_id', inputId);
+                        if (typeof sessionStorage !== 'undefined') { sessionStorage.setItem('eduvet_session_school_id', inputId); }
                         this.isLoggingIn = false;
                         this.loadSchoolData();
                         return;
                     }
 
                     this.isLoggingIn = false;
-                    this.loginErrorMsg = `School ID "${inputId}" could not be reached. Please check your internet connection or verify your ID.`;
+                    this.loginErrorMsg = `School ID "${inputId}" is not registered. Please verify your ID or use the "Register New School" tab.`;
                 },
 
                 logoutSchool() {
