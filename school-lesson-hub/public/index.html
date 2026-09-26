@@ -283,23 +283,20 @@
                         </span>
                     </div>
 
-                    <!-- ONLY 1 HERO ACTION: Single Interactive Swipe Login / Register Button -->
-                    <div class="pt-6 max-w-md mx-auto lg:mx-0 space-y-2">
-                        <div class="flex items-center justify-between text-xs text-black font-bold px-1">
-                            <span class="flex items-center gap-1.5"><i class="fa fa-hand-point-right text-[#0284C7]"></i> Drag slider to enter portal</span>
-                            <a href="eduvet.html" onclick="triggerSwipeLogin();" class="font-mono text-[11px] font-black text-[#0284C7] bg-[#F0F9FF] hover:bg-sky-100 border border-[#BAE6FD] px-2 py-0.5 rounded transition cursor-pointer" title="Direct Login to EduVet Portal">Login / Register</a>
-                        </div>
-                        <div class="swipe-slider-track" id="heroSwipeTrack" role="button" tabindex="0" onclick="triggerSwipeLogin()" title="Swipe or click to Login / Register">
-                            <div class="swipe-slider-fill" id="heroSwipeFill"></div>
-                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none text-xs font-mono font-black text-black uppercase tracking-widest" id="heroSwipeText">
-                                &bull;&bull;&bull; Swipe to Login / Register &bull;&bull;&bull;
-                            </div>
-                            <div class="swipe-slider-handle" id="heroSwipeHandle" title="Slide right to Login / Register">
-                                <i class="fa fa-angles-right text-sm"></i>
-                            </div>
-                        </div>
-                        <p class="text-[11px] text-slate-500 font-medium px-1">
-                            Single sign-on for all Ghanaian Basic School teachers, headteachers &amp; SISOs.
+                    <!-- HERO ACTION: Login / Register Button -->
+                    <div class="pt-6 max-w-md mx-auto lg:mx-0 space-y-3">
+                        <a href="eduvet.html" onclick="triggerSwipeLogin();" id="heroLoginBtn" class="w-full inline-flex items-center justify-between gap-3 bg-[#0284C7] hover:bg-[#0369A1] active:bg-[#075985] text-white font-black text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-4.5 rounded-2xl shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer group">
+                            <span class="flex items-center gap-3">
+                                <i class="fa fa-arrow-right-to-bracket text-xl text-sky-200 group-hover:scale-110 transition-transform"></i>
+                                <span>Login / Register into EduVet</span>
+                            </span>
+                            <span class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center text-white group-hover:translate-x-1 transition-transform">
+                                <i class="fa fa-arrow-right text-sm"></i>
+                            </span>
+                        </a>
+                        <p class="text-[11px] sm:text-xs text-slate-500 font-medium px-1 flex items-center justify-center lg:justify-start gap-1.5">
+                            <i class="fa fa-shield-halved text-[#0284C7]"></i>
+                            <span>Single sign-on for all Ghanaian Basic School teachers, headteachers &amp; SISOs.</span>
                         </p>
                     </div>
 
