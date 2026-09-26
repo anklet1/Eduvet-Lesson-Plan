@@ -2,16 +2,24 @@
   "cleanUrls": true,
   "rewrites": [
     {
-      "source": "/eduvet.css",
-      "destination": "/eduvet.css"
+      "source": "/eduvet",
+      "destination": "/eduvet.html"
     },
     {
       "source": "/eduvet.html",
       "destination": "/eduvet.html"
     },
     {
-      "source": "/((?!.*\\..*).*)$",
-      "destination": "/index.html"
+      "source": "/login",
+      "destination": "/eduvet.html"
+    },
+    {
+      "source": "/app",
+      "destination": "/eduvet.html"
+    },
+    {
+      "source": "/eduvet.css",
+      "destination": "/eduvet.css"
     }
   ]
 }

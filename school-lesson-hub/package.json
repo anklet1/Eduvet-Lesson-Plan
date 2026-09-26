@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build:css": "tailwindcss -i src/index.css -o public/eduvet.css --minify",
-    "build": "npm run build:css && tsc && vite build && node -e \"const fs=require('fs'); fs.copyFileSync('public/eduvet.html','dist/eduvet.html'); fs.copyFileSync('public/eduvet.html','dist/index.html'); fs.copyFileSync('public/eduvet.css','dist/eduvet.css');\"",
+    "build": "npm run build:css && tsc && vite build && node -e \"const fs=require('fs'); fs.copyFileSync('public/eduvet.html','dist/eduvet.html'); fs.copyFileSync('index.html','dist/index.html'); fs.copyFileSync('index.html','public/index.html'); fs.copyFileSync('public/eduvet.css','dist/eduvet.css');\"",
     "preview": "vite preview"
   },
   "dependencies": {
