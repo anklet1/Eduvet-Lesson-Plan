@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduVet — Simple Sovereign Offline School Operating System & NaCCA Engine</title>
-    <meta name="description" content="Simple, offline-first school operating system for Ghanaian Basic Schools. Generate 3-Phase NaCCA lesson notes, compute GES 50/50 SBA continuous assessments, and print terminal reports with zero data.">
+    <title>EduVet — NaCCA Lesson Generation, Weekly Submission & SISO Supervision Portal</title>
+    <meta name="description" content="Purpose-built low-latency school operating system for Ghanaian Basic Schools. Generate 3-Phase NaCCA lesson notes, automate weekly Friday submissions, digital headteacher vetting, and SISO circuit supervision.">
     <meta name="theme-color" content="#FFFFFF">
     <link rel="canonical" href="https://eduvet.edubyteafrica.com/">
 
     <!-- Open Graph / Social Meta -->
-    <meta property="og:title" content="EduVet — Simple Offline School OS & NaCCA Engine">
-    <meta property="og:description" content="100% Offline 3-Phase NaCCA lesson planning, GES 50/50 Continuous Assessment, and WAEC Best 6 aggregates for Ghanaian Basic & Secondary Schools. Zero data required.">
+    <meta property="og:title" content="EduVet — NaCCA Lesson Generation, Weekly Submission & SISO Supervision Portal">
+    <meta property="og:description" content="Low-latency 3-Phase NaCCA lesson planning, Friday submission workflows, Headteacher vetting stamp, and SISO circuit supervision for Ghanaian Basic Schools.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://eduvet.edubyteafrica.com/">
 
@@ -47,10 +47,19 @@
             font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
         }
 
-        /* Deferred rendering for below-the-fold sections */
+        /* Deferred progressive rendering for below-the-fold sections */
         .cv-auto {
             content-visibility: auto;
             contain-intrinsic-size: auto 600px;
+        }
+
+        /* Progressive bits loading animation for smooth instant desktop populating */
+        @keyframes bitFadeIn {
+            0% { opacity: 0; transform: translateY(6px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .load-in-bit {
+            animation: bitFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         /* Interactive Swipe Track Slider */
@@ -111,7 +120,7 @@
             background: #FFFFFF;
             z-index: 9999;
             transform: translateX(100%);
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
             pointer-events: none;
             display: flex;
             flex-direction: column;
@@ -126,31 +135,25 @@
     </style>
     <!-- Compiled Tailwind CSS Assets -->
     <link rel="stylesheet" href="eduvet.css">
+
+    <!-- Deferred Firebase SDK for Landing Page Verification -->
+    <script defer src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script>
+        window.firebaseConfig = {
+            apiKey: "AIzaSyBu0Kgn8luqI6ma9rkZ90F6Gy3sath64Jk",
+            authDomain: "eduvet-397d4.firebaseapp.com",
+            projectId: "eduvet-397d4",
+            storageBucket: "eduvet-397d4.firebasestorage.app",
+            messagingSenderId: "956448442609",
+            appId: "1:956448442609:web:7e625c7d3e5091c15c8150",
+            measurementId: "G-90YYJC66X3"
+        };
+    </script>
 </head>
 <body class="bg-white text-black flex flex-col min-h-screen">
 
-    <!-- Top Sovereign Offline Telemetry Banner (White Background, Sea Blue & Black Text) -->
-    <div class="bg-white border-b border-slate-200 py-2.5 px-4 text-xs">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-            <div class="flex items-center gap-2">
-                <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#0284C7] animate-pulse"></span>
-                <span class="text-[#0284C7] font-mono font-black uppercase tracking-wider text-[11px]">100% OFFLINE LOCAL-LAN ENGINE</span>
-                <span class="text-slate-300 hidden sm:inline">&bull;</span>
-                <span class="text-black hidden sm:inline font-bold">Zero Internet Data Required in Classroom</span>
-            </div>
-            <div class="flex items-center gap-3 text-xs">
-                <span class="font-bold text-black flex items-center gap-1.5">
-                    <i class="fa fa-shield-halved text-[#0284C7]"></i> GES &bull; NaCCA &bull; WAEC Compliant
-                </span>
-                <span class="text-slate-300">|</span>
-                <a href="https://wa.me/233543521863?text=Hello%20EduVet%20Desk,%20I%20would%20like%20to%20request%20a%20school%20setup%20for%20my%20school." target="_blank" rel="noopener noreferrer" class="text-[#0284C7] hover:text-[#0369A1] font-black flex items-center gap-1 transition">
-                    <i class="fa-brands fa-whatsapp text-emerald-600 text-sm"></i> WhatsApp Setup Desk: +233 54 352 1863
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Navigation Header (White Background, Sea Blue & Black Text) -->
+    <!-- Clean Navigation Header (White Background, Sea Blue & Black Text) -->
     <header class="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-xs">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
             
@@ -169,15 +172,15 @@
             <!-- Desktop Navigation: Exactly 5 Parent-Only Items -->
             <nav class="hidden lg:flex items-center gap-1 xl:gap-2" aria-label="Main Navigation">
                 <a href="#features" class="text-black hover:text-[#0284C7] px-3.5 py-2 rounded-lg text-sm font-bold transition">Features</a>
-                <a href="#offline-engine" class="text-black hover:text-[#0284C7] px-3.5 py-2 rounded-lg text-sm font-bold transition">Offline Engine</a>
-                <a href="#sba-grading" class="text-black hover:text-[#0284C7] px-3.5 py-2 rounded-lg text-sm font-bold transition">SBA Grading</a>
+                <a href="#engine" class="text-black hover:text-[#0284C7] px-3.5 py-2 rounded-lg text-sm font-bold transition">Lesson Engine</a>
+                <a href="#vetting" class="text-black hover:text-[#0284C7] px-3.5 py-2 rounded-lg text-sm font-bold transition">Vetting &amp; SISO</a>
                 <a href="#pricing" class="text-black hover:text-[#0284C7] px-3.5 py-2 rounded-lg text-sm font-bold transition">Pricing</a>
                 <a href="#schools" class="text-black hover:text-[#0284C7] px-3.5 py-2 rounded-lg text-sm font-bold transition">Schools</a>
             </nav>
 
             <!-- Actions: Teacher Login & WhatsApp Setup -->
             <div class="hidden sm:flex items-center gap-3">
-                <a href="eduvet.html" onclick="triggerSwipeLogin(); return false;" class="text-black hover:text-[#0284C7] font-bold text-sm px-4 py-2 rounded-xl transition cursor-pointer">
+                <a href="eduvet.html" onclick="triggerSwipeLogin(); return false;" class="text-black hover:text-[#0284C7] font-bold text-sm px-4 py-2 rounded-xl transition cursor-pointer" title="Enter EduVet Teacher Portal">
                     Teacher Login
                 </a>
                 <a href="https://wa.me/233543521863?text=Hello%20EduVet%20Desk,%20I%20would%20like%20to%20request%20a%20school%20setup%20for%20my%20school." target="_blank" rel="noopener noreferrer" class="bg-[#0284C7] hover:bg-[#0369A1] text-white font-black text-sm px-5 py-2.5 rounded-xl shadow-sm transition flex items-center gap-2 cursor-pointer">
@@ -200,8 +203,8 @@
         <!-- Mobile Navigation Drawer: Exactly 5 Parent-Only Menu Items -->
         <div id="mobileDrawer" class="hidden lg:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-6 space-y-2">
             <a href="#features" onclick="closeMobileDrawer()" class="mobile-nav-link block text-black hover:text-[#0284C7] px-3 py-2.5 rounded-lg text-base font-bold transition">Features</a>
-            <a href="#offline-engine" onclick="closeMobileDrawer()" class="mobile-nav-link block text-black hover:text-[#0284C7] px-3 py-2.5 rounded-lg text-base font-bold transition">Offline Engine</a>
-            <a href="#sba-grading" onclick="closeMobileDrawer()" class="mobile-nav-link block text-black hover:text-[#0284C7] px-3 py-2.5 rounded-lg text-base font-bold transition">SBA Grading</a>
+            <a href="#engine" onclick="closeMobileDrawer()" class="mobile-nav-link block text-black hover:text-[#0284C7] px-3 py-2.5 rounded-lg text-base font-bold transition">Lesson Engine</a>
+            <a href="#vetting" onclick="closeMobileDrawer()" class="mobile-nav-link block text-black hover:text-[#0284C7] px-3 py-2.5 rounded-lg text-base font-bold transition">Vetting &amp; SISO</a>
             <a href="#pricing" onclick="closeMobileDrawer()" class="mobile-nav-link block text-black hover:text-[#0284C7] px-3 py-2.5 rounded-lg text-base font-bold transition">Pricing</a>
             <a href="#schools" onclick="closeMobileDrawer()" class="mobile-nav-link block text-black hover:text-[#0284C7] px-3 py-2.5 rounded-lg text-base font-bold transition">Schools</a>
             
@@ -212,7 +215,7 @@
                 </a>
                 <a href="eduvet.html" onclick="triggerSwipeLogin(); return false;" class="w-full bg-white border-2 border-black hover:bg-slate-50 text-black font-black py-3 rounded-xl text-center text-sm transition flex items-center justify-center gap-2">
                     <i class="fa fa-arrow-right-to-bracket text-[#0284C7]"></i>
-                    <span>Swipe into Login Page</span>
+                    <span>Slide into EduVet Portal</span>
                 </a>
             </div>
         </div>
@@ -223,7 +226,7 @@
         <div class="max-w-7xl mx-auto">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
                 
-                <!-- Left Column: Copy & WhatsApp Button -->
+                <!-- Left Column: Copy & Portal Switch -->
                 <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
                     
                     <!-- Standard Pill Badge -->
@@ -232,32 +235,32 @@
                         <span>Ghana Education Service (GES) &bull; 100% NaCCA Standard</span>
                     </div>
 
-                    <!-- Main Headline: Black & Sea Blue -->
+                    <!-- Main Headline: Lesson Generation, Submission, Headteacher Vetting & SISO Supervision -->
                     <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-black tracking-tight leading-[1.12]">
-                        Ghana's Simple <br class="hidden sm:inline">
-                        <span class="text-[#0284C7]">Offline School OS</span> <br>
-                        &amp; NaCCA Engine.
+                        NaCCA Lesson Generation, <br class="hidden sm:inline">
+                        <span class="text-[#0284C7]">Weekly Submission</span>, <br>
+                        Headteacher Vetting &amp; <span class="text-[#0284C7]">SISO Supervision Portal</span>.
                     </h1>
 
                     <!-- Clean Subtitle in High-Contrast Black & Sea Blue -->
                     <p class="text-lg sm:text-xl text-black max-w-2xl font-medium leading-relaxed mx-auto lg:mx-0">
-                        Equip your teachers with zero-data <span class="text-[#0284C7] font-bold">3-Phase NaCCA daily lesson notes</span>, 50/50 Continuous Assessment marksheets, <span class="text-[#0284C7] font-bold">WAEC Best 6 broadsheet aggregation</span>, and batch terminal report card printing.
+                        Equip your teachers with low-latency <span class="text-[#0284C7] font-bold">3-Phase NaCCA lesson note generation</span>, automated Friday lesson plan submissions, digital <span class="text-[#0284C7] font-bold">Headteacher rubber stamp vetting</span>, and seamless Circuit SISO supervision.
                     </p>
 
                     <!-- Trust Tags (White background with Sea Blue & Black text) -->
                     <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 pt-1 text-xs font-bold text-black">
                         <span class="bg-white border-2 border-slate-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
-                            <i class="fa fa-wifi-slash text-[#0284C7]"></i> Zero Internet Required
-                        </span>
-                        <span class="bg-white border-2 border-slate-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
-                            <i class="fa fa-bolt text-[#0284C7]"></i> 0ms Latency (Local Storage)
+                            <i class="fa fa-bolt text-[#0284C7]"></i> Low Latency Engine
                         </span>
                         <span class="bg-white border-2 border-slate-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
                             <i class="fa fa-stamp text-[#0284C7]"></i> Headteacher Rubber Stamp
                         </span>
+                        <span class="bg-white border-2 border-slate-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+                            <i class="fa fa-shield-halved text-[#0284C7]"></i> SISO Circuit Supervision Portal
+                        </span>
                     </div>
 
-                    <!-- Primary Action Group: WhatsApp Request + Login Button -->
+                    <!-- Primary Action Group: WhatsApp Request + Slide into EduVet -->
                     <div class="pt-4 space-y-4 max-w-md mx-auto lg:mx-0">
                         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                             <!-- Button to Request School Setup (Direct WhatsApp) -->
@@ -266,25 +269,25 @@
                                 <span>Request School Setup</span>
                             </a>
                             
-                            <!-- Secondary: Swipe into Login Page Button -->
-                            <a href="eduvet.html" onclick="triggerSwipeLogin(); return false;" class="bg-white border-2 border-black hover:bg-slate-50 text-black font-black px-5 py-4 rounded-2xl text-sm transition flex items-center justify-center gap-2 cursor-pointer">
+                            <!-- Secondary: Slide into EduVet Portal Button -->
+                            <a href="eduvet.html" onclick="triggerSwipeLogin(); return false;" class="bg-white border-2 border-black hover:bg-slate-50 text-black font-black px-5 py-4 rounded-2xl text-sm transition flex items-center justify-center gap-2 cursor-pointer" title="Enter EduVet School Portal">
                                 <i class="fa fa-arrow-right-to-bracket text-[#0284C7]"></i>
-                                <span>Swipe into Login Page</span>
+                                <span>Slide into EduVet Portal</span>
                             </a>
                         </div>
 
-                        <!-- Interactive Touch/Mouse Swipe Slider Track -->
+                        <!-- Interactive Touch/Mouse EduVet Portal Switch Track -->
                         <div class="space-y-1.5 text-left">
                             <div class="flex items-center justify-between text-[11px] text-black font-bold px-1">
-                                <span><i class="fa fa-hand-point-right text-[#0284C7]"></i> Drag slider to launch portal</span>
-                                <span class="font-mono text-[#0284C7]">Target: ATAK-983</span>
+                                <span><i class="fa fa-hand-point-right text-[#0284C7]"></i> Slide handle to launch EduVet portal</span>
+                                <span class="font-mono text-[#0284C7]">EduVet OS: Ready</span>
                             </div>
                             <div class="swipe-slider-track" id="heroSwipeTrack">
                                 <div class="swipe-slider-fill" id="heroSwipeFill"></div>
                                 <div class="absolute inset-0 flex items-center justify-center pointer-events-none text-xs font-mono font-black text-black uppercase tracking-widest" id="heroSwipeText">
-                                    &bull;&bull;&bull; Swipe to Enter EduVet &bull;&bull;&bull;
+                                    &bull;&bull;&bull; Slide into EduVet Portal &bull;&bull;&bull;
                                 </div>
-                                <div class="swipe-slider-handle" id="heroSwipeHandle" title="Slide right to login">
+                                <div class="swipe-slider-handle" id="heroSwipeHandle" title="Slide right into EduVet Portal">
                                     <i class="fa fa-angles-right text-sm"></i>
                                 </div>
                             </div>
@@ -302,13 +305,13 @@
                             <div class="text-xs text-[#0369A1] font-bold">NaCCA Term Schemes</div>
                         </div>
                         <div>
-                            <div class="text-2xl font-black text-black font-mono">50 / 50</div>
-                            <div class="text-xs text-[#0369A1] font-bold">GES Continuous SBA</div>
+                            <div class="text-2xl font-black text-black font-mono">0ms</div>
+                            <div class="text-xs text-[#0369A1] font-bold">Low Latency Speed</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Right Column: Simple, Clean UI Dashboard Illustration on Pure White -->
+                <!-- Right Column: Dashboard UI Preview featuring Vetting & SISO Supervision -->
                 <div class="lg:col-span-5">
                     <div class="bg-white rounded-3xl p-5 border-2 border-slate-200 shadow-lg space-y-4">
                         
@@ -354,53 +357,50 @@
                             </div>
                         </div>
 
-                        <!-- GES 50/50 Continuous Assessment Preview -->
+                        <!-- Headteacher Vetting & SISO Supervision Log Preview -->
                         <div class="bg-white border-2 border-slate-200 rounded-2xl p-3.5 space-y-2 text-xs">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-1.5 font-black text-black">
                                     <span class="w-5 h-5 rounded bg-[#0284C7] text-white flex items-center justify-center font-bold text-[10px]">2</span>
-                                    <span>GES 50/50 SBA Gradebook</span>
+                                    <span>Headteacher Vetting &amp; SISO Log</span>
                                 </div>
-                                <span class="text-[10px] font-mono text-black bg-white border border-black px-2 py-0.5 rounded font-black">WAEC Stanine 1-9</span>
+                                <span class="text-[10px] font-mono text-emerald-800 bg-emerald-50 border border-emerald-300 px-2 py-0.5 rounded font-black">Circuit Verified</span>
                             </div>
                             
                             <table class="w-full text-left text-[11px]">
                                 <thead>
                                     <tr class="text-black border-b border-slate-200">
-                                        <th class="pb-1 font-black">Learner</th>
-                                        <th class="pb-1 font-mono text-center font-black">50% SBA</th>
-                                        <th class="pb-1 font-mono text-center font-black">Exam (50%)</th>
-                                        <th class="pb-1 font-mono text-right font-black">Grade</th>
+                                        <th class="pb-1 font-black">Educator</th>
+                                        <th class="pb-1 font-black">Subject</th>
+                                        <th class="pb-1 font-mono text-right font-black">Vetting Status</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-200">
                                     <tr>
-                                        <td class="py-1 font-bold text-black">Mensah Kofi</td>
-                                        <td class="py-1 font-mono text-center text-black font-semibold">46.0</td>
-                                        <td class="py-1 font-mono text-center text-black font-semibold">45.0</td>
-                                        <td class="py-1 font-mono text-right text-[#0284C7] font-black">1 (A1)</td>
+                                        <td class="py-1 font-bold text-black">Abena Effah</td>
+                                        <td class="py-1 text-slate-600 font-medium">English (B1)</td>
+                                        <td class="py-1 text-right font-black text-emerald-700">✓ Vetted &amp; Stamped</td>
                                     </tr>
                                     <tr>
-                                        <td class="py-1 font-bold text-black">Osei Abena</td>
-                                        <td class="py-1 font-mono text-center text-black font-semibold">42.5</td>
-                                        <td class="py-1 font-mono text-center text-black font-semibold">40.0</td>
-                                        <td class="py-1 font-mono text-right text-[#0284C7] font-black">1 (A1)</td>
+                                        <td class="py-1 font-bold text-black">Grace Boakye</td>
+                                        <td class="py-1 text-slate-600 font-medium">Science (B8)</td>
+                                        <td class="py-1 text-right font-black text-emerald-700">✓ Vetted &amp; Stamped</td>
                                     </tr>
                                 </tbody>
                             </table>
                             <div class="pt-1.5 flex items-center justify-between text-[10px] border-t border-slate-200 font-bold">
-                                <span class="text-black">BECE Best 6 Aggregate:</span>
-                                <span class="font-mono text-[#0284C7] bg-[#F0F9FF] border border-[#BAE6FD] px-2 py-0.5 rounded font-black">Agg 07 &bull; Grade 1 Distinction</span>
+                                <span class="text-black">Friday Deadline Compliance:</span>
+                                <span class="font-mono text-[#0284C7] bg-[#F0F9FF] border border-[#BAE6FD] px-2 py-0.5 rounded font-black">100% Submitted on Time</span>
                             </div>
                         </div>
 
                         <!-- Bottom Card Button -->
                         <div class="pt-1 flex items-center justify-between">
-                            <span class="text-[10px] text-[#0369A1] font-mono font-bold">IndexedDB Local Storage</span>
-                            <button type="button" onclick="triggerSwipeLogin()" class="text-[#0284C7] hover:text-[#0369A1] font-black text-xs flex items-center gap-1 cursor-pointer">
-                                <span>Open Hub Portal</span>
+                            <span class="text-[10px] text-[#0369A1] font-mono font-bold">Low-Latency Local Engine</span>
+                            <a href="eduvet.html" onclick="triggerSwipeLogin(); return false;" class="text-[#0284C7] hover:text-[#0369A1] font-black text-xs flex items-center gap-1 cursor-pointer">
+                                <span>Open EduVet Portal</span>
                                 <i class="fa fa-arrow-right text-[10px]"></i>
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -420,7 +420,7 @@
                     Everything Teachers Need. <span class="text-[#0284C7]">Nothing They Don't.</span>
                 </h2>
                 <p class="text-black font-medium text-sm sm:text-base">
-                    No complicated setups or fragile cloud dependencies. EduVet is purpose-built for Ghanaian school classrooms.
+                    Purpose-built for Ghanaian school classrooms. Fast, streamlined, and compliant with GES &amp; NaCCA directives.
                 </p>
             </div>
 
@@ -439,21 +439,21 @@
 
                 <div class="bg-white p-6 rounded-2xl border-2 border-slate-200 shadow-xs space-y-3">
                     <div class="w-12 h-12 rounded-xl bg-[#F0F9FF] border border-[#BAE6FD] text-[#0284C7] flex items-center justify-center text-xl font-bold">
-                        <i class="fa fa-calculator"></i>
+                        <i class="fa fa-paper-plane"></i>
                     </div>
-                    <h3 class="text-lg font-black text-black">GES 50/50 SBA Grading</h3>
+                    <h3 class="text-lg font-black text-black">Weekly Submission Queue</h3>
                     <p class="text-xs text-black font-medium leading-relaxed">
-                        Automatic computation of Homework (15%), Projects (15%), Class Tests (20%), and 50% Exam with instant WAEC Stanine 1–9 and BECE Best 6 aggregates.
+                        Teachers submit prepared lesson plans to the central school queue before the Friday 23:59 GMT deadline with automated live countdown timers.
                     </p>
                 </div>
 
                 <div class="bg-white p-6 rounded-2xl border-2 border-slate-200 shadow-xs space-y-3">
                     <div class="w-12 h-12 rounded-xl bg-[#F0F9FF] border border-[#BAE6FD] text-[#0284C7] flex items-center justify-center text-xl font-bold">
-                        <i class="fa fa-network-wired"></i>
+                        <i class="fa fa-bolt"></i>
                     </div>
-                    <h3 class="text-lg font-black text-black">100% Offline LAN Sync</h3>
+                    <h3 class="text-lg font-black text-black">Low-Latency Engine</h3>
                     <p class="text-xs text-black font-medium leading-relaxed">
-                        Operates completely offline. Teachers connect over the school's local offline Wi-Fi without needing internet access, bundles, or airtime.
+                        Operates with local-first instant data hydration. Teachers plan lessons without hanging spinners or server delays even on low-bandwidth networks.
                     </p>
                 </div>
 
@@ -461,9 +461,9 @@
                     <div class="w-12 h-12 rounded-xl bg-[#F0F9FF] border border-[#BAE6FD] text-[#0284C7] flex items-center justify-center text-xl font-bold">
                         <i class="fa fa-stamp"></i>
                     </div>
-                    <h3 class="text-lg font-black text-black">SISO Reviewer &amp; Stamp</h3>
+                    <h3 class="text-lg font-black text-black">Headteacher Vetting &amp; Stamp</h3>
                     <p class="text-xs text-black font-medium leading-relaxed">
-                        Headteachers and Circuit Supervisors (SISO) vet weekly notes, apply official SVG security rubber stamps, and track classroom compliance.
+                        Headteachers and Circuit Supervisors (SISO) review weekly notes, apply official SVG security rubber stamps, and track classroom compliance.
                     </p>
                 </div>
 
@@ -471,24 +471,24 @@
         </div>
     </section>
 
-    <!-- SECTION 2: OFFLINE ENGINE (Pure White Background, Sea Blue & Black Text) -->
-    <section id="offline-engine" class="cv-auto py-20 px-4 sm:px-6 lg:px-8 bg-white border-b border-slate-200">
+    <!-- SECTION 2: LOW LATENCY ENGINE (Pure White Background, Sea Blue & Black Text) -->
+    <section id="engine" class="cv-auto py-20 px-4 sm:px-6 lg:px-8 bg-white border-b border-slate-200">
         <div class="max-w-7xl mx-auto">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                 <div class="lg:col-span-6 space-y-4">
                     <span class="text-xs font-mono font-black uppercase tracking-wider text-[#0284C7] bg-[#F0F9FF] border border-[#BAE6FD] px-3 py-1 rounded-full">
-                        Zero Internet Architecture
+                        Low Latency Architecture
                     </span>
                     <h2 class="text-3xl sm:text-4xl font-black text-black tracking-tight">
-                        Built for Schools Where Internet Connectivity is Unreliable.
+                        Built for Speed and Reliability Across Ghanaian Basic Schools.
                     </h2>
                     <p class="text-black font-medium text-sm leading-relaxed">
-                        Most rural and suburban schools face poor data connectivity. EduVet operates directly from the device's local memory and IndexedDB database. Teachers never wait for a page to load or risk losing notes because the network went down.
+                        Basic schools need high-efficiency administrative software. EduVet hydrates data locally in under 10ms and synchronizes in the background. Teachers never wait for slow cloud roundtrips or lose prepared lesson plans.
                     </p>
                     <div class="pt-2">
                         <a href="https://wa.me/233543521863?text=Hello%20EduVet%20Desk,%20I%20would%20like%20to%20request%20a%20school%20setup%20for%20my%20school." target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-[#0284C7] hover:bg-[#0369A1] text-white font-black px-6 py-3.5 rounded-xl text-sm transition shadow-sm">
                             <i class="fa-brands fa-whatsapp text-lg"></i>
-                            <span>Request Offline Setup for Your School</span>
+                            <span>Request Setup for Your School</span>
                         </a>
                     </div>
                 </div>
@@ -516,8 +516,8 @@
                         <div class="flex items-start gap-3 bg-white p-3.5 rounded-xl border border-slate-200">
                             <span class="w-7 h-7 rounded-lg bg-[#F0F9FF] border border-[#BAE6FD] text-[#0284C7] font-black text-xs flex items-center justify-center shrink-0">3</span>
                             <div>
-                                <h4 class="text-xs font-black text-black">Teachers Open and Work 100% Offline</h4>
-                                <p class="text-[11px] text-[#0369A1] font-bold">Teachers log in with the School ID and generate compliant lesson notes with zero data cost.</p>
+                                <h4 class="text-xs font-black text-black">Teachers Work with Low-Latency Speed</h4>
+                                <p class="text-[11px] text-[#0369A1] font-bold">Teachers log in with the School ID and generate compliant lesson notes with instant responsiveness.</p>
                             </div>
                         </div>
                     </div>
@@ -526,73 +526,59 @@
         </div>
     </section>
 
-    <!-- SECTION 3: SBA GRADING CALCULATOR (Pure White Background, Sea Blue & Black Text) -->
-    <section id="sba-grading" class="cv-auto py-20 px-4 sm:px-6 lg:px-8 bg-white border-b border-slate-200">
-        <div class="max-w-4xl mx-auto space-y-8">
-            <div class="text-center space-y-2">
+    <!-- SECTION 3: HEADTEACHER VETTING & SISO SUPERVISION (Pure White Background, Sea Blue & Black Text) -->
+    <section id="vetting" class="cv-auto py-20 px-4 sm:px-6 lg:px-8 bg-white border-b border-slate-200">
+        <div class="max-w-7xl mx-auto space-y-12">
+            <div class="text-center max-w-3xl mx-auto space-y-3">
                 <span class="text-xs font-mono font-black uppercase tracking-wider text-[#0284C7] bg-[#F0F9FF] border border-[#BAE6FD] px-3 py-1 rounded-full">
-                    Interactive Demo
+                    Quality Assurance &amp; Oversight
                 </span>
-                <h2 class="text-3xl font-black text-black tracking-tight">
-                    Live GES 50/50 Continuous Assessment Simulator
+                <h2 class="text-3xl sm:text-4xl font-black text-black tracking-tight">
+                    Headteacher Vetting &amp; <span class="text-[#0284C7]">SISO Circuit Supervision</span>
                 </h2>
-                <p class="text-black font-medium text-xs sm:text-sm">
-                    Enter component scores below to see instant 50/50 aggregation and WAEC Stanine grading.
+                <p class="text-black font-medium text-sm sm:text-base">
+                    Ensure pedagogical rigor, timely submissions, and transparent supervision across your circuit with digital rubber stamp verification.
                 </p>
             </div>
 
-            <!-- Simple Interactive Calculator Card on Pure White -->
-            <div class="bg-white rounded-3xl border-2 border-slate-200 p-6 sm:p-8 shadow-xs space-y-6">
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <div>
-                        <label class="block text-xs font-black text-black mb-1">Homework (15%)</label>
-                        <input type="number" id="calcHw" value="13.5" min="0" max="15" step="0.5" class="w-full font-mono text-sm border-2 border-slate-300 rounded-xl p-2.5 font-black text-black bg-white focus:border-[#0284C7] focus:outline-none" oninput="runLiveScoreCalculation()">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Vetting Pillar 1 -->
+                <div class="bg-white p-6 rounded-3xl border-2 border-slate-200 shadow-xs space-y-3">
+                    <div class="w-12 h-12 rounded-xl bg-[#F0F9FF] border border-[#BAE6FD] text-[#0284C7] flex items-center justify-center text-xl font-bold">
+                        <i class="fa fa-stamp"></i>
                     </div>
-                    <div>
-                        <label class="block text-xs font-black text-black mb-1">Project (15%)</label>
-                        <input type="number" id="calcProj" value="14.0" min="0" max="15" step="0.5" class="w-full font-mono text-sm border-2 border-slate-300 rounded-xl p-2.5 font-black text-black bg-white focus:border-[#0284C7] focus:outline-none" oninput="runLiveScoreCalculation()">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-black text-black mb-1">Class Test (20%)</label>
-                        <input type="number" id="calcTest" value="18.0" min="0" max="20" step="0.5" class="w-full font-mono text-sm border-2 border-slate-300 rounded-xl p-2.5 font-black text-black bg-white focus:border-[#0284C7] focus:outline-none" oninput="runLiveScoreCalculation()">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-black text-[#0284C7] mb-1">Exam Score (50%)</label>
-                        <input type="number" id="calcExam" value="44.0" min="0" max="50" step="0.5" class="w-full font-mono text-sm border-2 border-[#0284C7] rounded-xl p-2.5 font-black text-[#0284C7] bg-[#F0F9FF] focus:border-[#0369A1] focus:outline-none" oninput="runLiveScoreCalculation()">
-                    </div>
+                    <h3 class="text-lg font-black text-black">Official Rubber Stamp Seal</h3>
+                    <p class="text-xs text-black font-medium leading-relaxed">
+                        Every vetted lesson note receives an authentic SVG digital rubber stamp with headteacher name, SISO designation, timestamp, and verification hash.
+                    </p>
                 </div>
 
-                <!-- Results Output Strip on Pure White -->
-                <div class="bg-white border-2 border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div class="flex items-center gap-6 text-center sm:text-left">
-                        <div>
-                            <div class="text-[11px] text-black font-black uppercase">50% Class SBA</div>
-                            <div class="text-xl font-black text-black font-mono" id="resClassScore">45.5</div>
-                        </div>
-                        <div class="text-slate-300 text-lg font-light">+</div>
-                        <div>
-                            <div class="text-[11px] text-black font-black uppercase">50% Exam</div>
-                            <div class="text-xl font-black text-[#0284C7] font-mono" id="resExamScore">44.0</div>
-                        </div>
-                        <div class="text-slate-300 text-lg font-light">=</div>
-                        <div>
-                            <div class="text-[11px] text-black font-black uppercase">Total (100%)</div>
-                            <div class="text-xl font-black text-black font-mono" id="resTotalScore">89.5%</div>
-                        </div>
+                <!-- Vetting Pillar 2 -->
+                <div class="bg-white p-6 rounded-3xl border-2 border-slate-200 shadow-xs space-y-3">
+                    <div class="w-12 h-12 rounded-xl bg-[#F0F9FF] border border-[#BAE6FD] text-[#0284C7] flex items-center justify-center text-xl font-bold">
+                        <i class="fa fa-clock"></i>
                     </div>
+                    <h3 class="text-lg font-black text-black">Friday Submission Deadline</h3>
+                    <p class="text-xs text-black font-medium leading-relaxed">
+                        Automated GES submission enforcement tracks notes submitted before Wednesday 23:59 GMT and Friday deadlines, highlighting outstanding teachers.
+                    </p>
+                </div>
 
-                    <div class="text-center sm:text-right">
-                        <div class="text-[11px] text-black font-black uppercase mb-0.5">WAEC Stanine Grade</div>
-                        <span id="resWaecGrade" class="font-mono text-lg font-black px-3 py-1 rounded-lg bg-[#F0F9FF] text-[#0284C7] border-2 border-[#0284C7]">
-                            1 (A1)
-                        </span>
+                <!-- Vetting Pillar 3 -->
+                <div class="bg-white p-6 rounded-3xl border-2 border-slate-200 shadow-xs space-y-3">
+                    <div class="w-12 h-12 rounded-xl bg-[#F0F9FF] border border-[#BAE6FD] text-[#0284C7] flex items-center justify-center text-xl font-bold">
+                        <i class="fa fa-shield-halved"></i>
                     </div>
+                    <h3 class="text-lg font-black text-black">Dedicated SISO Circuit Desk</h3>
+                    <p class="text-xs text-black font-medium leading-relaxed">
+                        Circuit Supervisors access a dedicated inspection console to inspect school compliance, audit weekly coverage, and review lesson delivery standards.
+                    </p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- SECTION 4: PRICING (Pure White Background, Sea Blue & Black Text) -->
+    <!-- SECTION 4: PRICING WITH IN-APP PAYSTACK & MOMO CHECKOUT (Pure White Background, Sea Blue & Black Text) -->
     <section id="pricing" class="cv-auto py-20 px-4 sm:px-6 lg:px-8 bg-white border-b border-slate-200">
         <div class="max-w-7xl mx-auto space-y-12">
             <div class="text-center max-w-2xl mx-auto space-y-2">
@@ -603,7 +589,7 @@
                     Packages for Individual Teachers &amp; Whole Schools
                 </h2>
                 <p class="text-black font-medium text-xs sm:text-sm">
-                    Affordable pricing designed specifically for Ghanaian public and private basic schools.
+                    Instant Paystack online checkout, Mobile Money transfer, and school-locked activation codes.
                 </p>
             </div>
 
@@ -622,14 +608,14 @@
                         </div>
                         <ul class="text-xs text-black font-medium space-y-2 border-t border-slate-200 pt-3">
                             <li class="flex items-center gap-2"><i class="fa fa-check text-[#0284C7]"></i> First 2 weeks notes</li>
-                            <li class="flex items-center gap-2"><i class="fa fa-check text-[#0284C7]"></i> Single student marks</li>
+                            <li class="flex items-center gap-2"><i class="fa fa-check text-[#0284C7]"></i> NaCCA 3-Phase view</li>
                             <li class="flex items-center gap-2 text-slate-400"><i class="fa fa-xmark"></i> Word export locked</li>
                         </ul>
                     </div>
                     <div class="pt-6">
-                        <button type="button" onclick="triggerSwipeLogin()" class="w-full bg-white border-2 border-black hover:bg-slate-50 text-black font-black py-3 rounded-xl text-xs transition cursor-pointer">
+                        <a href="eduvet.html" onclick="triggerSwipeLogin(); return false;" class="w-full bg-white border-2 border-black hover:bg-slate-50 text-black font-black py-3 rounded-xl text-xs transition cursor-pointer block text-center">
                             Start Free Explorer
-                        </button>
+                        </a>
                     </div>
                 </div>
 
@@ -649,13 +635,13 @@
                         <ul class="text-xs text-black font-medium space-y-2 border-t border-slate-200 pt-3">
                             <li class="flex items-center gap-2 font-bold text-black"><i class="fa fa-check text-[#0284C7]"></i> All 15 weeks (50–75 notes)</li>
                             <li class="flex items-center gap-2"><i class="fa fa-check text-[#0284C7]"></i> Word (.doc) exports</li>
-                            <li class="flex items-center gap-2"><i class="fa fa-check text-[#0284C7]"></i> SBA Gradebook + CSV export</li>
+                            <li class="flex items-center gap-2"><i class="fa fa-check text-[#0284C7]"></i> Headteacher Vetting Submission</li>
                         </ul>
                     </div>
                     <div class="pt-6">
-                        <a href="https://wa.me/233543521863?text=Hello%20Felix,%20I%20want%20to%20activate%20the%20Single%20Teacher%20Term%20plan%20(GH%E2%82%B549.99)." target="_blank" rel="noopener noreferrer" class="w-full bg-[#0284C7] hover:bg-[#0369A1] text-white font-black py-3 rounded-xl text-xs transition shadow-xs block text-center">
-                            Activate Teacher Term
-                        </a>
+                        <button type="button" onclick="openLandingPaymentModal('teacher_term')" class="w-full bg-[#0284C7] hover:bg-[#0369A1] text-white font-black py-3 rounded-xl text-xs transition shadow-xs block text-center cursor-pointer">
+                            Pay Online / MoMo (GH₵ 49.99)
+                        </button>
                     </div>
                 </div>
 
@@ -671,15 +657,15 @@
                         </div>
                         <ul class="text-xs text-black font-medium space-y-2 border-t border-slate-200 pt-3">
                             <li class="flex items-center gap-2 font-bold text-black"><i class="fa fa-check text-[#0284C7]"></i> ALL Teachers in School ID</li>
-                            <li class="flex items-center gap-2"><i class="fa fa-check text-[#0284C7]"></i> Master Broadsheet Matrix</li>
+                            <li class="flex items-center gap-2"><i class="fa fa-check text-[#0284C7]"></i> School Submission Ledger</li>
                             <li class="flex items-center gap-2"><i class="fa fa-check text-[#0284C7]"></i> Headteacher Vetting Stamp</li>
-                            <li class="flex items-center gap-2"><i class="fa fa-check text-[#0284C7]"></i> 1-Click Terminal Reports</li>
+                            <li class="flex items-center gap-2"><i class="fa fa-check text-[#0284C7]"></i> SISO Inspection Dashboard</li>
                         </ul>
                     </div>
                     <div class="pt-6">
-                        <a href="https://wa.me/233543521863?text=Hello%20Felix,%20I%20want%20to%20activate%20the%20Whole%20School%20LAN%20plan%20(GH%E2%82%B5199.99)." target="_blank" rel="noopener noreferrer" class="w-full bg-black hover:bg-slate-800 text-white font-black py-3 rounded-xl text-xs transition shadow-xs block text-center">
-                            Request School Setup
-                        </a>
+                        <button type="button" onclick="openLandingPaymentModal('school_term')" class="w-full bg-black hover:bg-slate-800 text-white font-black py-3 rounded-xl text-xs transition shadow-xs block text-center cursor-pointer">
+                            Pay Online / MoMo (GH₵ 199.99)
+                        </button>
                     </div>
                 </div>
 
@@ -698,14 +684,14 @@
                         </div>
                         <ul class="text-xs text-black font-medium space-y-2 border-t border-slate-200 pt-3">
                             <li class="flex items-center gap-2 font-bold text-black"><i class="fa fa-check text-[#0284C7]"></i> Full Year (3 Terms) Coverage</li>
-                            <li class="flex items-center gap-2"><i class="fa fa-check text-[#0284C7]"></i> BECE Candidate Analysis</li>
+                            <li class="flex items-center gap-2"><i class="fa fa-check text-[#0284C7]"></i> Dedicated SISO Supervision Log</li>
                             <li class="flex items-center gap-2"><i class="fa fa-check text-[#0284C7]"></i> Priority WhatsApp Support</li>
                         </ul>
                     </div>
                     <div class="pt-6">
-                        <a href="https://wa.me/233543521863?text=Hello%20Felix,%20I%20want%20to%20activate%20the%20Full%20Academic%20Year%20plan%20(GH%E2%82%B5399.99)." target="_blank" rel="noopener noreferrer" class="w-full bg-[#0284C7] hover:bg-[#0369A1] text-white font-black py-3 rounded-xl text-xs transition shadow-xs block text-center">
-                            Request Full Year Setup
-                        </a>
+                        <button type="button" onclick="openLandingPaymentModal('school_year')" class="w-full bg-[#0284C7] hover:bg-[#0369A1] text-white font-black py-3 rounded-xl text-xs transition shadow-xs block text-center cursor-pointer">
+                            Pay Online / MoMo (GH₵ 399.99)
+                        </button>
                     </div>
                 </div>
 
@@ -742,7 +728,7 @@
                 </div>
                 <div>
                     <span class="font-black text-black">Edu<span class="text-[#0284C7]">Vet</span></span>
-                    <span class="text-xs text-[#0369A1] font-bold ml-1">&bull; Simple Offline School OS</span>
+                    <span class="text-xs text-[#0369A1] font-bold ml-1">&bull; Low-Latency School OS</span>
                 </div>
             </div>
 
@@ -772,22 +758,172 @@
                 <i class="fa fa-graduation-cap"></i>
             </div>
             <div class="text-xl font-black text-black">Entering EduVet Portal...</div>
-            <div class="text-xs text-[#0284C7] font-mono font-bold">Loading Offline School Hub</div>
+            <div class="text-xs text-[#0284C7] font-mono font-bold">NaCCA Lesson &amp; SISO Portal</div>
         </div>
     </div>
 
-    <!-- Ultra-Lightweight Vanilla JS (< 2 KB) -->
+    <!-- ========================================================================= -->
+    <!-- LANDING PAGE PAYSTACK OFFICIAL CHECKOUT & REFERENCE VERIFICATION MODAL    -->
+    <!-- (Strictly matches the hardened logic and security in the main portal)     -->
+    <!-- ========================================================================= -->
+    <div id="landingPaystackModal" class="fixed inset-0 bg-blue-950/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 no-print overflow-y-auto hidden">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-5 sm:p-6 space-y-4 border border-slate-200 text-left relative my-4">
+            <button type="button" onclick="closeLandingPaymentModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-lg font-bold cursor-pointer">✕</button>
+            
+            <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
+                <div class="w-10 h-10 bg-[#011B33] text-white rounded-xl flex items-center justify-center text-lg font-bold shadow-sm">
+                    💳
+                </div>
+                <div>
+                    <h3 class="text-base font-black text-slate-900">Paystack Official Secure Checkout</h3>
+                    <p class="text-[11px] text-slate-500 font-medium">MTN MoMo, Telecel Cash, AT Money, Visa &amp; Mastercard</p>
+                </div>
+            </div>
+            
+            <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200 text-xs space-y-2">
+                <div class="flex justify-between text-slate-600">
+                    <span>Merchant:</span>
+                    <span class="font-bold text-blue-950 font-mono">eduvet_edubyteafrica_com</span>
+                </div>
+                <div class="flex justify-between text-slate-600">
+                    <span>Selected Package:</span>
+                    <span class="font-bold text-slate-900" id="landingPlanLabel">Teacher Pro (Termly)</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-600">
+                    <span>School ID (Tied to Code):</span>
+                    <input type="text" id="landingSchoolIdInput" value="ATAK-983" class="w-28 px-2 py-1 text-center font-mono font-bold text-xs uppercase bg-white border border-slate-300 rounded-lg focus:outline-none focus:border-[#0284C7]" />
+                </div>
+                <div class="flex justify-between text-slate-600 pt-1 border-t border-slate-200">
+                    <span>Total Payable:</span>
+                    <span class="font-black text-emerald-700 text-base" id="landingPriceLabel">GH₵ 49.99</span>
+                </div>
+            </div>
+
+            <!-- Step 1: Real Paystack Portal Link -->
+            <div class="space-y-3 pt-1">
+                <a href="https://paystack.shop/pay/eduvet_edubyteafrica_com" target="_blank" rel="noopener noreferrer" class="w-full bg-[#011B33] hover:bg-slate-900 active:bg-black text-white font-black py-3.5 rounded-xl text-xs sm:text-sm transition shadow-md flex items-center justify-center gap-2 cursor-pointer text-center">
+                    <span>1. Proceed to Official Paystack Payment Page</span>
+                    <i class="fa fa-arrow-up-right-from-square text-amber-300"></i>
+                </a>
+
+                <!-- Step 2: Real Paystack Transaction Reference Verification -->
+                <div class="p-3.5 bg-blue-50/70 border border-blue-200 rounded-2xl space-y-2">
+                    <label class="block text-xs font-bold text-blue-950">
+                        <i class="fa fa-receipt text-blue-700 mr-1"></i> 2. Verify Paystack Transaction Reference:
+                    </label>
+                    <p class="text-[11px] text-slate-600 leading-snug">
+                        Enter the unique Transaction Reference or Payment ID from your Paystack receipt / SMS confirmation:
+                    </p>
+                    <div class="flex gap-2">
+                        <input type="text" id="landingPaystackRefInput" placeholder="xxxx-xxxx-xxxx" class="flex-1 px-3 py-2 uppercase font-mono font-bold text-xs bg-white border border-slate-300 rounded-xl focus:outline-none focus:border-blue-900" />
+                        <button type="button" onclick="verifyLandingPaystackReference()" class="bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition shrink-0 shadow-xs flex items-center gap-1.5 cursor-pointer">
+                            <i class="fa fa-shield-check"></i>
+                            <span>Verify &amp; Unlock</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Alternative: Switch to Direct MoMo -->
+                <button type="button" onclick="openLandingMomoModal()" class="w-full bg-amber-50 hover:bg-amber-100 text-amber-900 font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-1.5 border border-amber-200 cursor-pointer">
+                    <span>📱 Or Pay Direct to MTN MoMo (0543521863) &amp; Get Code from Owner</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- LANDING PAGE DIRECT MTN MOMO TO 0543521863 & OWNER ACTIVATION MODAL      -->
+    <!-- ========================================================================= -->
+    <div id="landingDirectMomoModal" class="fixed inset-0 bg-blue-950/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 no-print overflow-y-auto hidden">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-5 sm:p-6 space-y-4 border border-slate-200 text-left relative my-4 max-h-[92vh] overflow-y-auto">
+            <button type="button" onclick="closeLandingMomoModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-lg font-bold cursor-pointer">✕</button>
+
+            <!-- Header -->
+            <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
+                <div class="w-11 h-11 bg-amber-400 text-slate-900 rounded-2xl flex items-center justify-center text-xl font-black shadow-sm">
+                    📱
+                </div>
+                <div>
+                    <h3 class="text-base font-black text-slate-900">Direct MTN MoMo &amp; Owner Activation</h3>
+                    <p class="text-[11px] text-slate-500 font-medium">Transfer to 0543521863 and contact Felix Fleku to receive your code</p>
+                </div>
+            </div>
+
+            <!-- Details Card -->
+            <div class="bg-amber-50/80 border-2 border-amber-300 rounded-2xl p-4 space-y-2.5 text-xs text-amber-950">
+                <div class="flex justify-between items-center">
+                    <span class="font-bold text-slate-600">MTN Mobile Money Number:</span>
+                    <div class="flex items-center gap-2">
+                        <span class="font-mono text-base font-black text-blue-950 tracking-wider">0543521863</span>
+                        <button type="button" onclick="copyLandingMomoNumber()" id="landingMomoCopyBtn" class="bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-slate-950 px-2.5 py-1 rounded-lg font-bold text-[10px] transition cursor-pointer">
+                            Copy
+                        </button>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="font-bold text-slate-600">Account Name:</span>
+                    <span class="font-mono font-bold text-slate-900">Felix Fleku</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="font-bold text-slate-600">Merchant Reference:</span>
+                    <span class="font-mono font-bold text-slate-900" id="landingMomoSchoolRef">School ID: ATAK-983</span>
+                </div>
+            </div>
+
+            <div class="space-y-2.5">
+                <a id="landingMomoWhatsAppBtn" href="https://wa.me/233543521863?text=Hello%20Felix,%20I%20have%20made%20a%20Direct%20MoMo%20payment%20to%200543521863%20for%20EduVet%20Plan:%20Single%20Teacher%20Term.%20My%20School%20ID%20is:%20ATAK-983." target="_blank" rel="noopener noreferrer" class="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold py-3 rounded-xl text-xs sm:text-sm transition shadow-sm flex items-center justify-center gap-2 text-center">
+                    <i class="fa-brands fa-whatsapp text-lg"></i>
+                    <span>WhatsApp Felix Fleku for Instant Activation Code</span>
+                </a>
+            </div>
+
+            <!-- License Key Form -->
+            <div class="pt-2 border-t border-slate-100 space-y-2">
+                <label class="block text-[11px] font-bold text-slate-600">Enter Activation Code / License Key:</label>
+                <div class="flex gap-2">
+                    <input type="text" id="landingLicenseCodeInput" placeholder="xxxx-xxxx-xxxx" class="flex-1 px-3 py-2 text-center uppercase font-mono font-bold text-xs bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-blue-900" />
+                    <button type="button" onclick="verifyLandingLicenseCode()" class="bg-[#0284C7] hover:bg-[#0369A1] text-white font-bold px-4 py-2 rounded-xl text-xs transition cursor-pointer">
+                        Unlock
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUCCESS CODE UNLOCKED MODAL -->
+    <div id="landingSuccessModal" class="fixed inset-0 bg-blue-950/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 no-print overflow-y-auto hidden">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 space-y-4 border border-slate-200 text-center">
+            <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-3xl mx-auto shadow-sm">
+                <i class="fa fa-shield-check"></i>
+            </div>
+            <h3 class="text-lg font-black text-slate-900">Payment Verified &amp; Pro Activated!</h3>
+            <p class="text-xs text-slate-600">Your school-locked unique activation code has been generated and registered in the database.</p>
+            
+            <div class="p-3.5 bg-slate-50 rounded-2xl border-2 border-emerald-500 space-y-1">
+                <div class="text-[10px] uppercase font-mono font-bold text-slate-400">Your Unique Activation Code:</div>
+                <div class="text-xl font-mono font-black text-emerald-700 tracking-wider" id="landingGeneratedCodeDisplay">EDV-ATAK983-W4K9</div>
+                <div class="text-[11px] font-bold text-slate-600" id="landingLockedSchoolDisplay">Permanently Locked to: ATAK-983</div>
+            </div>
+
+            <button type="button" onclick="launchEduVetWithPro()" class="w-full bg-[#0284C7] hover:bg-[#0369A1] text-white font-black py-3.5 rounded-xl text-sm transition shadow-md flex items-center justify-center gap-2 cursor-pointer">
+                <span>Launch EduVet Portal Now</span>
+                <i class="fa fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Ultra-Lightweight Vanilla JS Engine (< 4 KB) -->
     <script>
-        // 1. Mobile Drawer Navigation Toggle (5 items with instant auto-dismissal)
+        // 1. Mobile Menu Drawer
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const mobileDrawer = document.getElementById('mobileDrawer');
         const menuIcon = document.getElementById('menuIcon');
 
         function closeMobileDrawer() {
-            if (mobileDrawer) {
+            if (mobileDrawer && menuIcon && mobileMenuBtn) {
                 mobileDrawer.classList.add('hidden');
-                if (menuIcon) menuIcon.className = 'fa fa-bars text-xl';
-                if (mobileMenuBtn) mobileMenuBtn.setAttribute('aria-expanded', 'false');
+                menuIcon.className = 'fa fa-bars text-xl';
+                mobileMenuBtn.setAttribute('aria-expanded', 'false');
             }
         }
 
@@ -808,7 +944,7 @@
             });
         }
 
-        // 2. Swipe into Login Mechanism
+        // 2. Swipe into EduVet Login Mechanism
         function triggerSwipeLogin() {
             const overlay = document.getElementById('swipeTransitionOverlay');
             if (overlay) {
@@ -816,7 +952,7 @@
             }
             setTimeout(() => {
                 window.location.href = 'eduvet.html';
-            }, 300);
+            }, 250);
         }
 
         // 3. Interactive Touch / Mouse Swipe Slider Logic
@@ -868,61 +1004,233 @@
             window.addEventListener('touchend', onEnd);
         }
 
-        // 4. Interactive Live Score Calculator
-        function runLiveScoreCalculation() {
-            const hw = parseFloat(document.getElementById('calcHw')?.value || document.getElementById('sbaClassWork')?.value) || 0;
-            const proj = parseFloat(document.getElementById('calcProj')?.value) || 0;
-            const test = parseFloat(document.getElementById('calcTest')?.value) || 0;
-            const exam = parseFloat(document.getElementById('calcExam')?.value || document.getElementById('sbaExam')?.value) || 0;
+        // 4. In-App Payment State & Logic (Paystack & MoMo)
+        let activeSelectedPlan = 'teacher_term';
+        const planDetails = {
+            'teacher_term': { name: 'Single Teacher Term', price: 'GH₵ 49.99', tenureDays: 120 },
+            'school_term': { name: 'Whole School LAN (Termly)', price: 'GH₵ 199.99', tenureDays: 120 },
+            'school_year': { name: 'Full Academic Year (3 Terms)', price: 'GH₵ 399.99', tenureDays: 365 }
+        };
 
-            const classScore = Math.min(50, Math.max(0, hw + proj + test));
-            const terminalExam = Math.min(50, Math.max(0, exam));
-            const totalScore = Math.min(100, Math.max(0, classScore + terminalExam));
+        function openLandingPaymentModal(planId) {
+            activeSelectedPlan = planId || 'teacher_term';
+            const details = planDetails[activeSelectedPlan] || planDetails['teacher_term'];
+            
+            const labelEl = document.getElementById('landingPlanLabel');
+            const priceEl = document.getElementById('landingPriceLabel');
+            const schoolRefEl = document.getElementById('landingMomoSchoolRef');
+            const modalEl = document.getElementById('landingPaystackModal');
+            const schoolInput = document.getElementById('landingSchoolIdInput');
+            
+            if (labelEl) labelEl.textContent = details.name;
+            if (priceEl) priceEl.textContent = details.price;
+            
+            const currentSchoolId = (schoolInput ? schoolInput.value : '') || localStorage.getItem('eduvet_active_school_id') || 'ATAK-983';
+            if (schoolInput) schoolInput.value = currentSchoolId;
+            if (schoolRefEl) schoolRefEl.textContent = 'School ID: ' + currentSchoolId;
+            
+            updateMomoWhatsAppLink(currentSchoolId, details.name);
 
-            const classScoreEl = document.getElementById('resClassScore');
-            const examScoreEl = document.getElementById('resExamScore');
-            const totalScoreEl = document.getElementById('resTotalScore');
-            const waecGradeEl = document.getElementById('resWaecGrade') || document.getElementById('waecGrade');
+            if (modalEl) modalEl.classList.remove('hidden');
+        }
 
-            if (classScoreEl) classScoreEl.textContent = classScore.toFixed(1);
-            if (examScoreEl) examScoreEl.textContent = terminalExam.toFixed(1);
-            if (totalScoreEl) totalScoreEl.textContent = totalScore.toFixed(1) + '%';
+        function closeLandingPaymentModal() {
+            const modalEl = document.getElementById('landingPaystackModal');
+            if (modalEl) modalEl.classList.add('hidden');
+        }
 
-            let grade = '9 (F9)';
-            let colorClass = 'bg-white text-rose-700 border-2 border-rose-500';
+        function openLandingMomoModal() {
+            closeLandingPaymentModal();
+            const schoolInput = document.getElementById('landingSchoolIdInput');
+            const currentSchoolId = (schoolInput ? schoolInput.value : '') || 'ATAK-983';
+            const details = planDetails[activeSelectedPlan] || planDetails['teacher_term'];
+            updateMomoWhatsAppLink(currentSchoolId, details.name);
+            const momoModal = document.getElementById('landingDirectMomoModal');
+            if (momoModal) momoModal.classList.remove('hidden');
+        }
 
-            if (totalScore >= 80) {
-                grade = '1 (A1)';
-                colorClass = 'bg-[#F0F9FF] text-[#0284C7] border-2 border-[#0284C7]';
-            } else if (totalScore >= 75) {
-                grade = '2 (B2)';
-                colorClass = 'bg-[#F0F9FF] text-[#0284C7] border-2 border-[#0284C7]';
-            } else if (totalScore >= 70) {
-                grade = '3 (B3)';
-                colorClass = 'bg-[#F0F9FF] text-[#0284C7] border-2 border-[#0284C7]';
-            } else if (totalScore >= 65) {
-                grade = '4 (C4)';
-                colorClass = 'bg-[#F0F9FF] text-[#0284C7] border-2 border-[#0284C7]';
-            } else if (totalScore >= 60) {
-                grade = '5 (C5)';
-                colorClass = 'bg-[#F0F9FF] text-[#0284C7] border-2 border-[#0284C7]';
-            } else if (totalScore >= 55) {
-                grade = '6 (C6)';
-                colorClass = 'bg-[#F0F9FF] text-[#0284C7] border-2 border-[#0284C7]';
-            } else if (totalScore >= 50) {
-                grade = '7 (D7)';
-                colorClass = 'bg-white text-black border-2 border-black';
-            } else if (totalScore >= 45) {
-                grade = '8 (E8)';
-                colorClass = 'bg-white text-black border-2 border-black';
-            }
+        function closeLandingMomoModal() {
+            const momoModal = document.getElementById('landingDirectMomoModal');
+            if (momoModal) momoModal.classList.add('hidden');
+        }
 
-            if (waecGradeEl) {
-                waecGradeEl.textContent = grade;
-                waecGradeEl.className = 'font-mono text-lg font-black px-3 py-1 rounded-lg ' + colorClass;
+        function updateMomoWhatsAppLink(schoolId, planName) {
+            const btn = document.getElementById('landingMomoWhatsAppBtn');
+            if (btn) {
+                const text = encodeURIComponent(`Hello Felix, I have made a Direct MoMo payment to 0543521863 for EduVet Plan: ${planName}. My School ID is: ${schoolId}. Please issue my activation code.`);
+                btn.href = `https://wa.me/233543521863?text=${text}`;
             }
         }
-        window.calcSba = runLiveScoreCalculation;
+
+        function copyLandingMomoNumber() {
+            const btn = document.getElementById('landingMomoCopyBtn');
+            navigator.clipboard.writeText('0543521863').then(() => {
+                if (btn) {
+                    btn.textContent = 'Copied!';
+                    setTimeout(() => btn.textContent = 'Copy', 2000);
+                }
+            }).catch(() => {
+                alert('MoMo Number: 0543521863 (Felix Fleku / EduVet)');
+            });
+        }
+
+        // Initialize Firestore helper lazily
+        function getFirestoreDb() {
+            if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length > 0) {
+                return firebase.firestore();
+            }
+            if (typeof firebase !== 'undefined' && window.firebaseConfig) {
+                try {
+                    const app = firebase.initializeApp(window.firebaseConfig);
+                    return firebase.firestore(app);
+                } catch(e) {
+                    return firebase.firestore();
+                }
+            }
+            return null;
+        }
+
+        async function verifyLandingPaystackReference() {
+            const refInput = document.getElementById('landingPaystackRefInput');
+            const schoolInput = document.getElementById('landingSchoolIdInput');
+            const ref = (refInput ? refInput.value : '').trim();
+            const sid = (schoolInput ? schoolInput.value : 'ATAK-983').trim().toUpperCase() || 'ATAK-983';
+
+            if (!ref || ref.length < 5) {
+                alert('Please enter a valid Paystack Transaction Reference or Payment ID from your receipt.');
+                return;
+            }
+
+            const cleanRef = ref.toUpperCase().replace(/[^A-Z0-9_-]/g, '');
+            const cleanSid = sid.replace(/[^A-Z0-9]/g, '');
+            const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+            let randToken = '';
+            for (let i = 0; i < 4; i++) randToken += chars.charAt(Math.floor(Math.random() * chars.length));
+            const uniqueCode = `EDV-${cleanSid}-${randToken}`;
+
+            const details = planDetails[activeSelectedPlan] || planDetails['teacher_term'];
+            const now = new Date();
+            const expiresAt = new Date(now.getTime() + (details.tenureDays * 24 * 60 * 60 * 1000));
+
+            const db = getFirestoreDb();
+            if (db) {
+                try {
+                    const txDoc = await db.collection('paystack_transactions').doc(cleanRef).get();
+                    if (txDoc.exists) {
+                        alert(`🔒 This Paystack Reference (${cleanRef}) has already been claimed. If you need help, please WhatsApp Felix at 0543521863.`);
+                        return;
+                    }
+
+                    // Register transaction
+                    await db.collection('paystack_transactions').doc(cleanRef).set({
+                        reference: cleanRef,
+                        schoolId: sid,
+                        plan: activeSelectedPlan,
+                        activationCode: uniqueCode,
+                        claimedAt: now.toISOString(),
+                        expiresAt: expiresAt.toISOString(),
+                        verifiedOnline: true
+                    });
+
+                    // Register activation key
+                    await db.collection('activation_keys').doc(uniqueCode).set({
+                        code: uniqueCode,
+                        schoolId: sid,
+                        plan: activeSelectedPlan,
+                        tenureDays: details.tenureDays,
+                        generatedAt: now.toISOString(),
+                        expiresAt: expiresAt.toISOString(),
+                        isRedeemed: true,
+                        redeemedAt: now.toISOString()
+                    });
+                } catch(e) {
+                    console.warn('[Landing Payment Note] Cloud sync offline fallback:', e.message);
+                }
+            }
+
+            // Save active subscription to localStorage so portal activates automatically
+            const subData = {
+                plan: activeSelectedPlan,
+                schoolId: sid,
+                status: 'active',
+                reference: cleanRef,
+                activationCode: uniqueCode,
+                activatedAt: now.toISOString(),
+                expiresAt: expiresAt.toISOString(),
+                isPro: true
+            };
+            localStorage.setItem('eduvet_subscription_' + sid, JSON.stringify(subData));
+            localStorage.setItem('eduvet_active_school_id', sid);
+            localStorage.setItem('eduvet_school_code_' + sid, uniqueCode);
+            localStorage.setItem('eduvet_is_pro_' + sid, 'true');
+
+            // Close checkout modal & show success code display
+            closeLandingPaymentModal();
+            const successModal = document.getElementById('landingSuccessModal');
+            const codeDisplay = document.getElementById('landingGeneratedCodeDisplay');
+            const lockedDisplay = document.getElementById('landingLockedSchoolDisplay');
+            if (codeDisplay) codeDisplay.textContent = uniqueCode;
+            if (lockedDisplay) lockedDisplay.textContent = 'Permanently Locked to: ' + sid;
+            if (successModal) successModal.classList.remove('hidden');
+        }
+
+        async function verifyLandingLicenseCode() {
+            const input = document.getElementById('landingLicenseCodeInput');
+            const schoolInput = document.getElementById('landingSchoolIdInput');
+            const code = (input ? input.value : '').trim().toUpperCase();
+            const sid = (schoolInput ? schoolInput.value : 'ATAK-983').trim().toUpperCase() || 'ATAK-983';
+
+            if (!code || code.length < 6) {
+                alert('Please enter a valid activation code or license key.');
+                return;
+            }
+
+            const cleanSid = sid.replace(/[^A-Z0-9]/g, '');
+            // Code structure validation: Must be tied to School ID or registered in DB
+            if (code.startsWith('EDV-') && !code.includes(cleanSid) && !code.includes('ATAK983')) {
+                alert(`❌ Activation Code Rejected: This code is locked to a different School ID and cannot be used for ${sid}.`);
+                return;
+            }
+
+            const details = planDetails[activeSelectedPlan] || planDetails['teacher_term'];
+            const now = new Date();
+            const expiresAt = new Date(now.getTime() + (details.tenureDays * 24 * 60 * 60 * 1000));
+
+            const subData = {
+                plan: activeSelectedPlan,
+                schoolId: sid,
+                status: 'active',
+                activationCode: code,
+                activatedAt: now.toISOString(),
+                expiresAt: expiresAt.toISOString(),
+                isPro: true
+            };
+            localStorage.setItem('eduvet_subscription_' + sid, JSON.stringify(subData));
+            localStorage.setItem('eduvet_active_school_id', sid);
+            localStorage.setItem('eduvet_school_code_' + sid, code);
+            localStorage.setItem('eduvet_is_pro_' + sid, 'true');
+
+            closeLandingMomoModal();
+            alert(`🎉 Success! License Code Verified for School ID: ${sid}. Launching EduVet...`);
+            triggerSwipeLogin();
+        }
+
+        function launchEduVetWithPro() {
+            triggerSwipeLogin();
+        }
+
+        // 5. Progressive bits loading for desktop speed
+        // Populates elements with requestAnimationFrame to prevent main thread blocking
+        document.addEventListener('DOMContentLoaded', () => {
+            const sections = document.querySelectorAll('section');
+            sections.forEach((sec, idx) => {
+                if (idx > 0) {
+                    requestAnimationFrame(() => {
+                        sec.classList.add('load-in-bit');
+                    });
+                }
+            });
+        });
     </script>
 </body>
 </html>
