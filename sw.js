@@ -85,21 +85,55 @@ self.addEventListener('fetch', (event) => {
         return; // Direct network for transactions and live DB sync
     }
 
-    // A. HTML Navigation Requests: Stale-While-Revalidate (Instant load + silent background refresh)
+    // A. HTML Navigation Requests: Stale-While-Revalidate with Route Normalization & Anti-ERR_FAILED
     if (req.mode === 'navigate' || req.headers.get('accept')?.includes('text/html')) {
         event.respondWith(
-            caches.open(CACHE_NAME).then((cache) => {
-                return cache.match(req).then((cachedResponse) => {
-                    const fetchPromise = fetch(req).then((networkResponse) => {
-                        if (networkResponse && networkResponse.status === 200) {
-                            cache.put(req, networkResponse.clone());
-                        }
-                        return networkResponse;
-                    }).catch(() => cachedResponse);
+            caches.open(CACHE_NAME).then(async (cache) => {
+                // Check cache for this exact request or equivalent route
+                let cached = await cache.match(req);
+                if (!cached) {
+                    if (url.pathname.includes('eduvet')) {
+                        cached = (await cache.match('/eduvet')) || (await cache.match('/eduvet.html'));
+                    } else if (url.pathname === '/' || url.pathname === '/index.html') {
+                        cached = (await cache.match('/')) || (await cache.match('/index.html'));
+                    }
+                }
 
-                    // Return cached response instantly (0ms latency), background revalidates
-                    return cachedResponse || fetchPromise;
-                });
+                // If cached, return immediately for instant 0ms load and revalidate in background
+                if (cached) {
+                    fetch(req).then(async (netRes) => {
+                        if (netRes && netRes.ok && netRes.status === 200 && !netRes.redirected) {
+                            await cache.put(req, netRes.clone());
+                        }
+                    }).catch(() => {});
+                    return cached;
+                }
+
+                // If not in cache, fetch from network
+                try {
+                    const netRes = await fetch(req);
+                    // Crucial: If response is redirected (e.g. 308/301), follow target URL cleanly
+                    // This prevents Chromium navigation error ERR_FAILED
+                    if (netRes.redirected && netRes.url) {
+                        const targetRes = await fetch(netRes.url);
+                        if (targetRes && targetRes.ok && targetRes.status === 200) {
+                            await cache.put(req, targetRes.clone());
+                        }
+                        return targetRes;
+                    }
+                    if (netRes && netRes.ok && netRes.status === 200) {
+                        cache.put(req, netRes.clone());
+                    }
+                    return netRes;
+                } catch (netErr) {
+                    // Offline fallback to any cached app shell
+                    const fallback = (await cache.match('/eduvet')) || 
+                                     (await cache.match('/eduvet.html')) || 
+                                     (await cache.match('/index.html')) || 
+                                     (await cache.match('/'));
+                    if (fallback) return fallback;
+                    throw netErr;
+                }
             })
         );
         return;
