@@ -12,6 +12,8 @@ const PRECACHE_URLS = [
     '/index.html',
     '/eduvet',
     '/eduvet.html',
+    '/privacy-terms.html',
+    '/privacy-terms',
     '/eduvet.css',
     'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap',
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css',
@@ -94,6 +96,8 @@ self.addEventListener('fetch', (event) => {
                 if (!cached) {
                     if (url.pathname.includes('eduvet')) {
                         cached = (await cache.match('/eduvet')) || (await cache.match('/eduvet.html'));
+                    } else if (url.pathname.includes('privacy') || url.pathname.includes('terms')) {
+                        cached = (await cache.match('/privacy-terms.html')) || (await cache.match('/privacy-terms'));
                     } else if (url.pathname === '/' || url.pathname === '/index.html') {
                         cached = (await cache.match('/')) || (await cache.match('/index.html'));
                     }

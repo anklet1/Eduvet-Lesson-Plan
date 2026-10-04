@@ -24,6 +24,22 @@
     {
       "source": "/sw.js",
       "destination": "/sw.js"
+    },
+    {
+      "source": "/privacy-terms",
+      "destination": "/privacy-terms.html"
+    },
+    {
+      "source": "/privacy-terms.html",
+      "destination": "/privacy-terms.html"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/privacy-terms.html"
+    },
+    {
+      "source": "/terms",
+      "destination": "/privacy-terms.html"
     }
   ],
   "headers": [

@@ -261,6 +261,9 @@
         }
         [x-cloak] { display: none !important; }
     </style>
+    <script>setTimeout(function() { if (!window.Alpine) { console.warn('[EduVet] clearing x-cloak failsafe'); document.querySelectorAll('[x-cloak]').forEach(function(el){ el.removeAttribute('x-cloak'); }); } }, 1500);</script>
+    <style>
+    </style>
 </head>
 <body class="bg-slate-50 text-slate-900 font-sans min-h-screen flex flex-col overflow-x-hidden pb-24 lg:pb-0" x-data="schoolApp()">
 
@@ -863,55 +866,55 @@
             <div class="flex-1 overflow-y-auto pr-1 text-xs text-slate-600 space-y-4 leading-relaxed">
                 <!-- PRIVACY TAB -->
                 <div x-show="legalModalTab === 'privacy'" class="space-y-4">
-                    <div class="bg-blue-50/80 border border-blue-200 rounded-xl p-3 text-[11px] text-blue-900">
-                        <strong>Ghana Data Protection Act (Act 843) Compliance:</strong> Edubyte Africa Inc. respects the confidentiality of Ghanaian educators. Your personal details and school records are protected with industry standard encryption.
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-[11px] text-slate-700">
+                        <strong>Regulatory Compliance:</strong> Edubyte Africa Inc. complies with the Ghana Data Protection Act, 2012 (Act 843), Apple App Store Review Guidelines, and Google Play Developer Policies.
                     </div>
 
                     <div>
-                        <h4 class="font-bold text-slate-900 mb-1 text-xs">1. Information We Collect</h4>
-                        <p>We collect teacher names, Staff IDs, registered school names, circuits, contact phone numbers, and curriculum preferences solely to generate, format, and digitally vet your lesson notes. <strong>We collect zero student or child identifying data.</strong></p>
+                        <h4 class="font-bold text-slate-900 mb-1 text-xs">Information We Collect</h4>
+                        <p>We collect educator professional profiles (name, staff ID, registered school, district, and contact details) and user-generated lesson notes strictly to deliver curriculum tools and facilitate administrative school vetting. We do not collect or store personal data of children or students.</p>
                     </div>
 
                     <div>
-                        <h4 class="font-bold text-slate-900 mb-1 text-xs">2. Use of Data &amp; AI Engine</h4>
-                        <p>Curriculum records are processed to produce authentic GES/NaCCA lesson schemes. AI activity enrichment runs autonomously using lesson topic indicators; teacher personal details are never supplied to external AI training models.</p>
+                        <h4 class="font-bold text-slate-900 mb-1 text-xs">How We Use Information</h4>
+                        <p>Information is used solely to generate official GES/NaCCA curriculum materials, authenticate teacher accounts, process subscriptions, and support school-level quality assurance workflows.</p>
                     </div>
 
                     <div>
-                        <h4 class="font-bold text-slate-900 mb-1 text-xs">3. Offline Storage &amp; Cloud Security</h4>
-                        <p>Data is stored locally in your browser (IndexedDB and localStorage) for seamless offline planning in Ghanaian classrooms, and backed up to high-availability Google Cloud Firebase databases (99.99% uptime). We never sell your data.</p>
+                        <h4 class="font-bold text-slate-900 mb-1 text-xs">Data Security &amp; Storage</h4>
+                        <p>All data in transit is encrypted using TLS/HTTPS. Information is stored in secure, encrypted cloud databases (Google Cloud/Firebase) and cached locally on user devices for offline accessibility. We do not sell or monetize user data.</p>
                     </div>
 
                     <div>
-                        <h4 class="font-bold text-slate-900 mb-1 text-xs">4. Teacher Data Ownership</h4>
-                        <p>You retain full ownership of all lesson plans, custom notes, and schemes created on Eduvet. You may export them in Word (.doc), Print/PDF, or JSON formats at any time.</p>
+                        <h4 class="font-bold text-slate-900 mb-1 text-xs">Account &amp; Data Deletion</h4>
+                        <p>Users have the right to request full account and data deletion at any time by emailing <strong>privacy@edubyteafrica.com</strong> with the subject "Account Deletion Request". Requests are processed within 30 days.</p>
                     </div>
                 </div>
 
                 <!-- TERMS TAB -->
                 <div x-show="legalModalTab === 'terms'" class="space-y-4">
-                    <div class="bg-amber-50/80 border border-amber-200 rounded-xl p-3 text-[11px] text-amber-900">
-                        <strong>Educational Standards Agreement:</strong> By using Eduvet, you agree to these terms governing lesson notes creation, headteacher vetting workflows, and Pro subscriptions.
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-[11px] text-slate-700">
+                        <strong>Agreement to Terms:</strong> By using Eduvet School Hub, you agree to these Terms of Service governing platform usage, educational standards, and subscriptions.
                     </div>
 
                     <div>
-                        <h4 class="font-bold text-slate-900 mb-1 text-xs">1. Pedagogical Discretion</h4>
-                        <p>Eduvet schemes and SMART lesson notes adhere to official NaCCA Standards-Based Curriculum benchmarks. Teachers retain final professional discretion to adjust TLMs and activities to suit their individual classroom environment.</p>
+                        <h4 class="font-bold text-slate-900 mb-1 text-xs">Pedagogical Standards &amp; Educator Discretion</h4>
+                        <p>The Application provides curriculum templates adhering to NaCCA Standards-Based Curriculum benchmarks. Educators maintain ultimate professional discretion to adapt and approve lesson content for their specific classroom delivery.</p>
                     </div>
 
                     <div>
-                        <h4 class="font-bold text-slate-900 mb-1 text-xs">2. Pro Subscriptions &amp; Activation</h4>
-                        <p>Pro subscriptions (Teacher Termly GH₵ 49.99, School Termly GH₵ 199.99, School Yearly GH₵ 399.99) grant access to all 15-week terms, Word doc downloads, and school vetting. Activation codes are non-transferable.</p>
+                        <h4 class="font-bold text-slate-900 mb-1 text-xs">Subscriptions &amp; Purchases</h4>
+                        <p>In-app purchases on iOS and Android are billed according to Apple and Google standard billing terms. Direct purchases are verified through certified local payment processors. Subscriptions grant access to termly curriculum tools and downloads.</p>
                     </div>
 
                     <div>
-                        <h4 class="font-bold text-slate-900 mb-1 text-xs">3. Intellectual Property</h4>
-                        <p>The Eduvet software, curriculum database algorithms, and layout are the intellectual property of Edubyte Africa Inc. Teachers own their customized lesson notes and academic materials.</p>
+                        <h4 class="font-bold text-slate-900 mb-1 text-xs">Intellectual Property</h4>
+                        <p>Teachers retain ownership of their custom academic notes. The Application software, interface designs, trademarks, and database algorithms remain the intellectual property of Edubyte Africa Inc.</p>
                     </div>
 
                     <div>
-                        <h4 class="font-bold text-slate-900 mb-1 text-xs">4. Governing Law</h4>
-                        <p>These terms are governed by the laws of the Republic of Ghana. Disputes are subject to the jurisdiction of the competent courts in Accra, Ghana.</p>
+                        <h4 class="font-bold text-slate-900 mb-1 text-xs">Governing Law</h4>
+                        <p>These terms are governed by the laws of the Republic of Ghana. Legal inquiries may be directed to <strong>legal@edubyteafrica.com</strong>.</p>
                     </div>
                 </div>
             </div>

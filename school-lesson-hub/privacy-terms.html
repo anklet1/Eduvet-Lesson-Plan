@@ -1,381 +1,655 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Privacy Policy & Terms of Service — Eduvet School Hub</title>
-    <meta name="description" content="Official Privacy Policy and Terms of Service for Eduvet Lesson Plan & School Hub by Edubyte Africa Inc. Compliant with Ghana Data Protection Act, 2012 (Act 843).">
-    <meta name="theme-color" content="#FFFFFF">
+    <title>Privacy Policy &amp; Terms of Service — Eduvet School Hub</title>
+    <meta name="description" content="Official Privacy Policy and Terms of Service for Eduvet School Hub by Edubyte Africa Inc. Compliant with Ghana Data Protection Act (Act 843), Apple App Store, and Google Play Store policies.">
+    <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://eduvet.edubyteafrica.com/privacy-terms.html">
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M10 25C10 25 25 35 45 28V75C25 82 10 70 10 70V25Z" fill="%232563EB"/><path d="M90 25C90 25 75 35 55 28V75C75 82 90 70 90 70V25Z" fill="%230D9488"/><path d="M28 50L44 65L74 32" stroke="%23F97316" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/></svg>'>
-
     <style>
-        body {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        :root {
+            --bg: #ffffff;
+            --surface: #f8fafc;
+            --surface-subtle: #f1f5f9;
+            --border: #e2e8f0;
+            --border-strong: #cbd5e1;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --text-light: #64748b;
+            --brand: #0284c7;
+            --brand-dark: #0369a1;
+            --accent: #2563eb;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
         }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Top Bar */
+        .site-header {
+            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.95);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            backdrop-filter: blur(8px);
+        }
+
+        .header-container {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand-link {
+            text-decoration: none;
+            color: var(--text-main);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 1.15rem;
+            letter-spacing: -0.02em;
+        }
+
+        .brand-link span.accent {
+            color: #0d9488;
+        }
+
+        .brand-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--brand-dark);
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            padding: 3px 8px;
+            border-radius: var(--radius-sm);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-link {
+            text-decoration: none;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            transition: color 0.15s, background-color 0.15s;
+        }
+
+        .btn-link:hover {
+            color: var(--text-main);
+            background-color: var(--surface-subtle);
+        }
+
+        .btn-portal {
+            text-decoration: none;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: #ffffff;
+            background: var(--brand);
+            padding: 7px 14px;
+            border-radius: var(--radius-sm);
+            transition: background-color 0.15s;
+        }
+
+        .btn-portal:hover {
+            background: var(--brand-dark);
+        }
+
+        /* Main Container */
+        .page-container {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 40px 20px 80px 20px;
+        }
+
+        /* Document Header */
+        .doc-header {
+            margin-bottom: 32px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 24px;
+        }
+
+        .doc-header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .doc-meta {
+            font-size: 0.8125rem;
+            color: var(--text-light);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .doc-meta span {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        /* Navigation Tabs */
+        .tab-bar {
+            display: flex;
+            background: var(--surface-subtle);
+            padding: 4px;
+            border-radius: var(--radius-md);
+            margin-bottom: 32px;
+            border: 1px solid var(--border);
+        }
+
+        .tab-btn {
+            flex: 1;
+            text-align: center;
+            padding: 9px 16px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .tab-btn.active {
+            background: #ffffff;
+            color: var(--text-main);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Content Sections */
+        .content-panel {
+            display: none;
+        }
+
+        .content-panel.active {
+            display: block;
+        }
+
+        .legal-section {
+            margin-bottom: 36px;
+        }
+
+        .legal-section h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 12px;
+            letter-spacing: -0.01em;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .legal-section h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin: 16px 0 8px 0;
+        }
+
+        .legal-section p {
+            font-size: 0.9375rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            line-height: 1.65;
+        }
+
+        .legal-section ul, .legal-section ol {
+            margin: 10px 0 16px 20px;
+            color: var(--text-muted);
+            font-size: 0.9375rem;
+        }
+
+        .legal-section li {
+            margin-bottom: 6px;
+            line-height: 1.6;
+        }
+
+        .legal-section strong {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        /* Informational Callout Box */
+        .callout-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--brand);
+            padding: 16px 18px;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            margin: 18px 0;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .callout-box.highlight {
+            border-left-color: #0d9488;
+            background: #f0fdfa;
+        }
+
+        .callout-box p {
+            margin-bottom: 0;
+            font-size: 0.875rem;
+        }
+
+        /* Contact Details Card */
+        .contact-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: var(--radius-md);
+            margin-top: 20px;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .contact-card table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .contact-card td {
+            padding: 6px 0;
+            vertical-align: top;
+        }
+
+        .contact-card td:first-child {
+            width: 140px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        /* Footer */
+        .site-footer {
+            border-top: 1px solid var(--border);
+            padding: 24px 20px;
+            background: var(--surface);
+            color: var(--text-light);
+            font-size: 0.8125rem;
+            text-align: center;
+        }
+
+        .site-footer p {
+            margin: 4px 0;
+        }
+
+        @media (max-width: 640px) {
+            .header-container {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .doc-header h1 {
+                font-size: 1.5rem;
+            }
+            .page-container {
+                padding-top: 24px;
+            }
+        }
+
         @media print {
-            .no-print { display: none !important; }
-            body { background: #fff !important; color: #000 !important; }
-            .print-border { border: 1px solid #ddd !important; }
+            .site-header, .tab-bar, .site-footer {
+                display: none !important;
+            }
+            .content-panel {
+                display: block !important;
+                margin-bottom: 40px;
+            }
+            body {
+                background: #ffffff;
+                color: #000000;
+            }
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-blue-100 selection:text-blue-900">
+<body>
 
-    <!-- Header Navigation -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
-            <!-- Brand Logo -->
-            <a href="index.html" class="flex items-center gap-3">
-                <div class="w-9 h-9 bg-white rounded-xl flex items-center justify-center p-1.5 border border-slate-200 shadow-xs">
-                    <svg class="w-full h-full" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M10 25C10 25 25 35 45 28V75C25 82 10 70 10 70V25Z" fill="#2563EB"/>
-                        <path d="M90 25C90 25 75 35 55 28V75C75 82 90 70 90 70V25Z" fill="#0D9488"/>
-                        <path d="M28 50L44 65L74 32" stroke="#F97316" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </div>
-                <div>
-                    <span class="font-black text-slate-900 text-lg">edu<span class="text-teal-600">vet</span></span>
-                    <span class="hidden sm:inline-block text-xs text-blue-700 font-bold ml-1.5 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">Legal &amp; Compliance</span>
-                </div>
+    <!-- Header -->
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="brand-link">
+                <span>eduvet<span class="accent">.</span></span>
+                <span class="brand-badge">Legal Documentation</span>
             </a>
-
-            <!-- Action Buttons -->
-            <div class="flex items-center gap-2 sm:gap-3">
-                <button onclick="window.print()" class="no-print bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs px-3.5 py-2 rounded-xl transition flex items-center gap-1.5">
-                    <i class="fa fa-print"></i>
-                    <span class="hidden sm:inline">Print Document</span>
-                </button>
-                <a href="eduvet.html" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition shadow-xs flex items-center gap-1.5">
-                    <i class="fa fa-arrow-left"></i>
-                    <span>Open Teacher Portal</span>
-                </a>
+            <div class="header-actions">
+                <a href="javascript:window.print()" class="btn-link">Print Document</a>
+                <a href="eduvet.html" class="btn-portal">Teacher Portal</a>
             </div>
         </div>
     </header>
 
-    <!-- Main Content Area -->
-    <main class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-8 sm:py-12">
-
-        <!-- Hero Section -->
-        <div class="text-center max-w-2xl mx-auto mb-10">
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-800 border border-blue-200 mb-3">
-                <i class="fa fa-shield-halved text-blue-600"></i> Edubyte Africa Inc. Legal Framework
-            </span>
-            <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">Privacy Policy &amp; Terms of Service</h1>
-            <p class="text-slate-600 text-sm mt-3 leading-relaxed">
-                Clear, transparent, and legally binding commitments ensuring the privacy of Ghanaian educators, full compliance with the <strong>Ghana Data Protection Act, 2012 (Act 843)</strong>, and official <strong>GES &amp; NaCCA</strong> curriculum standards.
-            </p>
-            <div class="text-xs text-slate-400 font-medium mt-3">
-                <span>Effective Date: October 2026</span> • <span>Version 2.4</span> • <span>Accra, Republic of Ghana</span>
+    <!-- Main Content -->
+    <main class="page-container">
+        
+        <div class="doc-header">
+            <h1>Privacy Policy &amp; Terms of Service</h1>
+            <div class="doc-meta">
+                <span><strong>Developer:</strong>&nbsp;Edubyte Africa Inc.</span>
+                <span><strong>App:</strong>&nbsp;Eduvet School Hub</span>
+                <span><strong>Last Updated:</strong>&nbsp;October 2026</span>
+                <span><strong>Jurisdiction:</strong>&nbsp;Republic of Ghana</span>
             </div>
         </div>
 
-        <!-- Sticky Quick Navigation Tabs -->
-        <div class="no-print sticky top-20 z-30 bg-white/90 backdrop-blur-md p-1.5 rounded-2xl border border-slate-200 shadow-sm flex max-w-md mx-auto mb-8">
-            <a href="#privacy" id="nav-privacy" class="flex-1 py-2 px-4 rounded-xl text-xs font-bold text-center transition bg-blue-600 text-white shadow-xs">
-                <i class="fa fa-user-shield mr-1.5"></i> Privacy Policy
-            </a>
-            <a href="#terms" id="nav-terms" class="flex-1 py-2 px-4 rounded-xl text-xs font-bold text-center transition text-slate-600 hover:text-slate-900">
-                <i class="fa fa-scale-balanced mr-1.5"></i> Terms of Service
-            </a>
+        <!-- Tab Navigation -->
+        <div class="tab-bar">
+            <button class="tab-btn active" id="tabBtnPrivacy" onclick="showTab('privacy')">Privacy Policy</button>
+            <button class="tab-btn" id="tabBtnTerms" onclick="showTab('terms')">Terms of Service</button>
         </div>
 
-        <div class="space-y-12">
+        <!-- ========================================== -->
+        <!-- PRIVACY POLICY PANEL -->
+        <!-- ========================================== -->
+        <section id="panelPrivacy" class="content-panel active">
             
-            <!-- SECTION 1: PRIVACY POLICY -->
-            <section id="privacy" class="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-xs space-y-8">
-                <div class="flex items-center gap-3 pb-6 border-b border-slate-100">
-                    <div class="w-12 h-12 rounded-2xl bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center text-xl font-bold shadow-xs">
-                        <i class="fa fa-lock"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-2xl font-black text-slate-900">Privacy Policy</h2>
-                        <p class="text-xs text-slate-500 font-medium">Protecting Ghanaian teachers, schools, and educational data under Act 843</p>
-                    </div>
-                </div>
+            <div class="callout-box">
+                <p>This Privacy Policy outlines how Edubyte Africa Inc. collects, uses, and safeguards information through the <strong>Eduvet School Hub</strong> application across iOS, Android, and web. This policy complies with the <strong>Data Protection Act, 2012 (Act 843)</strong> of Ghana, the <strong>Apple App Store Review Guidelines</strong> (Section 5.1), and the <strong>Google Play Developer Policy</strong> (User Data).</p>
+            </div>
 
-                <!-- Intro Card -->
-                <div class="bg-blue-50/70 border border-blue-200 rounded-2xl p-4 sm:p-5 text-xs text-blue-950 leading-relaxed space-y-2">
-                    <p class="font-bold flex items-center gap-1.5 text-blue-900">
-                        <i class="fa fa-circle-info"></i> Our Core Commitment to Teachers &amp; Schools
-                    </p>
-                    <p>
-                        Eduvet School Hub is developed and operated by <strong>Edubyte Africa Inc.</strong> ("Edubyte Africa", "we", "us", or "our"). We are committed to safeguarding your personal data in accordance with the <strong>Data Protection Act, 2012 (Act 843)</strong> of the Republic of Ghana. This policy governs how we collect, store, process, and protect your information when using the Eduvet Lesson Plan platform.
-                    </p>
-                </div>
+            <div class="legal-section">
+                <h2>About the Application &amp; Developer</h2>
+                <p>Eduvet School Hub ("Application" or "Service") is developed and maintained by <strong>Edubyte Africa Inc.</strong> ("Company", "we", "us", or "our"), an educational technology company registered in Accra, Ghana. The Application is designed exclusively as an institutional curriculum management, lesson planning, and assessment recording tool for teachers, headteachers, and circuit supervisors.</p>
+            </div>
 
-                <!-- Policy Point 1 -->
-                <div class="space-y-3">
-                    <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
-                        <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 text-xs flex items-center justify-center font-mono">1</span>
-                        Information We Collect
-                    </h3>
-                    <p class="text-xs text-slate-600 leading-relaxed">
-                        We only collect information strictly required to generate authentic lesson notes and facilitate school-level academic vetting:
-                    </p>
-                    <ul class="text-xs text-slate-600 space-y-2 list-disc list-inside pl-2">
-                        <li><strong>Educator Profile Data:</strong> Teacher Name, Staff ID, Registered School Name, District, Contact Phone Number, Assigned Class/Level, and Teaching Subjects.</li>
-                        <li><strong>Academic Content:</strong> Schemes of learning, termly projections, 3-phase lesson plans, TLM selections, and pedagogical reflections created or customized by the teacher.</li>
-                        <li><strong>Quality Assurance &amp; Vetting Metadata:</strong> Headteacher endorsement stamps, review comments, circuit supervision remarks, and submission timestamps.</li>
-                        <li><strong>Billing &amp; License Data:</strong> Paystack transaction references, Mobile Money transaction identifiers, and activation code tokens. We do <strong>not</strong> collect or store credit card details or Mobile Money PINs.</li>
-                    </ul>
-                </div>
+            <div class="legal-section">
+                <h2>Information We Collect</h2>
+                <p>We only collect information strictly necessary to provide the services requested:</p>
+                <ul>
+                    <li><strong>Account &amp; Educator Profile Data:</strong> Name, professional email address, telephone number, official Staff/Teacher ID, registered school name, district/circuit, assigned grade levels, and assigned subject curricula.</li>
+                    <li><strong>User-Generated Educational Content:</strong> Termly schemes of learning, daily/weekly lesson notes, teaching learning materials (TLMs), continuous assessment records (SBA), and student performance summaries created by teachers.</li>
+                    <li><strong>Institutional Review &amp; Vetting Metadata:</strong> Headteacher verification stamps, inspection feedback notes, and submission timestamps.</li>
+                    <li><strong>Technical Diagnostics:</strong> Device type, operating system version, browser type, crash analytics, and application performance metrics to diagnose technical faults and maintain system security.</li>
+                    <li><strong>Billing Information:</strong> Transaction references, subscription tier identifiers, and license activation tokens. All payments are processed through certified third-party payment gateways (such as Paystack, Apple In-App Purchases, or Google Play Billing). We do not collect or store credit card numbers, debit card security codes, or Mobile Money PINs.</li>
+                </ul>
+            </div>
 
-                <!-- Child Data Zero-Collection Notice -->
-                <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 text-xs text-emerald-950 flex items-start gap-3">
-                    <div class="text-lg text-emerald-600 mt-0.5"><i class="fa fa-child-reaching"></i></div>
-                    <div>
-                        <span class="font-bold block text-emerald-900">Strict Child &amp; Student Privacy Guarantee:</span>
-                        Eduvet is an educator lesson planning and curriculum platform. We <strong>do NOT</strong> collect, store, or process any personal identification data, names, photos, or biometrics belonging to children or students.
-                    </div>
-                </div>
+            <div class="legal-section">
+                <h2>How We Use Information</h2>
+                <p>We process collected data exclusively for legitimate operational and educational purposes:</p>
+                <ul>
+                    <li>To generate, format, and export curriculum-compliant lesson plans adhering to Ghana Education Service (GES) and National Council for Curriculum and Assessment (NaCCA) standards.</li>
+                    <li>To facilitate internal digital lesson vetting workflows between teachers and headteachers.</li>
+                    <li>To provide resilient offline local caching (via browser IndexedDB/localStorage) for teachers working in low-connectivity areas.</li>
+                    <li>To verify subscription status, authenticate authorized school accounts, and issue activation licenses.</li>
+                    <li>To provide customer support and troubleshoot application issues.</li>
+                    <li>To maintain security, prevent unauthorized access, and protect system integrity.</li>
+                </ul>
+            </div>
 
-                <!-- Policy Point 2 -->
-                <div class="space-y-3">
-                    <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
-                        <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 text-xs flex items-center justify-center font-mono">2</span>
-                        How Your Data Is Used
-                    </h3>
-                    <p class="text-xs text-slate-600 leading-relaxed">
-                        We use the information we gather solely to deliver and optimize educational workflow services:
-                    </p>
-                    <ul class="text-xs text-slate-600 space-y-1.5 list-disc list-inside pl-2">
-                        <li>Generating Standards-Based Curriculum lesson plans adhering to NaCCA and GES frameworks.</li>
-                        <li>Enabling digital Friday lesson submissions from teachers directly to Headteachers.</li>
-                        <li>Providing zero-latency offline browser caching (IndexedDB and localStorage) for seamless operation in low-connectivity areas across Ghana.</li>
-                        <li>Validating Pro Tier subscription access and school-wide licenses.</li>
-                        <li>Providing technical assistance and customer care via WhatsApp and phone support.</li>
-                    </ul>
+            <div class="legal-section">
+                <h2>Children’s Privacy</h2>
+                <div class="callout-box highlight">
+                    <p><strong>Strict Children's Privacy Commitment:</strong> Eduvet School Hub is designed solely for adult educators and school administrative personnel. The Application does not target children under the age of 13 (or under the applicable age of majority), nor do we knowingly collect personally identifiable information from children.</p>
                 </div>
+                <p>All student records entered by educators (such as continuous assessment grades) are handled strictly in an institutional capacity as aggregate or pseudonymized academic records. If an educator or parent becomes aware that personal data of a minor has been submitted inappropriately, please contact us immediately at <a href="mailto:privacy@edubyteafrica.com">privacy@edubyteafrica.com</a> and we will promptly delete the data.</p>
+            </div>
 
-                <!-- Policy Point 3 -->
-                <div class="space-y-3">
-                    <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
-                        <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 text-xs flex items-center justify-center font-mono">3</span>
-                        Automated AI Generation &amp; Data Security
-                    </h3>
-                    <p class="text-xs text-slate-600 leading-relaxed">
-                        Our automated AI pedagogical engine operates autonomously to enrich lesson activities with Ghanaian realia, teaching aids, and inquiry prompts.
-                    </p>
-                    <p class="text-xs text-slate-600 leading-relaxed">
-                        Only curriculum subject names, strand topics, and instructional indicators are used to synthesize pedagogical activities. <strong>No personal teacher information, passwords, or phone numbers are shared with external AI training models.</strong>
-                    </p>
+            <div class="legal-section">
+                <h2>Data Sharing and Third-Party Disclosures</h2>
+                <p>We do not sell, rent, monetize, or disclose user data to advertisers or commercial data brokers. Information is shared strictly with essential service infrastructure providers:</p>
+                <ul>
+                    <li><strong>Cloud Hosting &amp; Databases:</strong> Google Cloud Platform and Firebase (encrypted storage, authentication, and 99.9% uptime hosting).</li>
+                    <li><strong>Payment Gateways:</strong> Paystack (PCI-DSS Level 1 certified), Apple App Store, and Google Play for processing subscription payments.</li>
+                    <li><strong>Legal Obligations:</strong> We may disclose information if required to do so by applicable law, court order, or official governmental request under the laws of the Republic of Ghana.</li>
+                </ul>
+            </div>
+
+            <div class="legal-section">
+                <h2>Data Storage &amp; Security Measures</h2>
+                <p>We implement industry-standard administrative, physical, and technical safeguards:</p>
+                <ul>
+                    <li><strong>Encryption in Transit:</strong> All communications between the app and servers use TLS 1.3 / HTTPS encryption.</li>
+                    <li><strong>Encryption at Rest:</strong> Cloud databases and authentication tokens are encrypted at rest using AES-256 standard.</li>
+                    <li><strong>Access Restrictions:</strong> Access to backend systems is restricted to authorized technical personnel via multi-factor authentication.</li>
+                </ul>
+            </div>
+
+            <div class="legal-section">
+                <h2>Data Retention &amp; Account Deletion</h2>
+                <p>We retain user information for the period necessary to fulfill the educational purposes described in this policy, or until account deletion is requested.</p>
+                <div class="callout-box">
+                    <p><strong>How to Request Account &amp; Data Deletion:</strong> Users have the right to request the permanent deletion of their account and all associated personal data at any time.</p>
+                    <p style="margin-top: 8px;">To initiate deletion, send an email to <strong>privacy@edubyteafrica.com</strong> from your registered email address with the subject <em>"Account Deletion Request"</em>. Requests are processed within 30 business days, following which all personal profile records and lesson notes are permanently erased from our active databases.</p>
                 </div>
+            </div>
 
-                <!-- Policy Point 4 -->
-                <div class="space-y-3">
-                    <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
-                        <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 text-xs flex items-center justify-center font-mono">4</span>
-                        Data Confidentiality &amp; Third Parties
-                    </h3>
-                    <p class="text-xs text-slate-600 leading-relaxed">
-                        Edubyte Africa Inc. does <strong>never sell, rent, monetize, or trade</strong> your personal information or curriculum notes with third-party advertisers or external data brokers.
-                    </p>
-                    <p class="text-xs text-slate-600 leading-relaxed">
-                        Data is shared only with strictly verified infrastructure partners:
-                    </p>
-                    <ul class="text-xs text-slate-600 space-y-1.5 list-disc list-inside pl-2">
-                        <li><strong>Google Cloud &amp; Firebase:</strong> High-availability, encrypted cloud database hosting with 99.99% uptime.</li>
-                        <li><strong>Paystack Payments:</strong> PCI-DSS certified gateway for secure in-app payments.</li>
-                    </ul>
+            <div class="legal-section">
+                <h2>User Rights</h2>
+                <p>In accordance with the Ghana Data Protection Act, 2012 (Act 843) and international data privacy frameworks, users possess the right to:</p>
+                <ul>
+                    <li><strong>Access:</strong> Review what personal profile and school information is held about them.</li>
+                    <li><strong>Rectification:</strong> Update or correct inaccurate educator or school details.</li>
+                    <li><strong>Portability:</strong> Export all generated schemes and lesson notes at any time in Word (.doc), Print/PDF, or JSON formats.</li>
+                    <li><strong>Objection / Erasure:</strong> Object to processing or request complete account erasure as detailed above.</li>
+                </ul>
+            </div>
+
+            <div class="legal-section">
+                <h2>Changes to This Policy</h2>
+                <p>We may update this Privacy Policy from time to time to reflect operational, legal, or regulatory updates. Any changes will be posted on this page with an updated "Last Updated" date. Continued use of the Application after changes are posted constitutes acceptance of the updated policy.</p>
+            </div>
+
+            <div class="legal-section">
+                <h2>Contact Us</h2>
+                <p>If you have questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact our Data Protection Officer:</p>
+                <div class="contact-card">
+                    <table>
+                        <tr>
+                            <td>Company:</td>
+                            <td>Edubyte Africa Inc.</td>
+                        </tr>
+                        <tr>
+                            <td>Application:</td>
+                            <td>Eduvet School Hub</td>
+                        </tr>
+                        <tr>
+                            <td>Email:</td>
+                            <td><a href="mailto:privacy@edubyteafrica.com">privacy@edubyteafrica.com</a> / <a href="mailto:support@edubyteafrica.com">support@edubyteafrica.com</a></td>
+                        </tr>
+                        <tr>
+                            <td>Telephone:</td>
+                            <td>+233 543 521 863</td>
+                        </tr>
+                        <tr>
+                            <td>Location:</td>
+                            <td>Accra, Greater Accra Region, Republic of Ghana</td>
+                        </tr>
+                    </table>
                 </div>
+            </div>
 
-                <!-- Policy Point 5 -->
-                <div class="space-y-3">
-                    <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
-                        <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 text-xs flex items-center justify-center font-mono">5</span>
-                        Your Statutory Rights (Act 843)
-                    </h3>
-                    <p class="text-xs text-slate-600 leading-relaxed">
-                        Under the Ghana Data Protection Act, 2012, you possess the right to:
-                    </p>
-                    <ul class="text-xs text-slate-600 space-y-1.5 list-disc list-inside pl-2">
-                        <li><strong>Access &amp; Export:</strong> Download and export all your lesson notes, schemes, and vetting logs in Word (.doc), Print/PDF, or JSON formats at any time.</li>
-                        <li><strong>Rectification:</strong> Modify or correct any personal data, school name, or curriculum subject choices.</li>
-                        <li><strong>Erasure:</strong> Request the deletion of your account and archived vetting notes by contacting our support desk.</li>
-                    </ul>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- TERMS OF SERVICE PANEL -->
+        <!-- ========================================== -->
+        <section id="panelTerms" class="content-panel">
+            
+            <div class="callout-box">
+                <p>These Terms of Service ("Terms") constitute a legally binding agreement between you and <strong>Edubyte Africa Inc.</strong> governing your access to and use of the <strong>Eduvet School Hub</strong> application on mobile devices and the web.</p>
+            </div>
+
+            <div class="legal-section">
+                <h2>Acceptance of Terms</h2>
+                <p>By downloading, installing, accessing, or using Eduvet School Hub, you confirm that you have read, understood, and agreed to be bound by these Terms of Service. If you do not agree to these Terms, you must not access or use the Application.</p>
+            </div>
+
+            <div class="legal-section">
+                <h2>Eligibility &amp; User Accounts</h2>
+                <p>To use Eduvet School Hub, you must be at least 18 years of age and authorized to act as an educator, school administrator, or institutional representative. You agree to provide accurate, current, and complete registration information and to maintain the security of your account credentials.</p>
+            </div>
+
+            <div class="legal-section">
+                <h2>License &amp; Permitted Use</h2>
+                <p>Subject to compliance with these Terms, Edubyte Africa Inc. grants you a limited, non-exclusive, non-transferable, revocable license to use the Application for personal educational lesson preparation and school administration. This license is subject to the standard Usage Rules set forth in the Apple App Store Terms of Service and Google Play Terms of Service.</p>
+            </div>
+
+            <div class="legal-section">
+                <h2>Pedagogical Standards &amp; Educator Discretion</h2>
+                <p>Eduvet School Hub incorporates curriculum frameworks aligned with the Ghana Education Service (GES) and National Council for Curriculum and Assessment (NaCCA) Standards-Based Curriculum. However:</p>
+                <ul>
+                    <li>The Application is provided as a supportive educational aid.</li>
+                    <li>Educators retain ultimate professional discretion and responsibility to review, adapt, and tailor learning activities, assessments, and teaching materials to suit their specific learners before classroom delivery.</li>
+                </ul>
+            </div>
+
+            <div class="legal-section">
+                <h2>Intellectual Property Rights</h2>
+                <ul>
+                    <li><strong>Your Content:</strong> You retain ownership of all original lesson notes, schemes, and custom notes created by you in the platform.</li>
+                    <li><strong>Our Intellectual Property:</strong> All software code, user interface designs, logos, database schemas, algorithms, and documentation are the exclusive intellectual property of Edubyte Africa Inc. and are protected by applicable intellectual property laws.</li>
+                </ul>
+            </div>
+
+            <div class="legal-section">
+                <h2>Subscriptions, Payments &amp; In-App Purchases</h2>
+                <p>Eduvet School Hub offers core complimentary features as well as premium Pro subscription tiers (including Teacher Termly, School Termly, and School Annual plans):</p>
+                <ul>
+                    <li><strong>In-App Purchases (iOS / Android):</strong> Payments processed via Apple In-App Purchase or Google Play Billing are subject to Apple’s and Google’s respective payment and subscription terms. Subscriptions will automatically renew unless cancelled at least 24 hours prior to the end of the current billing cycle via your device's account settings.</li>
+                    <li><strong>Direct Gateway Payments:</strong> Payments processed via Paystack or official direct Mobile Money transfers are validated upon receipt of confirmation. Activation codes are non-transferable.</li>
+                    <li><strong>Refunds:</strong> Refund requests for in-app purchases are managed in accordance with the refund policies of Apple and Google. For direct transactions, refund inquiries may be submitted to <a href="mailto:support@edubyteafrica.com">support@edubyteafrica.com</a>.</li>
+                </ul>
+            </div>
+
+            <div class="legal-section">
+                <h2>Prohibited Uses</h2>
+                <p>You agree not to:</p>
+                <ul>
+                    <li>Decompile, reverse-engineer, or disassemble any part of the Application.</li>
+                    <li>Circumvent, disable, or tamper with security or subscription validation mechanisms.</li>
+                    <li>Redistribute, sublicense, or share single-user activation licenses beyond authorized users.</li>
+                    <li>Use the Service to transmit malicious code, spam, or unlawful materials.</li>
+                </ul>
+            </div>
+
+            <div class="legal-section">
+                <h2>Service Availability &amp; Disclaimer of Warranties</h2>
+                <p>The Application is provided on an "AS IS" and "AS AVAILABLE" basis. While we maintain a 99.9% target uptime and provide resilient offline caching, Edubyte Africa Inc. makes no warranties, express or implied, that the Service will be uninterrupted or error-free. We are not responsible for data loss arising from cleared device storage without exported backups.</p>
+            </div>
+
+            <div class="legal-section">
+                <h2>Limitation of Liability</h2>
+                <p>To the maximum extent permitted by applicable law, Edubyte Africa Inc., its directors, officers, and employees shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of or inability to use the Application.</p>
+            </div>
+
+            <div class="legal-section">
+                <h2>Governing Law &amp; Dispute Resolution</h2>
+                <p>These Terms shall be governed by and construed in accordance with the laws of the Republic of Ghana. Any legal dispute or claim arising from these Terms shall be subject to the exclusive jurisdiction of the competent courts in Accra, Ghana.</p>
+            </div>
+
+            <div class="legal-section">
+                <h2>Contact Information</h2>
+                <div class="contact-card">
+                    <table>
+                        <tr>
+                            <td>Company:</td>
+                            <td>Edubyte Africa Inc.</td>
+                        </tr>
+                        <tr>
+                            <td>Inquiries:</td>
+                            <td><a href="mailto:legal@edubyteafrica.com">legal@edubyteafrica.com</a> / <a href="mailto:support@edubyteafrica.com">support@edubyteafrica.com</a></td>
+                        </tr>
+                        <tr>
+                            <td>Telephone:</td>
+                            <td>+233 543 521 863</td>
+                        </tr>
+                        <tr>
+                            <td>Jurisdiction:</td>
+                            <td>Accra, Ghana</td>
+                        </tr>
+                    </table>
                 </div>
-            </section>
+            </div>
 
-            <!-- SECTION 2: TERMS OF SERVICE -->
-            <section id="terms" class="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-xs space-y-8">
-                <div class="flex items-center gap-3 pb-6 border-b border-slate-100">
-                    <div class="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200 text-blue-700 flex items-center justify-center text-xl font-bold shadow-xs">
-                        <i class="fa fa-scale-balanced"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-2xl font-black text-slate-900">Terms of Service</h2>
-                        <p class="text-xs text-slate-500 font-medium">Agreement governing platform use, subscriptions, and curriculum delivery</p>
-                    </div>
-                </div>
+        </section>
 
-                <!-- Terms Point 1 -->
-                <div class="space-y-3">
-                    <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
-                        <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 text-xs flex items-center justify-center font-mono">1</span>
-                        Acceptance of Terms
-                    </h3>
-                    <p class="text-xs text-slate-600 leading-relaxed">
-                        By accessing, browsing, or utilizing the Eduvet School Hub platform (the "Service"), you agree to abide by and be bound by these Terms of Service and all applicable laws and regulations of the Republic of Ghana. If you do not agree to these terms, you must discontinue use of the platform.
-                    </p>
-                </div>
-
-                <!-- Terms Point 2 -->
-                <div class="space-y-3">
-                    <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
-                        <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 text-xs flex items-center justify-center font-mono">2</span>
-                        Pedagogical Alignment &amp; Teacher Responsibility
-                    </h3>
-                    <p class="text-xs text-slate-600 leading-relaxed">
-                        Eduvet generates lesson schemes and 3-Phase SMART lesson notes aligned with the official <strong>National Council for Curriculum and Assessment (NaCCA)</strong> Standards-Based Curriculum and <strong>Ghana Education Service (GES)</strong> guidelines.
-                    </p>
-                    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-xs text-amber-950">
-                        <span class="font-bold text-amber-900 block mb-1"><i class="fa fa-triangle-exclamation"></i> Professional Discretion:</span>
-                        While our system utilizes verified curriculum benchmarks, teachers maintain ultimate professional and pedagogical discretion. Teachers are encouraged to review, adapt, and tailor learning activities and TLMs to meet the specific learning abilities of their students and available classroom realia.
-                    </div>
-                </div>
-
-                <!-- Terms Point 3 -->
-                <div class="space-y-3">
-                    <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
-                        <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 text-xs flex items-center justify-center font-mono">3</span>
-                        Pro Plans, Subscriptions &amp; Payments
-                    </h3>
-                    <p class="text-xs text-slate-600 leading-relaxed">
-                        Eduvet provides free basic features and premium Pro subscription tiers:
-                    </p>
-                    <ul class="text-xs text-slate-600 space-y-2 list-disc list-inside pl-2">
-                        <li><strong>Individual Teacher Termly:</strong> GH₵ 49.99 per academic term.</li>
-                        <li><strong>Full School Termly (All Teachers + Headteacher):</strong> GH₵ 199.99 per term.</li>
-                        <li><strong>Full School Annual (Complete Academic Year):</strong> GH₵ 399.99 per year.</li>
-                    </ul>
-                    <p class="text-xs text-slate-600 leading-relaxed">
-                        Payment may be completed online via <strong>Paystack</strong> or through direct Mobile Money transfer to <strong>0543521863 (Felix Fleku / Edubyte Africa)</strong>. Activation codes issued are single-use per school or teacher device and must not be published or shared publicly.
-                    </p>
-                </div>
-
-                <!-- Terms Point 4 -->
-                <div class="space-y-3">
-                    <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
-                        <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 text-xs flex items-center justify-center font-mono">4</span>
-                        Intellectual Property Rights
-                    </h3>
-                    <p class="text-xs text-slate-600 leading-relaxed">
-                        All platform software, interface layouts, proprietary curriculum generation algorithms, trademarks, and logos are the intellectual property of <strong>Edubyte Africa Inc.</strong>
-                    </p>
-                    <p class="text-xs text-slate-600 leading-relaxed">
-                        The individual lesson notes, custom schemes, and pedagogical documents generated by teachers remain the personal academic property of the respective teachers and their institutions.
-                    </p>
-                </div>
-
-                <!-- Terms Point 5 -->
-                <div class="space-y-3">
-                    <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
-                        <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 text-xs flex items-center justify-center font-mono">5</span>
-                        Uptime, Offline Availability &amp; Liability
-                    </h3>
-                    <p class="text-xs text-slate-600 leading-relaxed">
-                        Eduvet targets 99.99% cloud uptime. In addition, the platform includes progressive offline caching to allow teachers to create and edit lesson notes even during internet disruptions. Edubyte Africa Inc. is not liable for data loss caused by unauthorized device tampering, cleared browser caches without export, or natural network outages.
-                    </p>
-                </div>
-
-                <!-- Terms Point 6 -->
-                <div class="space-y-3">
-                    <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
-                        <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 text-xs flex items-center justify-center font-mono">6</span>
-                        Governing Law &amp; Jurisdiction
-                    </h3>
-                    <p class="text-xs text-slate-600 leading-relaxed">
-                        These Terms shall be governed by and construed in accordance with the laws of the Republic of Ghana. Any disputes arising from or relating to these Terms shall be subject to the exclusive jurisdiction of the competent courts in Accra, Ghana.
-                    </p>
-                </div>
-            </section>
-
-            <!-- CONTACT & SUPPORT DESK -->
-            <section class="bg-gradient-to-br from-slate-900 to-blue-950 text-white rounded-3xl p-6 sm:p-10 border border-slate-800 shadow-xl space-y-6">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                    <div class="space-y-2">
-                        <span class="text-xs font-bold uppercase tracking-wider text-teal-400">Legal Contact &amp; Support Desk</span>
-                        <h3 class="text-xl sm:text-2xl font-black">Questions or Data Inquiries?</h3>
-                        <p class="text-xs text-slate-300 max-w-lg leading-relaxed">
-                            For privacy queries, data access requests, or school institutional onboarding under our legal terms, reach our Accra operations desk directly:
-                        </p>
-                    </div>
-                    <div class="flex flex-col sm:flex-row gap-3">
-                        <a href="https://wa.me/233543521863?text=Hello%20Eduvet%20Legal%20Desk,%20I%20have%20an%20inquiry%20regarding%20the%20Privacy%20Policy%20or%20Terms." target="_blank" rel="noopener noreferrer" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-3 rounded-2xl transition flex items-center justify-center gap-2 shadow-md">
-                            <i class="fa-brands fa-whatsapp text-sm"></i>
-                            <span>WhatsApp Legal Desk</span>
-                        </a>
-                        <a href="tel:+233543521863" class="bg-white/10 hover:bg-white/20 text-white font-bold text-xs px-5 py-3 rounded-2xl transition flex items-center justify-center gap-2 border border-white/20">
-                            <i class="fa fa-phone text-sm"></i>
-                            <span>+233 543 521 863</span>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="pt-6 border-t border-slate-800/80 text-[11px] text-slate-400 flex flex-col sm:flex-row justify-between gap-2">
-                    <div>
-                        <strong>Edubyte Africa Inc.</strong> • Registered in Accra, Ghana
-                    </div>
-                    <div>
-                        Official Support: <strong>support@edubyteafrica.com</strong>
-                    </div>
-                </div>
-            </section>
-
-        </div>
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white border-t border-slate-200 py-6 mt-12 no-print">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 font-medium">
-            <div class="flex items-center gap-2">
-                <span class="font-black text-slate-800">edu<span class="text-teal-600">vet</span></span>
-                <span>• © 2026 Edubyte Africa Inc. All rights reserved.</span>
-            </div>
-            <div class="flex items-center gap-4">
-                <a href="eduvet.html" class="hover:text-blue-600 transition font-bold">Teacher Portal</a>
-                <span>•</span>
-                <a href="index.html" class="hover:text-blue-600 transition font-bold">Home</a>
-                <span>•</span>
-                <a href="#privacy" class="hover:text-blue-600 transition">Privacy</a>
-                <span>•</span>
-                <a href="#terms" class="hover:text-blue-600 transition">Terms</a>
-            </div>
-        </div>
+    <footer class="site-footer">
+        <p>&copy; 2026 Edubyte Africa Inc. All rights reserved.</p>
+        <p>Eduvet School Hub &bull; Professional Educational Management System</p>
     </footer>
 
-    <!-- Tab Switching Script -->
     <script>
-        const navPrivacy = document.getElementById('nav-privacy');
-        const navTerms = document.getElementById('nav-terms');
+        function showTab(tabName) {
+            const panelPrivacy = document.getElementById('panelPrivacy');
+            const panelTerms = document.getElementById('panelTerms');
+            const btnPrivacy = document.getElementById('tabBtnPrivacy');
+            const btnTerms = document.getElementById('tabBtnTerms');
 
-        function updateActiveTab() {
-            const hash = window.location.hash;
-            if (hash === '#terms') {
-                navTerms.className = "flex-1 py-2 px-4 rounded-xl text-xs font-bold text-center transition bg-blue-600 text-white shadow-xs";
-                navPrivacy.className = "flex-1 py-2 px-4 rounded-xl text-xs font-bold text-center transition text-slate-600 hover:text-slate-900";
+            if (tabName === 'terms') {
+                panelPrivacy.classList.remove('active');
+                panelTerms.classList.add('active');
+                btnPrivacy.classList.remove('active');
+                btnTerms.classList.add('active');
+                history.replaceState(null, null, '#terms');
             } else {
-                navPrivacy.className = "flex-1 py-2 px-4 rounded-xl text-xs font-bold text-center transition bg-blue-600 text-white shadow-xs";
-                navTerms.className = "flex-1 py-2 px-4 rounded-xl text-xs font-bold text-center transition text-slate-600 hover:text-slate-900";
+                panelTerms.classList.remove('active');
+                panelPrivacy.classList.add('active');
+                btnTerms.classList.remove('active');
+                btnPrivacy.classList.add('active');
+                history.replaceState(null, null, '#privacy');
             }
         }
 
-        window.addEventListener('hashchange', updateActiveTab);
-        window.addEventListener('load', updateActiveTab);
+        // Initialize from URL hash
+        window.addEventListener('load', function() {
+            if (window.location.hash === '#terms') {
+                showTab('terms');
+            } else {
+                showTab('privacy');
+            }
+        });
+
+        window.addEventListener('hashchange', function() {
+            if (window.location.hash === '#terms') {
+                showTab('terms');
+            } else {
+                showTab('privacy');
+            }
+        });
     </script>
 </body>
 </html>
