@@ -205,12 +205,16 @@
                 <a href="#schools" class="text-black hover:text-[#0284C7] px-3.5 py-2 rounded-lg text-sm font-bold transition">Schools</a>
             </nav>
 
-            <!-- Actions: Teacher Login & WhatsApp Setup -->
-            <div class="hidden sm:flex items-center gap-3">
-                <a href="eduvet.html" onclick="triggerSwipeLogin(event);" class="text-black hover:text-[#0284C7] font-bold text-sm px-4 py-2 rounded-xl transition cursor-pointer" title="Enter EduVet Teacher Portal">
+            <!-- Actions: Contact Us, Teacher Login & WhatsApp Setup -->
+            <div class="hidden sm:flex items-center gap-2.5">
+                <a href="mailto:info@edubyteafrica.com?subject=EduVet%20Inquiry" class="text-black hover:text-[#0284C7] font-bold text-xs px-3 py-2 rounded-xl border border-slate-200 hover:border-[#0284C7] transition flex items-center gap-1.5 cursor-pointer" title="Contact EduVet Support via Email">
+                    <i class="fa fa-envelope text-[#0284C7]"></i>
+                    <span>Contact Us</span>
+                </a>
+                <a href="eduvet.html" onclick="triggerSwipeLogin(event);" class="text-black hover:text-[#0284C7] font-bold text-sm px-3.5 py-2 rounded-xl transition cursor-pointer" title="Enter EduVet Teacher Portal">
                     Teacher Login
                 </a>
-                <a href="https://wa.me/233543521863?text=Hello%20EduVet%20Desk,%20I%20would%20like%20to%20request%20a%20school%20setup%20for%20my%20school." target="_blank" rel="noopener noreferrer" class="bg-[#0284C7] hover:bg-[#0369A1] text-white font-black text-sm px-5 py-2.5 rounded-xl shadow-sm transition flex items-center gap-2 cursor-pointer">
+                <a href="https://wa.me/233543521863?text=Hello%20EduVet%20Desk,%20I%20would%20like%20to%20request%20a%20school%20setup%20for%20my%20school." target="_blank" rel="noopener noreferrer" class="bg-[#0284C7] hover:bg-[#0369A1] text-white font-black text-sm px-4.5 py-2.5 rounded-xl shadow-sm transition flex items-center gap-2 cursor-pointer">
                     <i class="fa-brands fa-whatsapp text-base"></i>
                     <span>Request School Setup</span>
                 </a>
@@ -218,6 +222,9 @@
 
             <!-- Mobile Menu Toggle Button -->
             <div class="flex items-center gap-2 lg:hidden">
+                <a href="mailto:info@edubyteafrica.com?subject=EduVet%20Inquiry" class="p-2 rounded-lg text-[#0284C7] hover:bg-[#F0F9FF] border border-slate-200" title="Email Contact">
+                    <i class="fa fa-envelope text-base"></i>
+                </a>
                 <a href="https://wa.me/233543521863?text=Hello%20EduVet%20Desk,%20I%20would%20like%20to%20request%20a%20school%20setup%20for%20my%20school." target="_blank" rel="noopener noreferrer" class="bg-[#0284C7] text-white text-xs font-black px-3 py-2 rounded-lg flex items-center gap-1 sm:hidden">
                     <i class="fa-brands fa-whatsapp"></i> Setup
                 </a>
@@ -236,6 +243,10 @@
             <a href="#schools" onclick="closeMobileDrawer()" class="mobile-nav-link block text-black hover:text-[#0284C7] px-3 py-2.5 rounded-lg text-base font-bold transition">Schools</a>
             
             <div class="pt-3 border-t border-slate-200 flex flex-col gap-2.5">
+                <a href="mailto:info@edubyteafrica.com?subject=EduVet%20Mobile%20Inquiry" class="w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 font-bold py-2.5 rounded-xl text-center text-sm transition flex items-center justify-center gap-2">
+                    <i class="fa fa-envelope text-[#0284C7]"></i>
+                    <span>Contact Support (info@edubyteafrica.com)</span>
+                </a>
                 <a href="https://wa.me/233543521863?text=Hello%20EduVet%20Desk,%20I%20would%20like%20to%20request%20a%20school%20setup%20for%20my%20school." target="_blank" rel="noopener noreferrer" class="w-full bg-[#0284C7] hover:bg-[#0369A1] text-white font-black py-3 rounded-xl text-center text-sm shadow-sm transition flex items-center justify-center gap-2">
                     <i class="fa-brands fa-whatsapp text-lg"></i>
                     <span>Request School Setup</span>
@@ -495,10 +506,14 @@
                     <p class="text-black font-medium text-sm leading-relaxed">
                         EduVet is a modern, high-availability cloud-based school hub designed for Ghanaian Basic Schools. Teachers, headteachers, and Circuit Supervisors (SISOs) collaborate in real-time on a reliable cloud platform that ensures seamless lesson note generation, weekly vetting submissions, and instant administrative sync 24/7 with zero downtime.
                     </p>
-                    <div class="pt-2">
+                    <div class="pt-2 flex flex-wrap items-center gap-3">
                         <a href="https://wa.me/233543521863?text=Hello%20EduVet%20Desk,%20I%20would%20like%20to%20request%20a%20school%20setup%20for%20my%20school." target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-[#0284C7] hover:bg-[#0369A1] text-white font-black px-6 py-3.5 rounded-xl text-sm transition shadow-sm">
                             <i class="fa-brands fa-whatsapp text-lg"></i>
-                            <span>Request Setup for Your School</span>
+                            <span>Request Setup on WhatsApp</span>
+                        </a>
+                        <a href="mailto:info@edubyteafrica.com?subject=EduVet%20School%20Setup%20Inquiry" class="inline-flex items-center gap-2 bg-white hover:bg-slate-50 border-2 border-slate-200 text-black font-black px-5 py-3.5 rounded-xl text-sm transition shadow-2xs">
+                            <i class="fa fa-envelope text-[#0284C7]"></i>
+                            <span>Contact via Email</span>
                         </a>
                     </div>
                 </div>
@@ -803,12 +818,11 @@
                 </div>
             </div>
 
-            <!-- Minimal Links (Menu hidden on mobile, Terms, Privacy & Email preserved) -->
+            <!-- Minimal Links (Menu hidden on mobile, Terms & Privacy preserved) -->
             <div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-black text-black">
                 <a href="#features" class="hidden md:inline hover:text-[#0284C7] transition">Features</a>
                 <a href="#pricing" class="hidden md:inline hover:text-[#0284C7] transition">Pricing</a>
                 <a href="privacy-terms.html" class="hover:text-[#0284C7] transition">Privacy &amp; Terms</a>
-                <a href="mailto:info@edubyteafrica.com" class="hover:text-[#0284C7] transition">info@edubyteafrica.com</a>
                 <a href="https://wa.me/233543521863?text=Hello%20EduVet%20Desk,%20I%20would%20like%20to%20request%20a%20school%20setup%20for%20my%20school." target="_blank" rel="noopener noreferrer" class="hidden md:inline-flex text-[#0284C7] hover:underline items-center gap-1 font-black">
                     <i class="fa-brands fa-whatsapp text-emerald-600"></i> Setup Desk: +233 54 352 1863
                 </a>
@@ -952,10 +966,14 @@
                 </div>
             </div>
 
-            <div class="space-y-2.5">
+            <div class="space-y-2">
                 <a id="landingMomoWhatsAppBtn" href="https://wa.me/233543521863?text=Hello%20Felix,%20I%20have%20made%20a%20Direct%20MoMo%20payment%20to%200543521863%20for%20EduVet%20Plan:%20Single%20Teacher%20Term.%20My%20School%20ID%20is:%20EPJHS-112." target="_blank" rel="noopener noreferrer" class="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold py-3 rounded-xl text-xs sm:text-sm transition shadow-sm flex items-center justify-center gap-2 text-center">
                     <i class="fa-brands fa-whatsapp text-lg"></i>
                     <span>WhatsApp Felix Fleku for Instant Activation Code</span>
+                </a>
+                <a href="mailto:info@edubyteafrica.com?subject=EduVet%20Payment%20Confirmation%20%26%20Activation%20Code%20Request" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-2 text-center">
+                    <i class="fa fa-envelope text-blue-600"></i>
+                    <span>Or Email Payment Proof to info@edubyteafrica.com</span>
                 </a>
             </div>
 

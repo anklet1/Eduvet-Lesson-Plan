@@ -366,15 +366,20 @@
                     <span>Need a new school? <button type="button" @click="gatewayTab = 'register'; loginErrorMsg = '';" class="text-blue-900 hover:underline font-bold">Register</button></span>
                     <span class="text-xs text-slate-400 font-medium">Authorized GES Basic Schools Only</span>
                 </div>
-                <!-- Back to Landing Page & WhatsApp Desk (Bottom of Form) -->
                 <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
                     <a href="index.html" class="inline-flex items-center gap-1.5 font-bold text-[#0284C7] hover:text-[#0369A1] hover:underline">
                         <i class="fa fa-arrow-left"></i>
                         <span>Back to Landing Page</span>
                     </a>
-                    <a href="https://wa.me/233543521863?text=Hello%20EduVet%20Desk,%20I%20would%20like%20to%20request%20a%20school%20setup%20for%20my%20school." target="_blank" rel="noopener noreferrer" class="font-semibold text-slate-500 hover:text-emerald-700 flex items-center gap-1">
-                        <i class="fa-brands fa-whatsapp text-emerald-600"></i> Setup Desk
-                    </a>
+                    <div class="flex items-center gap-3">
+                        <a href="mailto:info@edubyteafrica.com?subject=EduVet%20Teacher%20Support%20Request" class="font-semibold text-slate-500 hover:text-blue-700 flex items-center gap-1" title="Email EduVet Support">
+                            <i class="fa fa-envelope text-blue-600"></i> Contact Support
+                        </a>
+                        <span class="text-slate-300">|</span>
+                        <a href="https://wa.me/233543521863?text=Hello%20EduVet%20Desk,%20I%20would%20like%20to%20request%20a%20school%20setup%20for%20my%20school." target="_blank" rel="noopener noreferrer" class="font-semibold text-slate-500 hover:text-emerald-700 flex items-center gap-1">
+                            <i class="fa-brands fa-whatsapp text-emerald-600"></i> Setup Desk
+                        </a>
+                    </div>
                 </div>
             </form>
 
@@ -916,7 +921,7 @@
 
                     <div>
                         <h4 class="font-bold text-slate-900 mb-1 text-xs">Account &amp; Data Deletion</h4>
-                        <p>Users have the right to request full account and data deletion at any time by emailing <strong>privacy@edubyteafrica.com</strong> with the subject "Account Deletion Request". Requests are processed within 30 days.</p>
+                        <p>Users have the right to request full account and data deletion at any time by emailing <a href="mailto:info@edubyteafrica.com?subject=Account%20Deletion%20Request" class="font-bold text-blue-700 hover:underline">info@edubyteafrica.com</a> with the subject "Account Deletion Request". Requests are processed within 30 days.</p>
                     </div>
                 </div>
 
@@ -942,18 +947,25 @@
                     </div>
 
                     <div>
-                        <h4 class="font-bold text-slate-900 mb-1 text-xs">Governing Law</h4>
-                        <p>These terms are governed by the laws of the Republic of Ghana. Legal inquiries may be directed to <strong>legal@edubyteafrica.com</strong>.</p>
+                        <h4 class="font-bold text-slate-900 mb-1 text-xs">Governing Law &amp; Inquiries</h4>
+                        <p>These terms are governed by the laws of the Republic of Ghana. Official inquiries, support questions, or refund requests may be directed to <a href="mailto:info@edubyteafrica.com" class="font-bold text-blue-700 hover:underline">info@edubyteafrica.com</a>.</p>
                     </div>
                 </div>
             </div>
 
             <!-- Footer Action Buttons -->
-            <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-3 shrink-0">
-                <a href="privacy-terms.html" target="_blank" class="text-xs font-bold text-blue-700 hover:underline flex items-center gap-1">
-                    <span>View Complete Legal Document</span>
-                    <i class="fa fa-external-link text-[10px]"></i>
-                </a>
+            <div class="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 shrink-0">
+                <div class="flex items-center gap-3">
+                    <a href="privacy-terms.html" target="_blank" class="text-xs font-bold text-blue-700 hover:underline flex items-center gap-1">
+                        <span>View Complete Legal Document</span>
+                        <i class="fa fa-external-link text-[10px]"></i>
+                    </a>
+                    <span class="text-slate-300">|</span>
+                    <a href="mailto:info@edubyteafrica.com?subject=EduVet%20Legal%20%26%20Privacy%20Inquiry" class="text-xs font-bold text-slate-700 hover:text-blue-700 hover:underline flex items-center gap-1">
+                        <i class="fa fa-envelope text-blue-600"></i>
+                        <span>Contact Support</span>
+                    </a>
+                </div>
                 <button type="button" @click="showLegalModal = false" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-4 py-2 rounded-xl text-xs transition shadow-xs cursor-pointer">
                     I Understand &amp; Close
                 </button>
@@ -1144,9 +1156,15 @@
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-slate-500">Developer Support:</span>
-                                <a href="https://wa.me/233543521863" target="_blank" class="font-mono font-bold text-emerald-700 hover:underline flex items-center gap-1">
-                                    <i class="fa-brands fa-whatsapp"></i> +233 54 352 1863
-                                </a>
+                                <div class="flex items-center gap-2">
+                                    <a href="mailto:info@edubyteafrica.com" class="font-mono font-bold text-blue-700 hover:underline flex items-center gap-1" title="Email Developer Support">
+                                        <i class="fa fa-envelope"></i> Email
+                                    </a>
+                                    <span class="text-slate-300">•</span>
+                                    <a href="https://wa.me/233543521863" target="_blank" class="font-mono font-bold text-emerald-700 hover:underline flex items-center gap-1">
+                                        <i class="fa-brands fa-whatsapp"></i> WhatsApp
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -3734,7 +3752,7 @@
                     &copy; 2026 EduVet &bull; Edubyte Africa Inc. All rights reserved.
                 </div>
                 <div class="text-[11px] text-slate-400">
-                    Email: <a href="mailto:info@edubyteafrica.com" class="hover:text-blue-600 underline">info@edubyteafrica.com</a> &bull; +233 543 521 863
+                    NaCCA &amp; GES Standards-Based Curriculum Hub &bull; +233 543 521 863
                 </div>
             </div>
         </div>
