@@ -10,6 +10,18 @@
       "destination": "/eduvet.html"
     },
     {
+      "source": "/digitalmaker",
+      "destination": "/digitalmaker.html"
+    },
+    {
+      "source": "/digitalmaker.html",
+      "destination": "/digitalmaker.html"
+    },
+    {
+      "source": "/tools",
+      "destination": "/digitalmaker.html"
+    },
+    {
       "source": "/login",
       "destination": "/eduvet.html"
     },
